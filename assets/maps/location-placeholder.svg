@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#EEF3F1"/>
+  <path d="M640 0Q540 160 670 320T660 600H800V0Z" fill="#BDE8EB"/>
+  <g fill="#DDE7E1" stroke="#FFF" stroke-width="8">
+    <rect x="30" y="25" width="150" height="135" rx="15"/><rect x="210" y="25" width="165" height="135" rx="15"/>
+    <rect x="415" y="25" width="150" height="135" rx="15"/><rect x="30" y="200" width="150" height="155" rx="15"/>
+    <rect x="210" y="200" width="165" height="155" rx="15"/><rect x="415" y="200" width="160" height="155" rx="15"/>
+    <rect x="30" y="400" width="150" height="165" rx="15"/><rect x="415" y="400" width="160" height="165" rx="15"/>
+  </g>
+  <rect x="210" y="400" width="165" height="165" rx="20" fill="#C6DEC7"/>
+  <g fill="none" stroke="#FFF" stroke-width="22"><path d="M0 180H620M0 377H630M195 0V600M395 0V600M595 0V600"/></g>
+  <path d="M0 377H630" fill="none" stroke="#F6DBA4" stroke-width="10"/>
+  <g fill="#70867E" font-family="sans-serif" font-size="16"><text x="245" y="383">Market Street</text><text x="238" y="488">City Park</text><text x="58" y="90">Downtown</text></g>
+</svg>

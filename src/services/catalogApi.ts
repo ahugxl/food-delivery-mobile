@@ -13,6 +13,13 @@ export function createCatalogApi(client: SupabaseClient<SupabaseDatabase> | null
     return client;
   }
   return {
+    async restaurant(id: string, signal?: AbortSignal) {
+      if (!isUuid(id)) return null;
+      const query = db().from('restaurants').select('*').eq('id', id).eq('is_active', true);
+      const { data, error } = await (signal ? query.abortSignal(signal) : query).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
     async banners(signal?: AbortSignal) {
       const query = db().from('banners').select('*').eq('is_active', true).order('position').order('id');
       const { data, error } = await (signal ? query.abortSignal(signal) : query);

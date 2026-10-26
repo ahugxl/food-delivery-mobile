@@ -43,7 +43,7 @@ export type SupabaseDatabase = {
         Returns: Tables['orders']['Row'][];
       };
       create_food_order: {
-        Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code?: string | null };
+        Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code: string | null; p_latitude: number; p_longitude: number; p_delivery_fee: Tables['orders']['Row']['delivery_fee'] };
         Returns: Tables['orders']['Row'][];
       };
     };

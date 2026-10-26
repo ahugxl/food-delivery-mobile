@@ -3,6 +3,8 @@ import type { SupabaseDatabase } from '../types/supabase';
 import type { CartItem } from '../types';
 import { cartSubtotal, serializeCart, validatePurchase, voucherError } from '../features/order/purchase';
 import { validCoordinates, type Coordinates } from '../features/location/coordinates';
+import type { Database } from '../types/database.types';
+import { BASE_DELIVERY_FEE, EXTRA_KM_FEE } from '../utils/distance';
 
 export function createPurchaseApi(client: SupabaseClient<SupabaseDatabase> | null) {
   function db() { if (!client) throw new Error('Chưa cấu hình kết nối Supabase.'); return client; }
@@ -19,17 +21,19 @@ export function createPurchaseApi(client: SupabaseClient<SupabaseDatabase> | nul
       if (reason) throw new Error(reason);
       return data;
     },
-    async createOrder(input: { orderId: string; items: CartItem[]; address: string; voucherCode?: string; coordinates?: Coordinates }) {
+    async createOrder(input: { orderId: string; items: CartItem[]; address: string; voucherCode?: string; coordinates: Coordinates; deliveryFee: Database['public']['Tables']['orders']['Insert']['delivery_fee'] }) {
       validatePurchase(input.items, input.address);
+      if (!validCoordinates(input.coordinates)) throw new Error('Tọa độ giao hàng không hợp lệ.');
+      if (typeof input.deliveryFee !== 'number' || !Number.isInteger(input.deliveryFee) || input.deliveryFee < BASE_DELIVERY_FEE || (input.deliveryFee - BASE_DELIVERY_FEE) % EXTRA_KM_FEE !== 0) throw new Error('Phí giao hàng không hợp lệ. Vui lòng tính lại.');
       const args = {
         p_order_id: input.orderId, p_items: serializeCart(input.items),
         p_address: input.address.trim(), p_voucher_code: input.voucherCode?.trim().toUpperCase() || null,
+        p_latitude: input.coordinates.latitude, p_longitude: input.coordinates.longitude, p_delivery_fee: input.deliveryFee,
       };
-      if (input.coordinates && !validCoordinates(input.coordinates)) throw new Error('Tọa độ giao hàng không hợp lệ.');
-      const request = input.coordinates ? db().rpc('create_food_order_at_location', { ...args, p_latitude: input.coordinates.latitude, p_longitude: input.coordinates.longitude }) : db().rpc('create_food_order', args);
+      const request = db().rpc('create_food_order', args);
       const { data, error } = await request.single();
       if (error) {
-        if (error.code === 'PGRST202') throw new Error('Checkout setup is missing on Supabase. Please run the matching Phase 2/3 SQL migration.');
+        if (error.code === 'PGRST202') throw new Error('Máy chủ chưa được cấu hình tính phí giao hàng. Vui lòng liên hệ quản trị viên.');
         throw error;
       }
       if (!data) throw new Error('Chưa nhận được xác nhận đơn từ máy chủ. Vui lòng thử lại.');

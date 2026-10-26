@@ -2,6 +2,7 @@ import type { CartItem } from '../../types';
 import type { Database, Json } from '../../types/database.types';
 import type { Coordinates } from '../location/coordinates';
 import { currency } from './checkout';
+import { BASE_DELIVERY_FEE } from '../../utils/distance';
 
 export type VoucherRow = Database['public']['Tables']['vouchers']['Row'];
 export type OrderRow = Database['public']['Tables']['orders']['Row'];
@@ -19,9 +20,10 @@ export function voucherError(voucher: VoucherRow, subtotal: number, restaurantId
   return null;
 }
 
-export function purchaseTotals(items: CartItem[], voucher: VoucherRow | null, now = Date.now()) {
+export function purchaseTotals(items: CartItem[], voucher: VoucherRow | null, now = Date.now(), shippingFee = BASE_DELIVERY_FEE) {
   const subtotal = cartSubtotal(items);
-  const deliveryFee = items.length > 0 ? 2 : 0;
+  if (!Number.isFinite(shippingFee) || shippingFee < 0 || !Number.isInteger(shippingFee)) throw new Error('Phí giao hàng phải là số nguyên VND không âm.');
+  const deliveryFee = items.length > 0 ? shippingFee : 0;
   const error = voucher ? voucherError(voucher, subtotal, items[0]?.restaurantId ?? '', now) : null;
   const discountCents = !voucher || error ? 0 : Math.min(cents(subtotal), voucher.discount_type === 'percentage'
     ? Math.round(cents(subtotal) * Number(voucher.discount_value) / 100) : cents(Number(voucher.discount_value)));

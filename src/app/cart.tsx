@@ -19,6 +19,7 @@ import { useOrderStore } from '../store/orderStore';
 import { EmptyState } from '../components/EmptyState';
 import { currency } from '../features/order/checkout';
 import { viLabel } from '../utils/vietnamese';
+import { useShippingQuote } from '../hooks/useShippingQuote';
 
 
 
@@ -108,7 +109,10 @@ export default function CartScreen() {
   const appliedVoucher = useOrderStore((state) => state.checkoutVoucher);
   const locked = useCartStore(state => state.isCheckingOut);
   const isEmpty = items.length === 0;
-  const { subtotal, deliveryFee, discount, total } = purchaseTotals(items, appliedVoucher);
+  const address = useOrderStore(state => state.deliveryAddress);
+  const shipping = useShippingQuote(items[0]?.restaurantId, address);
+  const shippingReady = isEmpty || shipping.deliveryFee !== null;
+  const { subtotal, deliveryFee, discount, total } = purchaseTotals(items, appliedVoucher, Date.now(), shipping.deliveryFee ?? 0);
 
   const handleOrder = () => {
     if (isEmpty) return;
@@ -176,6 +180,7 @@ export default function CartScreen() {
           <Text className="text-ink" style={styles.paymentTitle}>
             Chi tiết thanh toán
           </Text>
+          {!!shipping.error && <Text className="mb-3 text-xs text-muted">{shipping.error}</Text>}
           <View style={styles.paymentRow}>
             <Text
               style={[styles.paymentLabel, { color: colors.mutedForeground }]}
@@ -193,7 +198,7 @@ export default function CartScreen() {
               Phí giao hàng
             </Text>
             <Text style={[styles.paymentValue, { color: colors.foreground }]}>
-              {currency(deliveryFee)}
+              {shippingReady ? currency(deliveryFee) : 'Chọn điểm giao để tính phí'}
             </Text>
           </View>
           {discount > 0 && (
@@ -214,7 +219,7 @@ export default function CartScreen() {
               Tổng cộng
             </Text>
             <Text className="text-ink" style={styles.totalValue}>
-              {currency(total)}
+              {shippingReady ? currency(total) : 'Chưa xác định'}
             </Text>
           </View>
           <Pressable
@@ -236,7 +241,7 @@ export default function CartScreen() {
                 },
               ]}
             >
-              Thanh toán · {currency(total)}
+              {shippingReady ? `Thanh toán · ${currency(total)}` : 'Tiếp tục thanh toán'}
             </Text>
             <Ionicons
               name="arrow-forward"

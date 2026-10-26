@@ -22,9 +22,10 @@ test('voucher accepts the exact minimum and checks active, expiry, restaurant an
 });
 
 test('fixed/percentage totals clamp discounts to food subtotal and preserve delivery fee', () => {
-  assert.equal(purchaseTotals([item], voucher).total, 14);
-  assert.equal(purchaseTotals([item], { ...voucher, discount_value: 999 }).total, 2);
-  assert.equal(purchaseTotals([item], { ...voucher, discount_type: 'percentage', discount_value: 10 }).total, 17.3);
+  assert.equal(purchaseTotals([item], voucher).total, 15012);
+  assert.equal(purchaseTotals([item], { ...voucher, discount_value: 999 }).total, 15000);
+  assert.equal(purchaseTotals([item], { ...voucher, discount_type: 'percentage', discount_value: 10 }).total, 15015.3);
+  assert.equal(purchaseTotals([item], voucher, Date.now(), 25000).total, 25012);
   assert.equal(purchaseTotals([], null).total, 0);
   assert.equal(purchaseTotals([item], { ...voucher, is_active: false }).discount, 0);
 });
@@ -93,18 +94,19 @@ test('voucher lookup sends a normalized code with equality, not a wildcard searc
 
 test('createOrder calls the atomic RPC with the supplied idempotency ID and JSON snapshot', async () => {
   const f = fixture({ id: 'order1', total: 14 });
-  assert.equal((await f.api.createOrder({ orderId: 'order1', items: [item], address: 'Test address', voucherCode: ' save5 ' })).id, 'order1');
+  assert.equal((await f.api.createOrder({ orderId: 'order1', items: [item], address: 'Test address', voucherCode: ' save5 ', coordinates: { latitude: 0, longitude: 0 }, deliveryFee: 15000 })).id, 'order1');
   assert.equal(f.requests[0].url.pathname, '/rest/v1/rpc/create_food_order');
   const body = JSON.parse(f.requests[0].init.body);
   assert.equal(body.p_order_id, 'order1');
   assert.equal(body.p_items[0].options[0].label, 'Corn');
   assert.equal(body.p_voucher_code, 'SAVE5');
+  assert.equal(body.p_delivery_fee, 15000);
 });
 
 test('failed RPC never clears the cart; invalid checkout does not issue any request', async () => {
   const f = fixture({ code: 'P0001', message: 'Voucher expired' }, 400);
   cart.setState(cart.getInitialState()); cart.getState().addToCart(item);
-  await assert.rejects(f.api.createOrder({ orderId: 'order1', items: cart.getState().items, address: 'Test address' }), e => e.message === 'Voucher expired');
+  await assert.rejects(f.api.createOrder({ orderId: 'order1', items: cart.getState().items, address: 'Test address', coordinates: { latitude: 0, longitude: 0 }, deliveryFee: 15000 }), e => e.message === 'Voucher expired');
   assert.equal(cart.getState().items.length, 1);
   const before = f.requests.length;
   await assert.rejects(f.api.createOrder({ orderId: 'order2', items: [], address: '' }), /Giỏ hàng/);

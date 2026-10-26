@@ -29,7 +29,7 @@ Pha 1 đã nối Home với `banners`, `categories`, `restaurants`; menu nhà h�
 
 Home có skeleton, retry theo từng phần và pull-to-refresh; Chi tiết có trạng thái loading, lỗi, không tìm thấy và không khả dụng. Nhà hàng không active bị lọc; nhà hàng đóng cửa hoặc món không khả dụng không thể thêm vào giỏ. Bảng banners hiện có 3 banner active; không tự thêm dữ liệu seed.
 
-Search giữ bộ lọc/sắp xếp và FlashList, nay dùng catalog thật. Favorite vẫn dùng Zustand. Near you/Distance yêu cầu vị trí qua luồng cấp quyền của thiết bị; không tự gán khoảng cách giả cho nhà hàng thiếu tọa độ. Các API danh sách hiện lấy tối đa giới hạn trả về của Supabase (mặc định 1.000 bản ghi); chưa có phân trang server cho catalog lớn.
+Search giữ bộ lọc/sắp xếp và FlashList, nay dùng catalog thật. Favorites đã dùng Supabase và React Query; Zustand chỉ giữ khóa thao tác chống nhấn lặp. Near you/Distance yêu cầu vị trí qua luồng cấp quyền của thiết bị; không tự gán khoảng cách giả cho nhà hàng thiếu tọa độ. Các API danh sách hiện lấy tối đa giới hạn trả về của Supabase (mặc định 1.000 bản ghi); chưa có phân trang server cho catalog lớn.
 
 ## Pha 2: Cart, voucher và checkout
 
@@ -41,7 +41,7 @@ Migration `supabase/migrations/20261026_phase2_checkout.sql` đã được chủ
 
 Client tạo request UUID bằng expo-crypto và tái sử dụng ID với cùng payload khi retry trong cùng phiên ứng dụng. RPC có advisory lock và trả đơn đã tạo nếu request cùng ID gửi lại bởi cùng chủ sở hữu. Không tự retry mutation. Thành công mới xóa giỏ/voucher và chuyển `/tracking?orderId=...`. Khi lỗi, giỏ và ghi chú vẫn giữ nguyên. Địa chỉ phải được người dùng nhập (5–500 ký tự), không dùng địa chỉ demo mặc định.
 
-My orders đọc đơn thật qua React Query. Tracking đọc hóa đơn, snapshot và trạng thái từ server, refresh mỗi 10 giây cho đơn đang hoạt động; không hiển thị tài xế hay ETA giả. Thanh toán hiện chỉ là cash on delivery, không thu tiền online. Chat, đánh giá, thông báo và quản lý sổ địa chỉ chưa tích hợp backend. Giỏ/favorites vẫn trong bộ nhớ; dữ liệu cục bộ và React Query cache được xóa khi tài khoản thay đổi. Giỏ/request UUID chưa được khôi phục qua việc đóng hẳn ứng dụng.
+My orders đọc đơn thật qua React Query và Realtime. Tracking hiển thị hóa đơn, snapshot và trạng thái server. Thanh toán hiện chỉ là cash on delivery. Chat, đánh giá, yêu thích đã tích hợp backend trong Pha 3/4; thông báo và sổ địa chỉ chưa tích hợp. Giỏ dùng Zustand Persist + AsyncStorage theo tài khoản, lưu tùy chọn, ghi chú và request UUID; chỉ xóa sau checkout thành công hoặc đăng xuất/chuyển tài khoản. React Query cache được dọn khi đổi tài khoản.
 
 SQL kiểm thử chạy trên PostgreSQL WASM riêng trong bộ nhớ, không chạm backend:
 
@@ -71,25 +71,29 @@ Bản sao lưu trước khi sửa nằm trong `backups/`, gồm mã nguồn, ass
 
 Trong lần kiểm tra này, `hermesc.exe` có sẵn trong `node_modules` khác binary từ gói npm chính thức cùng phiên bản `hermes-compiler@250829098.0.17` và không tạo file `.hbc`. Đã lưu binary cũ trong `backups/hermes-check/` và phục hồi binary từ đúng gói npm này. Không đổi phiên bản compiler hay tắt Hermes trong cấu hình ứng dụng. Khi cài lại dependencies, dùng `npm ci` từ registry chính thức thay vì sao chép `node_modules`.
 
-Kiểm thử live Pha 2 ngày 26/10/2026: voucher PIZZAHUT20 bị từ chối tại Hana Chicken; GIAM5K giảm $5 trên subtotal $17. Đơn kiểm thử `0805d837-1e73-4aea-bca2-0f6f958f54aa` được tạo qua UI, tổng $14 gồm phí giao $2, ghi chú/địa chỉ ghi rõ KHONG GIAO HANG. Tracking đọc lại đầy đủ các nhóm Size/Topping/Spiciness từ snapshot. Đây là bản ghi kiểm thử pending, không phải thanh toán online.
+Kiểm thử live Pha 2 ngày 26/10/2026: voucher PIZZAHUT20 bị từ chối tại Hana Chicken; GIAM5K giảm $5 trên subtotal $17. Đơn kiểm thử `0805d837-1e73-4aea-bca2-0f6f958f54aa` được tạo qua UI, tổng $14 gồm phí giao $2, ghi chú/địa chỉ ghi rõ KHONG GIAO HANG. Tracking đọc lại đầy đủ các nhóm Size/Topping/Spiciness từ snapshot. Đây là bản ghi kiểm thử, đã chuyển completed qua demo Pha 4, không phải thanh toán online.
 
 
-## Pha 3: Location, simulated tracking v? chat realtime
+## Pha 3: Location, tracking mô phỏng và chat realtime
 
-?? ch?y `npx expo install react-native-maps expo-location` theo SDK 57. `MapPanel.tsx` d?ng b?n ?? native m?c ??nh (Apple Maps iOS, Google Maps Android); kh?ng c?u h?nh Google Cloud key trong d? ?n. Th? b?ng Expo Go kh?ng c?n setup Maps ri?ng theo [Expo SDK 57](https://docs.expo.dev/versions/v57.0.0/sdk/map-view/). Binary Android ph?t h?nh ri?ng c?n c?u h?nh Maps theo h??ng d?n Expo; kh?ng xem k?t qu? export l? ki?m th? b?n ?? tr?n ?i?n tho?i.
+Đã cài react-native-maps, expo-location theo SDK 57. Native hỗ trợ kéo ghim, vị trí hiện tại, reverse geocoding hệ điều hành, debounce và bỏ kết quả cũ. Web dùng sơ đồ, nhập tọa độ/địa chỉ thủ công. RPC create_food_order_at_location lưu tọa độ cùng hóa đơn/items trong transaction.
 
-Select Location h? tr? ch?m b?n ??/k?o ghim, n?t l?y v? tr? hi?n t?i, reverse geocode b?ng expo-location, debounce 350ms v? b? k?t qu? c? khi ng??i d?ng k?o/nh?p ti?p. L?i m?ng ho?c t? ch?i quy?n kh?ng tr? th?nh chu?i ??a ch? h?p l?; ng??i d?ng c? th? nh?p ??a ch? cho ghim ?? ch?n. D? li?u ph??ng/qu?n t?y geocoder h? ?i?u h?nh, kh?ng b?o ??m lu?n ?? s? nh?. Web c? s? ?? v? ? nh?p t?a ??/??a ch?; reverse geocode ch? d?ng tr?n native. Kh?ng g?i geocoder tr? ph?.
+Tracking subscribe UPDATE theo order ID, đồng bộ sau reconnect/foreground và polling dự phòng. Xe nội suy đường thẳng trong 40 giây khi delivering; không tự chuyển trạng thái completed. Đây là mô phỏng, chưa có GPS tài xế hay định tuyến đường bộ.
 
-Checkout g?i `create_food_order_at_location` ?? ghi latitude/longitude giao h?ng trong c?ng transaction v?i h?a ??n/items, gi? request UUID khi retry. ??n Pha 2 c? c? t?a ?? null v?n ??c/chat b?nh th??ng, nh?ng kh?ng v? tuy?n khi thi?u t?a ??.
+Chat tải 200 tin gần nhất, subscribe INSERT theo order_id, gộp theo ID để tránh trùng/mất tin khi history và live chạy đồng thời. Gửi dùng request UUID khi retry. App chỉ gửi sender_type=user, tài xế demo thêm từ Dashboard. Bucket order-chat private, ảnh dùng URL ký có hạn. Upload chưa gắn message sau lỗi có thể cần dọn định kỳ.
 
-`useOrderTracking` ??ng k? UPDATE c?a orders theo ID, ??c l?i joined order qua React Query, t?i b? sau reconnect/foreground v? fallback polling khi WebSocket ch?a k?t n?i. Khi delivering, xe m? ph?ng n?i suy ???ng th?ng t? qu?n t?i ?i?m giao trong 40 gi?y; native marker animate gi?a c?c b??c. ??y l? m? ph?ng c?c b?, kh?ng c? GPS t?i x?, kh?ng ?i?u h??ng ???ng b? v? kh?ng t? ??i tr?ng th?i completed. M? l?i m?n h?nh delivering b?t ??u l??t m? ph?ng m?i.
-
-Inbox li?t k? cu?c tr? chuy?n theo ??n th?t. `useChatRealtime` t?i 200 tin g?n nh?t, subscribe INSERT theo order_id, g?p/s?p x?p theo ID + th?i gian, gi? ri?ng buffer live ?? tr?nh history response ghi ?? tin v?a ??n, t?i b? khi reconnect/foreground. G?i c? request UUID, ch?n nh?n l?p v? t?i s? d?ng ID khi retry. Ch? g?i sender_type=user t? app; driver demo ch? th?m b?ng Dashboard.
-
-Chat h? tr? ch?n/ch?p ?nh JPEG/PNG/WebP t?i ?a 5 MB. Bucket `order-chat` private, object path `orderId/userId/UUID.ext`; messages.image_url l?u path. App t?o signed URL 1 gi?, refresh sau 50 ph?t; kh?ng public ?nh chat. ?nh ?? g?i th?nh c?ng ???c gi? ?? xem l?ch s?. Upload ch?a g?n v?o message sau l?i/tho?t c? th? c?n d?n ??nh k?.
-
-Ch? d? ?n ?? ch?y `supabase/migrations/20261026_phase3_location_chat.sql`: RPC t?a ??, RLS messages, Storage policies/bucket v? publication orders/messages. Kh?ng c?p quy?n gi? sender_type=driver cho app. ?? demo: m? Chat c?a ??n test Pha 2 r?i ch?y `supabase/phase3_demo.sql` trong Dashboard; file ch? nh?m ??n 0805d837-1e73-4aea-bca2-0f6f958f54aa c? nh?n KHONG GIAO HANG, th?m m?t tin driver v? ??i sang delivering v?i t?a ?? m? ph?ng g?n qu?n. Sau ?? m? Tracking xem xe ch?y.
-
-Ki?m tra: `npm run typecheck`, `npm test`, `node scripts/test-phase3-sql.cjs`, export Android/iOS/Web. PostgreSQL WASM test ch?y ri?ng trong b? nh?; kh?ng ghi d? li?u ki?m th? v?o backend th?t. Native k?o ghim/geocoder/camera v?n c?n x?c minh tr?n Expo Go/thi?t b?, kh?ng th? thay b?ng test web.
+Chủ dự án đã chạy migration Pha 3 và phase3_demo.sql. Bản đồ/geocoder/camera native cần kiểm tra trực tiếp qua Expo Go. Android phát hành riêng cần cấu hình Maps theo tài liệu Expo; export thành công không thay thế kiểm thử thiết bị.
 
 Kết quả kiểm tra live Pha 3 (26/10/2026): Chat của đơn 0805d837 nhận tin tài xế từ Dashboard không reload; WebSocket báo connected. Tracking hiển thị delivering, xe mô phỏng chạy tới điểm giao trong 40 giây, không đổi trạng thái server thành completed. Web xác nhận điểm tọa độ/địa chỉ thủ công vào Checkout. Persist giữ 2 phần ăn, 3 nhóm tùy chọn và ghi chú sau reload; clear rồi reload vẫn rỗng. Không tạo thêm đơn trong lần kiểm tra Pha 3. TypeScript, 58/58 tests, SQL tests Pha 2/3 và export Android/iOS/Web pass. Gửi ảnh/camera và bản đồ/geocoder native chưa được kiểm thử trực tiếp trên thiết bị Expo Go.
+
+## Pha 4: Đánh giá, yêu thích và lịch sử đơn
+
+Chủ dự án đã chạy supabase/migrations/20261026_phase4_reviews_favorites.sql và supabase/phase4_demo.sql. Demo chỉ hoàn thành đơn có nhãn KHONG GIAO HANG.
+
+Đánh giá kiểm tra đơn thuộc tài khoản hiện tại và trạng thái completed. Hai mức sao quán/tài xế độc lập, kèm nhận xét và tag Friendly, Supportive, On-time. Mỗi đơn chỉ gửi một đánh giá, retry đọc lại bản đã lưu. Cả client và RLS kiểm tra điều kiện; app không tự hoàn thành đơn. John Cooper là tài xế mô phỏng.
+
+Favorites đọc/ghi bảng favorites theo user_id. Trái tim cập nhật lạc quan, khóa nhấn lặp theo quán, rollback khi API lỗi và tải lại sau mutation. Thẻ nhà hàng và Favorites dùng chung cache. Tab đơn hàng phân completed/cancelled vào Lịch sử, pending/preparing/delivering vào Đang đến; có pull-to-refresh và Realtime.
+
+Kiểm tra ngày 26/10/2026: TypeScript pass, 69/69 tests pass, SQL Pha 2/3/4 pass trên PostgreSQL WASM, export Android/iOS/Web thành công. Live UI xác minh lưu/bỏ yêu thích, giữ sau reload, phân loại đơn thật và đánh giá 5 sao quán / 4 sao tài xế. Schema gốc 16 bảng giữ nguyên; package.json và package-lock.json không đổi trong Pha 4.
+
+Kiểm thử SQL thêm: node scripts/test-phase4-sql.cjs (cần PGlite trong backups/sql-check như hướng dẫn trên). Xem PHASE4_REPORT.md để bàn giao. Gói source trong artifacts bỏ qua .env, dependencies, cache và backups; điền .env từ .env.example trên máy nhận.

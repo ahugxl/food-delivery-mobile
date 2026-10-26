@@ -11,6 +11,7 @@ type ForeignKey<Name extends string, Column extends string, Target extends strin
 
 // FK names from the provided CREATE TABLE statements. Keep database.types.ts intact.
 type Relationships = {
+  favorites: [ForeignKey<'favorites_restaurant_id_fkey', 'restaurant_id', 'restaurants'>];
   orders: [ForeignKey<'orders_restaurant_id_fkey', 'restaurant_id', 'restaurants'>];
   order_items: [ForeignKey<'order_items_order_id_fkey', 'order_id', 'orders'>];
   foods: [

@@ -24,6 +24,7 @@ export default function ServerTracking({ orderId }: { orderId: string }) {
             : <Text className="rounded-2xl bg-tealLight p-4 text-sm text-muted">Đơn hoặc nhà hàng chưa có tọa độ, nên chưa thể vẽ tuyến đường. Các đơn mới sẽ lưu tọa độ đã chọn khi checkout.</Text>}
           {order.data.status === 'delivering' && order.destination && order.origin && <Text className="text-sm text-teal">{order.progress >= 1 ? 'Xe mô phỏng đã tới điểm giao. Trạng thái đơn vẫn do server quản lý.' : `Xe mô phỏng đang di chuyển · ${Math.round(order.progress * 100)}%`}</Text>}
           <FlowButton title="Chat về đơn hàng" onPress={() => router.push({ pathname: '/chat', params: { orderId } })} />
+          {order.data.status === 'completed' && <FlowButton title="Đánh giá quán và tài xế" onPress={() => router.push({ pathname: '/rating', params: { orderId } })} />}
         </View>
         <FlowCard><Text className="font-bold text-xl text-ink">{statuses[order.data.status] ?? order.data.status}</Text>
           <Text selectable className="font-regular text-xs text-muted">Order #{order.data.id}</Text>

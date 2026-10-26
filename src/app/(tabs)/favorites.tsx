@@ -11,7 +11,9 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFavoritesStore } from '../../store/favoritesStore';
+import { useFavorites } from '../../hooks/useFavorites';
+import { FlowButton } from '../../components/FlowUI';
+import { RestaurantSkeleton } from '../../components/LoadingLayouts';
 import { EmptyState } from '../../components/EmptyState';
 import type { Restaurant } from '../../types';
 import { useColors } from '@/hooks/useColors';
@@ -19,8 +21,8 @@ import { useColors } from '@/hooks/useColors';
 export default function FavoritesScreen() {
   const colors = useColors();
   const { width } = useWindowDimensions();
-  const favorites = useFavoritesStore((state) => state.favorites);
-  const removeFavorite = useFavoritesStore((state) => state.removeFavorite);
+  const query = useFavorites();
+  const favorites = query.favorites;
   const cardWidth = (width - 52) / 2;
 
   return (
@@ -35,9 +37,11 @@ export default function FavoritesScreen() {
         </Text>
       </View>
 
-      <FlatList<Restaurant>
+      {query.isPending ? <RestaurantSkeleton cardWidth={cardWidth} /> : query.isError && !query.data ? <View className="gap-4 p-5"><Text className="text-coral">Không tải được yêu thích.</Text><FlowButton title="Thử lại" onPress={() => { void query.refetch(); }} /></View> : <FlatList<Restaurant>
         testID="favorite-restaurants"
         data={favorites}
+        refreshing={query.isRefetching}
+        onRefresh={() => { void query.refetch(); }}
         numColumns={2}
         keyExtractor={(restaurant) => restaurant.id}
         columnWrapperStyle={styles.gridRow}
@@ -78,7 +82,9 @@ export default function FavoritesScreen() {
               testID={`remove-favorite-${item.id}`}
               accessibilityRole="button"
               accessibilityLabel={`Remove ${item.name} from favorites`}
-              onPress={() => removeFavorite(item.id)}
+              disabled={query.isUpdating(item.id)}
+              accessibilityState={{ disabled: query.isUpdating(item.id), busy: query.isUpdating(item.id) }}
+              onPress={() => { void query.toggle(item); }}
               style={[styles.favoriteButton, { backgroundColor: colors.card }]}
             >
               <Ionicons name="heart" size={18} color={colors.destructive} />
@@ -124,7 +130,7 @@ export default function FavoritesScreen() {
             description="Good food is worth saving. Tap the heart on a restaurant to keep it here."
           />
         }
-      />
+      />}
     </SafeAreaView>
   );
 }

@@ -15,7 +15,7 @@ import { ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FlowButton, FlowHeader, TEAL } from '../../components/FlowUI';
 import { currency } from '../order/checkout';
-import { useFavoritesStore } from '../../store/favoritesStore';
+import { useFavorites } from '../../hooks/useFavorites';
 import {
   defaultFilters,
   type SearchFilters,
@@ -29,7 +29,7 @@ export default function SearchScreen({ categoryId, restaurantId }: { categoryId?
   const foods = useQuery({ queryKey: catalogKeys.foods(categoryId, restaurantId), queryFn: ({ signal }) => catalogApi.foods({ categoryId, restaurantId }, signal) });
   const categories = useQuery({ queryKey: catalogKeys.categories, queryFn: ({ signal }) => catalogApi.categories(signal) });
   const restaurants = useQuery({ queryKey: catalogKeys.restaurants, queryFn: ({ signal }) => catalogApi.restaurants(signal), enabled: !!restaurantId });
-  const favorites = useFavoritesStore((state) => state.favorites);
+  const { favorites } = useFavorites();
   const savedRestaurants = useMemo(
     () => favorites.map((restaurant) => restaurant.id),
     [favorites],

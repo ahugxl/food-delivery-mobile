@@ -4,7 +4,7 @@ import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 import { useColors } from '@/hooks/useColors';
 import type { Restaurant } from '../types';
-import { useFavoritesStore } from '../store/favoritesStore';
+import { useFavorites } from '../hooks/useFavorites';
 
 type RestaurantCardProps = {
   restaurant: Restaurant;
@@ -18,10 +18,9 @@ export function RestaurantCard({
   onPress,
 }: RestaurantCardProps) {
   const colors = useColors();
-  const saved = useFavoritesStore((state) =>
-    state.favorites.some((item) => item.id === restaurant.id),
-  );
-  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+  const favorites = useFavorites();
+  const saved = favorites.favorites.some(item => item.id === restaurant.id);
+  const busy = favorites.isPending || favorites.isUpdating(restaurant.id);
 
   return (
     <View
@@ -100,10 +99,11 @@ export function RestaurantCard({
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${saved ? 'Remove' : 'Save'} ${restaurant.name} ${saved ? 'from' : 'to'} favorites`}
-        accessibilityState={{ selected: saved }}
+        accessibilityState={{ selected: saved, disabled: busy, busy }}
+        disabled={busy}
         onPress={(event) => {
           event.stopPropagation();
-          toggleFavorite(restaurant);
+          void favorites.toggle(restaurant);
         }}
         className="absolute right-3 top-3 h-11 w-11 items-center justify-center rounded-full bg-white"
       >

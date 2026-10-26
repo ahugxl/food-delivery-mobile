@@ -11,6 +11,10 @@
       "supportsTablet": false
     },
     "android": {},
+    "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#000000"
+    },
     "web": {
       "bundler": "metro",
       "favicon": "./assets/images/icon.png"

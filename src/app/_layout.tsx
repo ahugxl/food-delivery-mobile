@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
+import { AppStatusBar } from '../components/AppStatusBar';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import {
   Inter_400Regular,
@@ -40,6 +41,9 @@ function RootLayoutNav() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: '#FFFFFF' },
+        statusBarStyle: Platform.OS === 'android' ? 'light' : 'dark',
+        statusBarHidden: false,
+        navigationBarHidden: false,
       }}
     >
       <Stack.Protected guard={!isAuthenticated}>
@@ -113,16 +117,17 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={{ flex: 1, width: '100%', maxWidth: Platform.OS === 'web' ? 520 : undefined, alignSelf: 'center' }}>
-        <KeyboardProvider>
-          <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1, width: '100%', backgroundColor: '#FFFFFF', maxWidth: Platform.OS === 'web' ? 520 : undefined, alignSelf: 'center' }}>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <KeyboardProvider statusBarTranslucent navigationBarTranslucent preserveEdgeToEdge>
             <ErrorBoundary>
               <SavedAddressSync />
               <RootLayoutNav />
+              <AppStatusBar />
               <AppToast />
             </ErrorBoundary>
-          </SafeAreaProvider>
-        </KeyboardProvider>
+          </KeyboardProvider>
+        </SafeAreaProvider>
       </GestureHandlerRootView>
     </QueryClientProvider>
   );

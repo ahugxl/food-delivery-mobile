@@ -2,7 +2,6 @@ import { AppPressable as Pressable } from '@/src/components/AppPressable';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
-import { StatusBar } from 'expo-status-bar';
 import { ScrollView, StyleSheet, Text, View, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
@@ -41,7 +40,7 @@ export default function AccountScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top', 'left', 'right']}>
-      <StatusBar style="dark" />
+      
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}

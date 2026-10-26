@@ -11,7 +11,7 @@ import { ORDER_LABELS } from '../../features/order/history';
 export default function InboxScreen() {
   const userId = useAuthStore(state => state.user?.id);
   const orders = useQuery({ queryKey: ['orders', userId], queryFn: ({ signal }) => purchaseApi.orders(userId!, signal), enabled: !!userId });
-  return <SafeAreaView className="flex-1 bg-cream">
+  return <SafeAreaView className="flex-1 bg-cream" edges={['top', 'left', 'right']}>
     <View className="gap-2 p-5"><Text className="font-bold text-2xl text-ink">Tin nhắn</Text><Text className="text-sm text-muted">Cuộc trò chuyện riêng theo từng đơn hàng.</Text></View>
     {orders.isPending ? <Text className="p-5 text-muted">Đang tải đơn hàng...</Text> : orders.isError ? <View className="gap-3 p-5"><Text className="text-coral">Không tải được danh sách.</Text><FlowButton title="Thử lại" onPress={() => { void orders.refetch(); }} /></View>
       : <FlatList data={orders.data} keyExtractor={item => item.id} contentContainerStyle={{ padding: 20, gap: 14 }} refreshing={orders.isRefetching} onRefresh={() => { void orders.refetch(); }}

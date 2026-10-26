@@ -1,6 +1,5 @@
 import { ScrollView, Text, View, RefreshControl, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
@@ -21,7 +20,7 @@ export default function HomeScreen() {
     const items = useCartStore(state => state.items);
     const { width } = useWindowDimensions();
     const count = items.reduce((sum, item) => sum + item.quantity, 0);
-    return <SafeAreaView className="flex-1 bg-white" edges={['top', 'left', 'right']}><StatusBar style="dark"/>
+    return <SafeAreaView className="flex-1 bg-white" edges={['top', 'left', 'right']}>
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }} refreshControl={<RefreshControl tintColor="#008B45" refreshing={restaurants.isRefetching || categories.isRefetching || banners.isRefetching} onRefresh={() => { void Promise.allSettled([restaurants.refetch(), categories.refetch(), banners.refetch()]); }}/>}>
       <View style={{ backgroundColor: '#EFF5A5', padding: 20, paddingBottom: 28, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}>
         <View className="mb-6 flex-row items-center gap-3"><AppPressable accessibilityRole="button" accessibilityLabel="Chọn địa chỉ giao hàng" onPress={() => router.push('/select-location')} className="flex-1 gap-1"><Text className="font-medium text-xs text-ink">GIAO NGAY</Text><View className="flex-row items-center gap-1"><Text numberOfLines={1} className="max-w-[230px] font-bold text-lg text-ink">{address || 'Chọn địa chỉ giao hàng'}</Text><Ionicons name="chevron-down" size={18} color="#17241B"/></View></AppPressable>

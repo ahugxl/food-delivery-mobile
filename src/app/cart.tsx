@@ -3,7 +3,6 @@ import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
@@ -121,7 +120,7 @@ export default function CartScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top', 'left', 'right']}>
-      <StatusBar style="dark" />
+      
       <View style={styles.header}>
         <Pressable
           testID="cart-back"

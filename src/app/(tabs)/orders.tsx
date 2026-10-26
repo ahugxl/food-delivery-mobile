@@ -13,7 +13,7 @@ export default function OrdersScreen() {
   const query = useMyOrders();
   const [section, setSection] = useState<OrderSection>('active');
   const orders = (query.data ?? []).filter(order => orderSection(order.status) === section);
-  return <SafeAreaView className="flex-1 bg-cream">
+  return <SafeAreaView className="flex-1 bg-cream" edges={['top', 'left', 'right']}>
     <View className="gap-4 p-5"><Text className="font-bold text-2xl text-ink">Đơn hàng của tôi</Text>
       <View accessibilityRole="tablist" className="flex-row gap-3">{(['active','history'] as const).map(value => <AppPressable key={value} accessibilityRole="tab" accessibilityLabel={value === 'active' ? 'Đang đến' : 'Lịch sử'} accessibilityState={{ selected: section === value }} onPress={() => setSection(value)} className={`min-h-12 flex-1 items-center justify-center rounded-2xl border ${section === value ? 'border-teal bg-tealLight' : 'border-line bg-card'}`}><Text className="font-semibold text-sm text-ink">{value === 'active' ? 'Đang đến' : 'Lịch sử'}</Text></AppPressable>)}</View>
     </View>

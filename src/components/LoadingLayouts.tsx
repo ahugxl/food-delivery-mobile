@@ -3,7 +3,6 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import { AppPressable } from './AppPressable';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -50,7 +49,7 @@ export function FoodDetailSkeleton() {
   const insets = useSafeAreaInsets();
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top', 'left', 'right']}>
-      <StatusBar style="dark" />
+      
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         <SkeletonGroup label="Đang tải chi tiết món">
           <Skeleton height={310} radius={0} />

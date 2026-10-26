@@ -2,7 +2,6 @@ import { AppPressable as Pressable } from '@/src/components/AppPressable';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import {
   FlatList,
   StyleSheet,
@@ -29,7 +28,7 @@ export default function FavoritesScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top', 'left', 'right']}>
-      <StatusBar style="dark" />
+      
       <View style={styles.header}>
         <Text className="text-ink" style={styles.title}>
           Yêu thích

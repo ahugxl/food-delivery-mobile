@@ -1,12 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 
 export default function MainTabsLayout() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const bottomPadding = Math.max(insets.bottom, 8);
 
   return (
     <Tabs
@@ -14,22 +15,25 @@ export default function MainTabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.tabActive,
         tabBarInactiveTintColor: colors.mutedForeground,
+        tabBarLabelPosition: 'below-icon',
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopColor: colors.border,
-          borderTopWidth: Platform.OS === 'web' ? StyleSheet.hairlineWidth : 0,
-          height: Platform.OS === 'web' ? 84 : undefined,
-          paddingTop: 7,
-          paddingBottom: Platform.OS === 'web' ? 0 : Math.max(insets.bottom, 6),
+          borderTopWidth: StyleSheet.hairlineWidth,
+          // An explicit undefined height overrides the navigator's native height
+          // and collapses the tab content. Include the system gesture inset.
+          height: 64 + bottomPadding,
+          paddingTop: 8,
+          paddingBottom: bottomPadding,
           elevation: 10,
         },
         tabBarLabelStyle: {
           fontFamily: 'Inter_600SemiBold',
           fontSize: 10,
-          marginTop: -2,
+          marginTop: 2,
         },
         tabBarItemStyle: {
-          paddingVertical: Platform.OS === 'web' ? 7 : 3,
+          paddingVertical: 3,
         },
       }}
     >

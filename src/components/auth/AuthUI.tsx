@@ -2,7 +2,6 @@ import { AppPressable as Pressable } from '@/src/components/AppPressable';
 import { useState, type PropsWithChildren } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -21,7 +20,7 @@ export function AuthScreen({
 }: PropsWithChildren<{ back?: boolean }>) {
   return (
     <SafeAreaView className="flex-1 bg-cream">
-      <StatusBar style="dark" />
+      
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

@@ -38,7 +38,7 @@ function RootLayoutNav() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: '#FFFBF5' },
+        contentStyle: { backgroundColor: '#FFFFFF' },
       }}
     >
       <Stack.Protected guard={!isAuthenticated}>
@@ -107,7 +107,7 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={{ flex: 1, width: '100%', maxWidth: Platform.OS === 'web' ? 520 : undefined, alignSelf: 'center' }}>
         <KeyboardProvider>
           <SafeAreaProvider>
             <ErrorBoundary>

@@ -29,23 +29,23 @@ export function createAuthStore(client: Pick<SupabaseClient, 'auth'> | null) {
         isAuthenticated: !!user,
         user: user ? {
           id: user.id,
-          name: user.user_metadata.full_name || user.email?.split('@')[0] || 'Your account',
+          name: user.user_metadata.full_name || user.email?.split('@')[0] || 'Tài khoản của bạn',
           email: user.email || '',
           avatar: user.user_metadata.avatar_url || null,
         } : null,
       });
     };
     const requireClient = () => {
-      if (!client) throw new Error('Supabase is not configured. Set the project URL and public key in .env, then restart Expo.');
+      if (!client) throw new Error('Chưa cấu hình Supabase. Vui lòng kiểm tra cấu hình kết nối rồi khởi động lại ứng dụng.');
       return client;
     };
     const perform = async <T,>(action: () => Promise<T>): Promise<T> => {
-      if (get().isLoading) throw new Error('An authentication request is already in progress.');
+      if (get().isLoading) throw new Error('Đang xử lý đăng nhập. Vui lòng chờ.');
       set({ isLoading: true, error: null });
       try {
         return await action();
       } catch (error) {
-        set({ error: error instanceof Error ? error.message : 'Unable to connect. Please try again.' });
+        set({ error: error instanceof Error ? error.message : 'Không thể kết nối. Vui lòng thử lại.' });
         throw error;
       } finally {
         set({ isLoading: false });
@@ -76,7 +76,7 @@ export function createAuthStore(client: Pick<SupabaseClient, 'auth'> | null) {
           applySession(error ? null : data.session);
         }).catch((error: unknown) => {
           if (!active || receivedEvent) return;
-          set({ error: error instanceof Error ? error.message : 'Unable to restore your session.' });
+          set({ error: error instanceof Error ? error.message : 'Không khôi phục được phiên đăng nhập.' });
           applySession(null);
         });
         return () => { active = false; subscription.unsubscribe(); };

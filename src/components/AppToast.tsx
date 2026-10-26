@@ -39,7 +39,7 @@ const toastConfig: ToastConfig = {
       </View>
       <AppPressable
         accessibilityRole="button"
-        accessibilityLabel="Dismiss notification"
+        accessibilityLabel="Đóng thông báo"
         onPress={() => hide()}
         hitSlop={8}
         className="h-11 w-9 items-center justify-center"

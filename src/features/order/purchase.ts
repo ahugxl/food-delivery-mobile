@@ -8,13 +8,13 @@ export const cents = (value: number) => Math.round(value * 100);
 export const cartSubtotal = (items: CartItem[]) => items.reduce((sum, item) => sum + cents(item.unitPrice) * item.quantity, 0) / 100;
 
 export function voucherError(voucher: VoucherRow, subtotal: number, restaurantId: string, now = Date.now()): string | null {
-  if (!voucher.is_active) return 'This voucher is inactive.';
-  if (voucher.expiry_date && (!Number.isFinite(Date.parse(voucher.expiry_date)) || Date.parse(voucher.expiry_date) <= now)) return 'This voucher has expired.';
-  if (voucher.restaurant_id && voucher.restaurant_id !== restaurantId) return 'This voucher belongs to another restaurant.';
-  if (cents(subtotal) <= 0 || cents(subtotal) < cents(Number(voucher.min_order_value ?? 0))) return `Minimum food subtotal: $${Number(voucher.min_order_value ?? 0).toFixed(2)}.`;
-  if (!['percentage', 'fixed'].includes(voucher.discount_type)) return 'Unsupported voucher type.';
+  if (!voucher.is_active) return 'Mã ưu đãi đã ngừng hoạt động.';
+  if (voucher.expiry_date && (!Number.isFinite(Date.parse(voucher.expiry_date)) || Date.parse(voucher.expiry_date) <= now)) return 'Mã ưu đãi đã hết hạn.';
+  if (voucher.restaurant_id && voucher.restaurant_id !== restaurantId) return 'Mã ưu đãi chỉ áp dụng tại quán khác.';
+  if (cents(subtotal) <= 0 || cents(subtotal) < cents(Number(voucher.min_order_value ?? 0))) return `Giá trị món tối thiểu: $${Number(voucher.min_order_value ?? 0).toFixed(2)}.`;
+  if (!['percentage', 'fixed'].includes(voucher.discount_type)) return 'Loại mã ưu đãi chưa được hỗ trợ.';
   const amount = Number(voucher.discount_value);
-  if (!Number.isFinite(amount) || amount < 0 || (voucher.discount_type === 'percentage' && amount > 100)) return 'Invalid voucher discount.';
+  if (!Number.isFinite(amount) || amount < 0 || (voucher.discount_type === 'percentage' && amount > 100)) return 'Giá trị giảm giá không hợp lệ.';
   return null;
 }
 
@@ -28,13 +28,13 @@ export function purchaseTotals(items: CartItem[], voucher: VoucherRow | null, no
 }
 
 export function validatePurchase(items: CartItem[], address: string) {
-  if (!items.length || items.length > 100) throw new Error('Your cart must contain 1 to 100 items.');
-  if (address.trim().length < 5 || address.length > 500) throw new Error('Enter a delivery address between 5 and 500 characters.');
+  if (!items.length || items.length > 100) throw new Error('Giỏ hàng cần có từ 1 đến 100 dòng món.');
+  if (address.trim().length < 5 || address.length > 500) throw new Error('Địa chỉ giao hàng cần từ 5 đến 500 ký tự.');
   for (const item of items) {
-    if (item.restaurantId !== items[0].restaurantId) throw new Error('Each order must belong to one restaurant.');
-    if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99) throw new Error('Quantity must be from 1 to 99.');
-    if (item.note.length > 500) throw new Error('Notes must be at most 500 characters.');
-    if (!Number.isFinite(item.unitPrice) || item.unitPrice < 0) throw new Error('Invalid item price.');
+    if (item.restaurantId !== items[0].restaurantId) throw new Error('Mỗi đơn hàng chỉ được đặt từ một quán.');
+    if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99) throw new Error('Số lượng phải từ 1 đến 99.');
+    if (item.note.length > 500) throw new Error('Ghi chú tối đa 500 ký tự.');
+    if (!Number.isFinite(item.unitPrice) || item.unitPrice < 0) throw new Error('Giá món không hợp lệ.');
   }
 }
 

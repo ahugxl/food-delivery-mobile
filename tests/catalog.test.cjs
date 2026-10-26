@@ -68,7 +68,7 @@ test('category/restaurant filters are sent as UUIDs and cancellation signal is f
 test('backend/configuration errors propagate so React Query can show errors, never mocks', async () => {
   const { api } = apiFixture({ message: 'permission denied', code: '42501' }, 403);
   await assert.rejects(api.categories(), error => error.message === 'permission denied');
-  await assert.rejects(createCatalogApi(null).restaurants(), /not configured/);
+  await assert.rejects(createCatalogApi(null).restaurants(), /Chưa cấu hình/);
 });
 
 const single = { id: 'size', name: 'Size', is_required: true, allow_multiple: false, food_option_items: [
@@ -109,8 +109,8 @@ test('cart merges only identical food/option combinations regardless of selectio
 test('restaurant cards use real hours/promotions and handle nullable images', () => {
   const card = toRestaurantCard({ id, name: 'Restaurant', image_url: null, opening_hours: '8am - 9pm', promo_tags: ['Freeship', null, {}], rating: 4.8, is_open: false });
   assert.equal(card.image, '');
-  assert.equal(card.openingHours, '8am - 9pm');
-  assert.deepEqual(card.tags, ['Freeship']);
+  assert.equal(card.openingHours, '8:00 - 21:00');
+  assert.deepEqual(card.tags, ['Miễn phí giao hàng']);
   assert.equal(card.isOpen, false);
 });
 

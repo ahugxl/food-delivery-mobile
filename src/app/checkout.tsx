@@ -15,6 +15,8 @@ import { useCartStore } from '../store/cartStore';
 import { useOrderStore } from '../store/orderStore';
 import { useAuthStore } from '../store/authStore';
 import { validCoordinates } from '../features/location/coordinates';
+import { viLabel } from '../utils/vietnamese';
+import { userMessage } from '../utils/userMessage';
 
 export default function CheckoutScreen() {
   const items = useCartStore(state => state.items);
@@ -43,54 +45,54 @@ export default function CheckoutScreen() {
       useCartStore.getState().clearCart();
       useOrderStore.getState().setCheckoutVoucher(null);
       void client.invalidateQueries({ queryKey: ['orders', userId] });
-      Toast.show({ type: 'success', text1: 'Order placed successfully!', text2: 'Your order is waiting for restaurant confirmation.' });
+      Toast.show({ type: 'success', text1: 'Đặt hàng thành công!', text2: 'Đơn hàng đang chờ quán xác nhận.' });
       router.replace({ pathname: '/tracking', params: { orderId: order.id } });
     } catch (error) {
-      Toast.show({ type: 'error', text1: 'Order was not confirmed', text2: errorMessage(error) });
+      Toast.show({ type: 'error', text1: 'Chưa xác nhận được đơn hàng', text2: errorMessage(error) });
     } finally {
       submitGuard.current = false;
       if (useAuthStore.getState().user?.id === userId && useCartStore.getState().checkoutRequest?.id === submittedRequestId) useCartStore.getState().setCheckingOut(false);
     }
   };
   return <SafeAreaView className="flex-1 bg-cream">
-    <FlowHeader title="Review your order" />
+    <FlowHeader title="Xác nhận đơn hàng" />
     <ScrollView contentContainerStyle={{ padding: 20 }}>
       <FlowCard>
-        <Text className="font-bold text-base text-ink">Deliver to {address.label}</Text>
-        <Text className="font-regular text-sm text-muted">{address.street || 'Please enter a delivery address.'}</Text>
-        {!coordinates && <Text className="text-sm text-coral">Please select a delivery pin before ordering.</Text>}
+        <Text className="font-bold text-base text-ink">Giao đến {viLabel(address.label)}</Text>
+        <Text className="font-regular text-sm text-muted">{address.street || 'Vui lòng nhập địa chỉ giao hàng.'}</Text>
+        {!coordinates && <Text className="text-sm text-coral">Vui lòng chọn điểm giao trên bản đồ trước khi đặt hàng.</Text>}
         <Pressable accessibilityRole="button" disabled={locked} onPress={() => router.push('/select-location')} className="min-h-11 justify-center">
-          <Text className="font-semibold text-sm text-teal">Change address</Text>
+          <Text className="font-semibold text-sm text-teal">Đổi địa chỉ</Text>
         </Pressable>
       </FlowCard>
       <FlowCard>
-        <Text className="font-bold text-base text-ink">{items[0]?.restaurantName || 'Your order'}</Text>
-        {items.length === 0 ? <FlowButton title="Browse food" onPress={() => router.replace('/(tabs)')} /> : items.map(item => <View key={item.lineId} className="flex-row items-center gap-3">
+        <Text className="font-bold text-base text-ink">{items[0]?.restaurantName || 'Đơn hàng của bạn'}</Text>
+        {items.length === 0 ? <FlowButton title="Khám phá quán ngon" onPress={() => router.replace('/(tabs)')} /> : items.map(item => <View key={item.lineId} className="flex-row items-center gap-3">
           <Image source={item.image ? { uri: item.image } : undefined} style={{ width: 56, height: 56, borderRadius: 14 }} contentFit="cover" />
-          <View className="flex-1 gap-1"><Text className="font-semibold text-sm text-ink">{item.quantity} × {item.name}</Text>
-            <Text className="font-regular text-xs text-muted">{item.options.map(option => `${option.groupName}: ${option.label}`).join(' · ') || 'Standard'}</Text>
-            {!!item.note && <Text className="font-regular text-xs text-muted">Note: {item.note}</Text>}
+          <View className="flex-1 gap-1"><Text className="font-semibold text-sm text-ink">{item.quantity} × {viLabel(item.name)}</Text>
+            <Text className="font-regular text-xs text-muted">{item.options.map(option => `${viLabel(option.groupName)}: ${viLabel(option.label)}`).join(' · ') || 'Mặc định'}</Text>
+            {!!item.note && <Text className="font-regular text-xs text-muted">Ghi chú: {item.note}</Text>}
           </View><Text className="font-semibold text-sm text-ink">{currency(item.unitPrice * item.quantity)}</Text>
         </View>)}
       </FlowCard>
       <Pressable accessibilityRole="button" disabled={locked || !items.length} onPress={() => router.push('/select-offer')} className="mb-5 gap-2 rounded-3xl border border-line bg-card p-5">
-        <Text className="font-semibold text-base text-ink">Voucher</Text>
-        <Text className="font-regular text-sm text-teal">{voucher?.code || 'Enter a voucher code'}</Text>
-        {!!totals.voucherError && <Text accessibilityRole="alert" className="text-sm text-coral">{totals.voucherError} Remove or replace this voucher.</Text>}
+        <Text className="font-semibold text-base text-ink">Mã ưu đãi</Text>
+        <Text className="font-regular text-sm text-teal">{voucher?.code || 'Nhập mã ưu đãi'}</Text>
+        {!!totals.voucherError && <Text accessibilityRole="alert" className="text-sm text-coral">{totals.voucherError} Vui lòng bỏ hoặc đổi mã ưu đãi này.</Text>}
       </Pressable>
       <FlowCard>
-        <Text className="font-bold text-base text-ink">Payment details</Text>
-        {([['Subtotal', totals.subtotal], ['Delivery fee', totals.deliveryFee], ['Voucher discount', -totals.discount], ['Total', totals.total]] as const).map(([label, amount]) => <View key={label} className="flex-row justify-between">
+        <Text className="font-bold text-base text-ink">Chi tiết thanh toán</Text>
+        {([['Tạm tính', totals.subtotal], ['Phí giao hàng', totals.deliveryFee], ['Giảm giá', -totals.discount], ['Tổng cộng', totals.total]] as const).map(([label, amount]) => <View key={label} className="flex-row justify-between">
           <Text className="font-medium text-sm text-muted">{label}</Text><Text className="font-semibold text-base text-ink">{amount < 0 ? `-${currency(-amount)}` : currency(amount)}</Text>
         </View>)}
       </FlowCard>
-      <Text className="mb-3 font-regular text-xs text-muted">Payment: Cash on delivery. Prices and vouchers are checked again when placing your order.</Text>
-      {mutation.isError && <Text accessibilityRole="alert" className="mb-4 font-medium text-sm text-coral">{errorMessage(mutation.error)} Your cart has been kept. Retry to check the same order request.</Text>}
+      <Text className="mb-3 font-regular text-xs text-muted">Thanh toán khi nhận hàng. Giá và mã ưu đãi được kiểm tra lại khi đặt đơn.</Text>
+      {mutation.isError && <Text accessibilityRole="alert" className="mb-4 font-medium text-sm text-coral">{errorMessage(mutation.error)} Giỏ hàng vẫn được giữ. Thử lại để kiểm tra cùng yêu cầu đặt đơn.</Text>}
     </ScrollView>
-    <View className="border-t border-line bg-card p-5"><FlowButton title={locked ? 'Placing order...' : `Order now · ${currency(totals.total)}`} onPress={() => { void placeOrder(); }} disabled={!canOrder} /></View>
+    <View className="border-t border-line bg-card p-5"><FlowButton title={locked ? 'Đang đặt hàng…' : `Đặt hàng · ${currency(totals.total)}`} onPress={() => { void placeOrder(); }} disabled={!canOrder} /></View>
   </SafeAreaView>;
 }
 
 function errorMessage(error: unknown) {
-  return error && typeof error === 'object' && 'message' in error && typeof error.message === 'string' ? error.message : 'Unable to connect. Please try again.';
+  return userMessage(error);
 }

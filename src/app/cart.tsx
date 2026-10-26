@@ -17,10 +17,10 @@ import type { CartItem } from '../types';
 import { purchaseTotals } from '../features/order/purchase';
 import { useOrderStore } from '../store/orderStore';
 import { EmptyState } from '../components/EmptyState';
+import { currency } from '../features/order/checkout';
+import { viLabel } from '../utils/vietnamese';
 
-function currency(amount: number) {
-  return `$${amount.toFixed(2)}`;
-}
+
 
 function CartRow({
   item,
@@ -35,7 +35,7 @@ function CartRow({
   const locked = useCartStore(state => state.isCheckingOut);
   const [note, setNote] = useState(item.note);
   useEffect(() => setNote(item.note), [item.note]);
-  const optionDescription = item.options.map(option => `${option.groupName}: ${option.label}`).join(' · ') || 'Standard';
+  const optionDescription = item.options.map(option => `${viLabel(option.groupName)}: ${viLabel(option.label)}`).join(' · ') || 'Mặc định';
 
   return (
     <View
@@ -49,11 +49,11 @@ function CartRow({
         contentFit="cover"
         transition={180}
         style={styles.foodThumbnail}
-        accessibilityLabel={item.name}
+        accessibilityLabel={viLabel(item.name)}
       />
       <View style={styles.itemDetails}>
         <Text numberOfLines={1} className="text-ink" style={styles.itemName}>
-          {item.name}
+          {viLabel(item.name)}
         </Text>
         <Text
           numberOfLines={1}
@@ -61,8 +61,8 @@ function CartRow({
         >
           {optionDescription}
         </Text>
-        <TextInput accessibilityLabel={`Note for ${item.name}`} value={note} onChangeText={setNote} editable={!locked} maxLength={500}
-          onEndEditing={event => { const error = useCartStore.getState().setNote(item.lineId, event.nativeEvent.text); if (error) { setNote(item.note); Toast.show({ type: 'error', text1: error }); } }} placeholder="Add a note..."
+        <TextInput accessibilityLabel={`Ghi chú cho ${viLabel(item.name)}`} value={note} onChangeText={setNote} editable={!locked} maxLength={500}
+          onEndEditing={event => { const error = useCartStore.getState().setNote(item.lineId, event.nativeEvent.text); if (error) { setNote(item.note); Toast.show({ type: 'error', text1: error }); } }} placeholder="Thêm ghi chú…"
           className="my-2 min-h-11 rounded-xl border border-line px-3 font-regular text-xs text-ink" />
         <View style={styles.itemBottomRow}>
           <Text className="text-coral" style={styles.itemPrice}>
@@ -72,7 +72,7 @@ function CartRow({
             <Pressable
               testID={`cart-decrease-${item.lineId}`}
               accessibilityRole="button"
-              accessibilityLabel={`Decrease ${item.name} quantity`}
+              accessibilityLabel={`Giảm số lượng ${viLabel(item.name)}`}
               onPress={onDecrease}
               disabled={locked}
               style={styles.stepperButton}
@@ -85,7 +85,7 @@ function CartRow({
             <Pressable
               testID={`cart-increase-${item.lineId}`}
               accessibilityRole="button"
-              accessibilityLabel={`Increase ${item.name} quantity`}
+              accessibilityLabel={`Tăng số lượng ${viLabel(item.name)}`}
               onPress={onIncrease}
               disabled={locked || item.quantity >= 99}
               style={styles.stepperButton}
@@ -122,7 +122,7 @@ export default function CartScreen() {
         <Pressable
           testID="cart-back"
           accessibilityRole="button"
-          accessibilityLabel="Go back"
+          accessibilityLabel="Quay lại"
           onPress={() => router.back()}
           style={[styles.headerButton, { backgroundColor: colors.card }]}
         >
@@ -130,13 +130,13 @@ export default function CartScreen() {
         </Pressable>
         <View style={styles.headerCopy}>
           <Text className="text-ink" style={styles.title}>
-            My cart
+            Giỏ hàng
           </Text>
           <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-            {items.length} {items.length === 1 ? 'item' : 'items'} in your bag
+            {items.length} món trong giỏ hàng
           </Text>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Clear cart" disabled={locked || isEmpty} onPress={() => { useCartStore.getState().clearCart(); useOrderStore.getState().setCheckoutVoucher(null); }} className="min-h-11 justify-center px-2"><Text className="font-semibold text-sm text-coral">Clear</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Xóa giỏ hàng" disabled={locked || isEmpty} onPress={() => { useCartStore.getState().clearCart(); useOrderStore.getState().setCheckoutVoucher(null); }} className="min-h-11 justify-center px-2"><Text className="font-semibold text-sm text-coral">Xóa</Text></Pressable>
       </View>
 
       <FlashList<CartItem>
@@ -156,8 +156,8 @@ export default function CartScreen() {
         }}
         ListEmptyComponent={
           <EmptyState
-            title="Your cart is empty"
-            description="Your bag is waiting for something delicious. Explore the menu and make it smile."
+            title="Giỏ hàng đang trống"
+            description="Khám phá các quán ngon, chọn món yêu thích và thêm vào giỏ hàng nhé."
           />
         }
       />
@@ -174,13 +174,13 @@ export default function CartScreen() {
           ]}
         >
           <Text className="text-ink" style={styles.paymentTitle}>
-            Payment details
+            Chi tiết thanh toán
           </Text>
           <View style={styles.paymentRow}>
             <Text
               style={[styles.paymentLabel, { color: colors.mutedForeground }]}
             >
-              Subtotal
+              Tạm tính
             </Text>
             <Text style={[styles.paymentValue, { color: colors.foreground }]}>
               {currency(subtotal)}
@@ -190,7 +190,7 @@ export default function CartScreen() {
             <Text
               style={[styles.paymentLabel, { color: colors.mutedForeground }]}
             >
-              Delivery fee
+              Phí giao hàng
             </Text>
             <Text style={[styles.paymentValue, { color: colors.foreground }]}>
               {currency(deliveryFee)}
@@ -199,7 +199,7 @@ export default function CartScreen() {
           {discount > 0 && (
             <View style={styles.paymentRow}>
               <Text className="font-medium text-xs text-teal">
-                Voucher discount
+                Giảm giá
               </Text>
               <Text className="font-semibold text-xs text-teal">
                 -{currency(discount)}
@@ -211,7 +211,7 @@ export default function CartScreen() {
           />
           <View style={styles.paymentRow}>
             <Text className="text-ink" style={styles.totalLabel}>
-              Total
+              Tổng cộng
             </Text>
             <Text className="text-ink" style={styles.totalValue}>
               {currency(total)}
@@ -236,7 +236,7 @@ export default function CartScreen() {
                 },
               ]}
             >
-              Checkout · {currency(total)}
+              Thanh toán · {currency(total)}
             </Text>
             <Ionicons
               name="arrow-forward"

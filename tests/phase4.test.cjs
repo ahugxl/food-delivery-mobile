@@ -26,7 +26,7 @@ test('review preserves independent restaurant/driver stars, feedback and dedupli
 });
 test('zero, fractional, out-of-range stars, unknown tags and overlong feedback are rejected',()=>{
   for(const rating of [0,1.5,6,NaN]) assert.throws(()=>reviewPayload('order','user',{...input,restaurantRating:rating}),/1 đến 5/);
-  assert.throws(()=>reviewPayload('order','user',{...input,tags:['Unrecognized']}),/Tag/);
+  assert.throws(()=>reviewPayload('order','user',{...input,tags:['Unrecognized']}),/Nhãn/);
   assert.throws(()=>reviewPayload('order','user',{...input,driverFeedback:'x'.repeat(2001)}),/2.000/);
 });
 test('review checks authenticated owner and completed status before posting',async()=>{

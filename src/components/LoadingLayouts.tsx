@@ -11,7 +11,7 @@ import { Skeleton, SkeletonGroup } from './Skeleton';
 
 export function RestaurantSkeleton({ cardWidth }: { cardWidth: number }) {
   return (
-    <SkeletonGroup label="Loading recommended restaurants">
+    <SkeletonGroup label="Đang tải quán gợi ý">
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -52,7 +52,7 @@ export function FoodDetailSkeleton() {
     <SafeAreaView className="flex-1 bg-cream" edges={['top', 'left', 'right']}>
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
-        <SkeletonGroup label="Loading food details">
+        <SkeletonGroup label="Đang tải chi tiết món">
           <Skeleton height={310} radius={0} />
           <View className="gap-6 p-5">
             <View className="gap-3">
@@ -76,7 +76,7 @@ export function FoodDetailSkeleton() {
       </ScrollView>
       <AppPressable
         accessibilityRole="button"
-        accessibilityLabel="Go back"
+        accessibilityLabel="Quay lại"
         onPress={() =>
           router.canGoBack() ? router.back() : router.replace('/(tabs)')
         }
@@ -88,7 +88,7 @@ export function FoodDetailSkeleton() {
         className="border-t border-line bg-white px-5 pt-3"
         style={{ paddingBottom: Math.max(insets.bottom, 16) }}
       >
-        <SkeletonGroup label="Loading price">
+        <SkeletonGroup label="Đang tải giá">
           <View className="flex-row gap-3">
             <Skeleton height={52} width={95} />
             <View className="flex-1">

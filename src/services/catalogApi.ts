@@ -9,7 +9,7 @@ export const FOOD_DETAIL_SELECT = `
 
 export function createCatalogApi(client: SupabaseClient<SupabaseDatabase> | null) {
   function db() {
-    if (!client) throw new Error('Supabase is not configured.');
+    if (!client) throw new Error('Chưa cấu hình kết nối Supabase.');
     return client;
   }
   return {

@@ -31,7 +31,7 @@ export function RestaurantCard({
     >
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`View ${restaurant.name}, rated ${restaurant.rating.toFixed(1)} stars`}
+        accessibilityLabel={`Xem quán ${restaurant.name}, đánh giá ${restaurant.rating.toFixed(1)} sao`}
         onPress={onPress}
         style={({ pressed }) => [
           { flex: 1 },
@@ -44,14 +44,14 @@ export function RestaurantCard({
             contentFit="cover"
             transition={180}
             style={styles.image}
-            accessibilityLabel={`${restaurant.name} food`}
+            accessibilityLabel={`Ảnh quán ${restaurant.name}`}
           />
           <View
             style={[styles.deliveryBadge, { backgroundColor: colors.card }]}
           >
             <Ionicons name="time-outline" size={12} color={colors.foreground} />
             <Text style={[styles.deliveryText, { color: colors.foreground }]}>
-              {restaurant.isOpen === false ? 'Closed' : restaurant.deliveryTime}
+              {restaurant.isOpen === false ? 'Đã đóng cửa' : restaurant.deliveryTime}
             </Text>
           </View>
         </View>
@@ -74,7 +74,7 @@ export function RestaurantCard({
               ]}
             />
             <Text style={[styles.metaText, { color: colors.mutedForeground }]}>
-              {restaurant.openingHours ? (restaurant.isOpen ? 'Open now' : 'Closed') : 'Local favorite'}
+              {restaurant.openingHours ? (restaurant.isOpen ? 'Đang mở cửa' : 'Đã đóng cửa') : 'Quán được yêu thích'}
             </Text>
           </View>
           <View style={styles.tagsRow}>
@@ -98,7 +98,7 @@ export function RestaurantCard({
       </Pressable>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`${saved ? 'Remove' : 'Save'} ${restaurant.name} ${saved ? 'from' : 'to'} favorites`}
+        accessibilityLabel={`${saved ? 'Bỏ yêu thích' : 'Yêu thích'} ${restaurant.name}`}
         accessibilityState={{ selected: saved, disabled: busy, busy }}
         disabled={busy}
         onPress={(event) => {

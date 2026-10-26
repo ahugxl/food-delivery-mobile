@@ -19,7 +19,7 @@ export function searchLiveCatalog(rows: FoodRow[], keyword: string, filters: Sea
     restaurantId: row.restaurant_id,
     restaurant: row.restaurants.name,
     rating: Number(row.restaurants.rating ?? 0),
-    deliveryTime: row.restaurants.opening_hours || 'Hours unavailable',
+    deliveryTime: row.restaurants.opening_hours || 'Chưa có giờ mở cửa',
     distanceKm: location && row.restaurants.latitude != null && row.restaurants.longitude != null
       ? distanceKm(location, { latitude: row.restaurants.latitude, longitude: row.restaurants.longitude }) : null,
     freeDelivery: Array.isArray(row.restaurants.promo_tags) && row.restaurants.promo_tags.some(tag => typeof tag === 'string' && /freeship|free delivery/i.test(tag)),

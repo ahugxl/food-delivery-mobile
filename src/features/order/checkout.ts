@@ -45,7 +45,8 @@ export const vouchers: Voucher[] = [
   },
 ];
 
-export const currency = (amount: number) => `$${amount.toFixed(2)}`;
+// Keep the backend's existing USD amounts; localize number formatting without conversion.
+export const currency = (amount: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'USD' }).format(amount === 0 ? 0 : amount);
 export const isVoucherEligible = (voucher: Voucher, subtotal: number) =>
   Math.round(subtotal * 100) > 0 &&
   (voucher.minimumSubtotal === undefined ||

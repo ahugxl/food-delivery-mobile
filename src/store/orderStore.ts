@@ -32,7 +32,7 @@ export const useOrderStore = create<OrderState>((set) => ({
         {
           ...order,
           id: `FD-${Date.now()}-${state.orders.length + 1}`,
-          date: new Date().toLocaleDateString('en-US', {
+          date: new Date().toLocaleDateString('vi-VN', {
             month: 'short',
             day: 'numeric',
             year: 'numeric',

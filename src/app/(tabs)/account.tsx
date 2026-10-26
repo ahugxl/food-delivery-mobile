@@ -8,13 +8,14 @@ import { useColors } from '@/hooks/useColors';
 import { useAuthStore } from '@/src/store/authStore';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProfile } from '@/src/services/profile';
+import { userMessage } from '../../utils/userMessage';
 
 const accountLinks = [
-  { label: 'Saved Addresses', icon: 'location-outline' },
-  { label: 'Payment Methods', icon: 'card-outline' },
-  { label: 'Vouchers', icon: 'ticket-outline' },
-  { label: 'Settings', icon: 'settings-outline' },
-  { label: 'Help Center', icon: 'help-circle-outline' },
+  { label: 'Địa chỉ đã lưu', icon: 'location-outline' },
+  { label: 'Phương thức thanh toán', icon: 'card-outline' },
+  { label: 'Mã ưu đãi', icon: 'ticket-outline' },
+  { label: 'Cài đặt', icon: 'settings-outline' },
+  { label: 'Trung tâm trợ giúp', icon: 'help-circle-outline' },
 ] as const;
 
 export default function AccountScreen() {
@@ -27,13 +28,13 @@ export default function AccountScreen() {
     queryFn: ({ signal }) => fetchProfile(user!.id, signal),
     enabled: !!user?.id,
   });
-  const name = profile.data?.full_name || user?.name || 'Your account';
+  const name = profile.data?.full_name || user?.name || 'Tài khoản của bạn';
   const avatar = profile.data?.avatar_url || user?.avatar;
 
   const showComingSoon = (label: string) => {
     Alert.alert(
       label,
-      'This section will be available when your account is connected.',
+      'Tính năng này đang được phát triển.',
     );
   };
 
@@ -45,7 +46,7 @@ export default function AccountScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text className="text-ink" style={styles.pageTitle}>
-          Account
+          Tài khoản
         </Text>
 
         <View
@@ -59,7 +60,7 @@ export default function AccountScreen() {
               source={{ uri: avatar }}
               contentFit="cover"
               transition={180}
-              accessibilityLabel={`${name} profile photo`}
+              accessibilityLabel={`${name} ảnh đại diện`}
               style={[styles.avatar, { backgroundColor: colors.accent }]}
             />
           ) : (
@@ -90,8 +91,8 @@ export default function AccountScreen() {
           </View>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Edit profile"
-            onPress={() => showComingSoon('Edit profile')}
+            accessibilityLabel="Chỉnh sửa hồ sơ"
+            onPress={() => showComingSoon('Chỉnh sửa hồ sơ')}
             style={[styles.editButton, { backgroundColor: colors.accent }]}
           >
             <Ionicons
@@ -104,12 +105,12 @@ export default function AccountScreen() {
 
         {profile.isError && (
           <Pressable accessibilityRole="button" onPress={() => { void profile.refetch(); }} className="mb-4 rounded-xl bg-sage p-4">
-            <Text className="text-sm text-forest">Unable to load your profile. Tap to retry.</Text>
+            <Text className="text-sm text-forest">Không tải được hồ sơ. Chạm để thử lại.</Text>
           </Pressable>
         )}
 
         <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>
-          YOUR ACCOUNT
+          TÀI KHOẢN CỦA BẠN
         </Text>
         <View
           style={[
@@ -159,7 +160,7 @@ export default function AccountScreen() {
           accessibilityRole="button"
           disabled={isLoading}
           accessibilityState={{ disabled: isLoading, busy: isLoading }}
-          onPress={() => { void logout().catch((error: unknown) => Alert.alert('Unable to log out', error instanceof Error ? error.message : 'Please try again.')); }}
+          onPress={() => { void logout().catch((error: unknown) => Alert.alert('Không đăng xuất được', userMessage(error))); }}
           style={[styles.logoutButton, { borderColor: colors.destructive }]}
         >
           <Ionicons
@@ -168,11 +169,11 @@ export default function AccountScreen() {
             color={colors.destructive}
           />
           <Text style={[styles.logoutText, { color: colors.destructive }]}>
-            Log out
+            Đăng xuất
           </Text>
         </Pressable>
         <Text style={[styles.version, { color: colors.mutedForeground }]}>
-          Food Delivery · Version 1.0
+          Giao đồ ăn · Phiên bản 1.0
         </Text>
       </ScrollView>
     </SafeAreaView>

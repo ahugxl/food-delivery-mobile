@@ -11,6 +11,7 @@ import {
   isValidEmail,
 } from '@/src/components/auth/AuthUI';
 import { useAuthStore } from '@/src/store/authStore';
+import { userMessage } from '../../utils/userMessage';
 
 export default function RegisterScreen() {
   const register = useAuthStore((state) => state.register);
@@ -24,15 +25,15 @@ export default function RegisterScreen() {
   const handleRegister = async () => {
     if (isLoading) return;
     if (!name.trim() || !isValidEmail(email)) {
-      setMessage('Please enter your full name and a valid email address.');
+      setMessage('Vui lòng nhập họ tên và email hợp lệ.');
       return;
     }
     if (password.trim().length < 6) {
-      setMessage('Please choose a password with at least 6 characters.');
+      setMessage('Mật khẩu phải có ít nhất 6 ký tự.');
       return;
     }
     if (password !== confirmPassword) {
-      setMessage('Your passwords do not match. Please try again.');
+      setMessage('Mật khẩu xác nhận không khớp. Vui lòng thử lại.');
       return;
     }
 
@@ -41,22 +42,22 @@ export default function RegisterScreen() {
       const signedIn = await register(name, email, password);
       setPassword('');
       setConfirmPassword('');
-      if (!signedIn) setMessage('Check your email to confirm your account, then return here to log in.');
+      if (!signedIn) setMessage('Vui lòng xác nhận tài khoản qua email, sau đó quay lại đăng nhập.');
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Unable to register. Please try again.');
+      setMessage(userMessage(error));
     }
   };
 
   return (
     <AuthScreen back>
       <AuthHeading
-        title="Create an account"
-        subtitle="Sign up for good food and great moments."
+        title="Tạo tài khoản"
+        subtitle="Đăng ký để đặt món ngon mỗi ngày."
       />
       <AuthInput
-        label="Full Name"
+        label="Họ và tên"
         icon="person-outline"
-        placeholder="Your full name"
+        placeholder="Nhập họ và tên"
         value={name}
         onChangeText={setName}
         autoCapitalize="words"
@@ -76,9 +77,9 @@ export default function RegisterScreen() {
         textContentType="emailAddress"
       />
       <AuthInput
-        label="Password"
+        label="Mật khẩu"
         icon="lock-closed-outline"
-        placeholder="At least 6 characters"
+        placeholder="Ít nhất 6 ký tự"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -88,9 +89,9 @@ export default function RegisterScreen() {
         textContentType="newPassword"
       />
       <AuthInput
-        label="Confirm Password"
+        label="Xác nhận mật khẩu"
         icon="lock-closed-outline"
-        placeholder="Re-enter your password"
+        placeholder="Nhập lại mật khẩu"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
@@ -102,17 +103,17 @@ export default function RegisterScreen() {
         onSubmitEditing={handleRegister}
       />
       <AuthMessage message={message} />
-      <AuthButton title="Sign Up" onPress={handleRegister} loading={isLoading} />
+      <AuthButton title="Đăng ký" onPress={handleRegister} loading={isLoading} />
       <View className="mt-auto flex-row flex-wrap items-center justify-center pt-8">
         <Text className="font-regular text-sm text-muted">
-          Already have an account?{' '}
+          Đã có tài khoản?{' '}
         </Text>
         <Pressable
           accessibilityRole="link"
           onPress={() => router.replace('/(auth)/login')}
           className="min-h-11 justify-center px-1"
         >
-          <Text className="font-semibold text-sm text-coral">Login</Text>
+          <Text className="font-semibold text-sm text-coral">Đăng nhập</Text>
         </Pressable>
       </View>
     </AuthScreen>

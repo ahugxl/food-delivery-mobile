@@ -11,7 +11,7 @@ const DRIVER_AVATAR =
 
 export function DriverAvatar({
   size,
-  accessibilityLabel = 'Driver John Cooper',
+  accessibilityLabel = 'Tài xế John Cooper',
 }: DriverAvatarProps) {
   return (
     <Image

@@ -4,14 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Text, View } from 'react-native';
 
-export const TEAL = '#159E98';
+export const TEAL = '#008B45';
 
 export function FlowHeader({ title }: { title: string }) {
   return (
     <View className="flex-row items-center gap-4 px-5 py-4">
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Go back"
+        accessibilityLabel="Quay lại"
         onPress={() =>
           router.canGoBack() ? router.back() : router.replace('/(tabs)')
         }

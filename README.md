@@ -97,3 +97,13 @@ Favorites đọc/ghi bảng favorites theo user_id. Trái tim cập nhật lạc
 Kiểm tra ngày 26/10/2026: TypeScript pass, 69/69 tests pass, SQL Pha 2/3/4 pass trên PostgreSQL WASM, export Android/iOS/Web thành công. Live UI xác minh lưu/bỏ yêu thích, giữ sau reload, phân loại đơn thật và đánh giá 5 sao quán / 4 sao tài xế. Schema gốc 16 bảng giữ nguyên; package.json và package-lock.json không đổi trong Pha 4.
 
 Kiểm thử SQL thêm: node scripts/test-phase4-sql.cjs (cần PGlite trong backups/sql-check như hướng dẫn trên). Xem PHASE4_REPORT.md để bàn giao. Gói source trong artifacts bỏ qua .env, dependencies, cache và backups; điền .env từ .env.example trên máy nhận.
+
+## Cập nhật giao diện tiếng Việt theo ảnh tham khảo
+
+Trang chủ dùng nền trắng, phần đầu xanh vàng, danh mục tròn và các thẻ quán dạng hàng. Tìm kiếm/danh mục trả về quán trước, kể cả khi tìm theo tên món; chọn quán mới mở thực đơn riêng, lọc đúng restaurant_id. Trang quán có ảnh bìa, nút yêu thích/chia sẻ, nhãn ưu đãi, tìm món, lọc danh mục và lưới món hai cột. Dấu cộng mở chi tiết để chọn đủ tùy chọn bắt buộc trước khi thêm giỏ.
+
+Đã Việt hóa các màn hình đăng nhập/đăng ký, tab, món ăn, giỏ, thanh toán, địa chỉ, mã ưu đãi, theo dõi đơn, đánh giá, yêu thích, tin nhắn, tài khoản và thông báo lỗi. Tên thương hiệu và nội dung người dùng nhập giữ nguyên. Tên món/tùy chọn/mô tả của dữ liệu mẫu được dịch khi hiển thị qua src/utils/vietnamese.ts, không thay ID, giá hay snapshot lưu xuống server. Catalog thêm mới nên nhập tiếng Việt trong Supabase để hiển thị nhất quán.
+
+Đơn vị tiền hiện có của backend là USD; chỉ định dạng số theo vi-VN, không tự quy đổi sang VND. Giữ nguyên checkout, Auth, Realtime và cấu trúc npm/Supabase.
+
+Kiểm tra cập nhật ngày 26/10/2026: TypeScript pass, 75/75 tests pass. Đã thử UI ở kích thước điện thoại: tìm “gà rán” trả về Hana Chicken, mở quán chỉ có món quán đó, chọn kích cỡ/món thêm/độ cay, thêm giỏ đúng tổng 17 USD + phí giao 2 USD và xem xác nhận đơn. Sau kiểm thử đã xóa món thử để trả giỏ về trống; không tạo đơn thật mới. Export Android/iOS/Web thành công. Bản sao trước chỉnh nằm tại backups/before-vietnamese-ui-20261026.zip. Kiểm thử phần cứng native vẫn cần thực hiện trên Expo Go. Gói source Pha 4 cũ là bản trước lần chỉnh UI này.

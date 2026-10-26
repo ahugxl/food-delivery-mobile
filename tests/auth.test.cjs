@@ -33,7 +33,7 @@ const tick = () => new Promise((resolve) => setImmediate(resolve));
 test('missing configuration initializes signed out and cannot create a demo session', async () => {
   const store = createAuthStore(null);
   store.getState().initialize()();
-  await assert.rejects(store.getState().login('a@example.com', 'secret'), /not configured/);
+  await assert.rejects(store.getState().login('a@example.com', 'secret'), /Chưa cấu hình/);
   assert.equal(store.getState().isInitialized, true);
   assert.equal(store.getState().isAuthenticated, false);
   assert.equal(store.getState().isLoading, false);
@@ -107,7 +107,7 @@ test('concurrent submits are rejected until the request completes', async () => 
   let resolve;
   const f = fixture({ signInWithPassword: () => new Promise((done) => { resolve = done; }) });
   const pending = f.store.getState().login('a@example.com', 'secret');
-  await assert.rejects(f.store.getState().login('a@example.com', 'secret'), /already in progress/);
+  await assert.rejects(f.store.getState().login('a@example.com', 'secret'), /Đang xử lý đăng nhập/);
   resolve(result(session));
   await pending;
   assert.equal(f.store.getState().isLoading, false);

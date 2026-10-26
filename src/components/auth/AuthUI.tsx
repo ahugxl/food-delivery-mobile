@@ -36,7 +36,7 @@ export function AuthScreen({
             {back && (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Back to welcome"
+                accessibilityLabel="Quay lại màn hình chào"
                 onPress={() => router.replace('/(auth)/welcome')}
                 className="mb-8 h-12 w-12 items-center justify-center rounded-full border border-line bg-card active:opacity-70"
               >
@@ -99,7 +99,7 @@ export function AuthInput({
     <View className="mb-5 gap-2">
       <Text className="font-semibold text-sm text-ink">{label}</Text>
       <View
-        className={`min-h-14 flex-row items-center rounded-2xl border bg-card px-4 ${focused ? 'border-coral' : 'border-line'}`}
+        className={`min-h-14 flex-row items-center rounded-2xl border bg-card px-4 ${focused ? 'border-teal' : 'border-line'}`}
       >
         <Ionicons name={icon} size={20} color={colors.light.mutedForeground} />
         <TextInput
@@ -114,7 +114,7 @@ export function AuthInput({
         {secureTextEntry && (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`${visible ? 'Hide' : 'Show'} ${label.toLowerCase()}`}
+            accessibilityLabel={`${visible ? 'Ẩn' : 'Hiện'} ${label.toLowerCase()}`}
             accessibilityState={{ checked: visible }}
             onPress={() => setVisible((value) => !value)}
             className="h-12 w-10 items-center justify-center"
@@ -148,12 +148,12 @@ export function AuthButton({
       accessibilityState={{ disabled: loading, busy: loading }}
       disabled={loading}
       onPress={onPress}
-      className={`min-h-14 items-center justify-center rounded-2xl border px-5 py-4 active:opacity-80 ${secondary ? 'border-line bg-card' : 'border-coral bg-coral'}`}
+      className={`min-h-14 items-center justify-center rounded-2xl border px-5 py-4 active:opacity-80 ${secondary ? 'border-line bg-card' : 'border-teal bg-teal'}`}
     >
       <Text
         className={`font-semibold text-base ${secondary ? 'text-ink' : 'text-white'}`}
       >
-        {loading ? 'Please wait…' : title}
+        {loading ? 'Vui lòng chờ…' : title}
       </Text>
     </Pressable>
   );
@@ -180,7 +180,7 @@ export function SocialLogin() {
       <View className="mb-6 flex-row items-center gap-4">
         <View className="h-px flex-1 bg-line" />
         <Text className="font-regular text-sm text-muted">
-          Or continue with
+          Hoặc tiếp tục với
         </Text>
         <View className="h-px flex-1 bg-line" />
       </View>
@@ -189,10 +189,10 @@ export function SocialLogin() {
           <Pressable
             key={provider}
             accessibilityRole="button"
-            accessibilityLabel={`Continue with ${provider} (demo)`}
+            accessibilityLabel={`Tiếp tục với ${provider} (bản minh họa)`}
             onPress={() =>
               setMessage(
-                `${provider} sign-in is a UI demo. Use the email form to try the app.`,
+                `${provider} chưa được hỗ trợ. Vui lòng đăng nhập bằng email.`,
               )
             }
             className="min-h-14 flex-1 flex-row items-center justify-center gap-3 rounded-2xl border border-line bg-card px-3 py-4 active:opacity-70"

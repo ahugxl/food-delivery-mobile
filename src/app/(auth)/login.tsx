@@ -12,6 +12,7 @@ import {
   SocialLogin,
 } from '@/src/components/auth/AuthUI';
 import { useAuthStore } from '@/src/store/authStore';
+import { userMessage } from '../../utils/userMessage';
 
 export default function LoginScreen() {
   const login = useAuthStore((state) => state.login);
@@ -23,7 +24,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     if (isLoading) return;
     if (!isValidEmail(email) || !password.trim()) {
-      setMessage('Please enter a valid email address and your password.');
+      setMessage('Vui lòng nhập email hợp lệ và mật khẩu.');
       return;
     }
 
@@ -32,15 +33,15 @@ export default function LoginScreen() {
       await login(email, password);
       // Protected routing reacts to the authenticated session.
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Unable to log in. Please try again.');
+      setMessage(userMessage(error));
     }
   };
 
   return (
     <AuthScreen back>
       <AuthHeading
-        title="Welcome back!"
-        subtitle="Login to find your next favorite meal."
+        title="Chào mừng bạn trở lại!"
+        subtitle="Đăng nhập để khám phá những quán ngon bạn yêu thích."
       />
       <AuthInput
         label="Email"
@@ -55,9 +56,9 @@ export default function LoginScreen() {
         textContentType="emailAddress"
       />
       <AuthInput
-        label="Password"
+        label="Mật khẩu"
         icon="lock-closed-outline"
-        placeholder="Enter your password"
+        placeholder="Nhập mật khẩu"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -72,28 +73,28 @@ export default function LoginScreen() {
         accessibilityRole="button"
         onPress={() =>
           setMessage(
-            'Password reset is coming soon. Please use your registered password.',
+            'Chức năng đặt lại mật khẩu đang được phát triển. Vui lòng dùng mật khẩu đã đăng ký.',
           )
         }
         className="mb-5 min-h-11 self-end justify-center"
       >
         <Text className="font-semibold text-sm text-coral">
-          Forgot Password?
+          Quên mật khẩu?
         </Text>
       </Pressable>
       <AuthMessage message={message} />
-      <AuthButton title="Login" onPress={handleLogin} loading={isLoading} />
+      <AuthButton title="Đăng nhập" onPress={handleLogin} loading={isLoading} />
       <SocialLogin />
       <View className="mt-auto flex-row flex-wrap items-center justify-center pt-8">
         <Text className="font-regular text-sm text-muted">
-          Don't have an account?{' '}
+          Chưa có tài khoản?{' '}
         </Text>
         <Pressable
           accessibilityRole="link"
           onPress={() => router.replace('/(auth)/register')}
           className="min-h-11 justify-center px-1"
         >
-          <Text className="font-semibold text-sm text-coral">Sign Up</Text>
+          <Text className="font-semibold text-sm text-coral">Đăng ký</Text>
         </Pressable>
       </View>
     </AuthScreen>

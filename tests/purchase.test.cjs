@@ -13,12 +13,12 @@ const voucher = { id: 'voucher', code: 'SAVE5', restaurant_id: null, discount_ty
 
 test('voucher accepts the exact minimum and checks active, expiry, restaurant and supported values', () => {
   assert.equal(voucherError(voucher, 17, 'restaurant'), null);
-  assert.match(voucherError({ ...voucher, is_active: false }, 17, 'restaurant'), /inactive/);
-  assert.match(voucherError({ ...voucher, expiry_date: '2020-01-01' }, 17, 'restaurant'), /expired/);
-  assert.match(voucherError({ ...voucher, restaurant_id: 'other' }, 17, 'restaurant'), /another restaurant/);
-  assert.match(voucherError(voucher, 16.99, 'restaurant'), /Minimum/);
-  assert.match(voucherError({ ...voucher, discount_type: 'unknown' }, 17, 'restaurant'), /Unsupported/);
-  assert.match(voucherError({ ...voucher, discount_type: 'percentage', discount_value: 101 }, 17, 'restaurant'), /Invalid/);
+  assert.match(voucherError({ ...voucher, is_active: false }, 17, 'restaurant'), /ngừng hoạt động/);
+  assert.match(voucherError({ ...voucher, expiry_date: '2020-01-01' }, 17, 'restaurant'), /hết hạn/);
+  assert.match(voucherError({ ...voucher, restaurant_id: 'other' }, 17, 'restaurant'), /quán khác/);
+  assert.match(voucherError(voucher, 16.99, 'restaurant'), /tối thiểu/);
+  assert.match(voucherError({ ...voucher, discount_type: 'unknown' }, 17, 'restaurant'), /chưa được hỗ trợ/);
+  assert.match(voucherError({ ...voucher, discount_type: 'percentage', discount_value: 101 }, 17, 'restaurant'), /không hợp lệ/);
 });
 
 test('fixed/percentage totals clamp discounts to food subtotal and preserve delivery fee', () => {
@@ -36,7 +36,7 @@ test('cart merges identical options/notes, keeps differing notes and rejects mix
   assert.equal(cart.getState().items[0].quantity, 2);
   cart.getState().addToCart({ ...item, note: 'No salt' });
   assert.equal(cart.getState().items.length, 2);
-  assert.match(cart.getState().addToCart({ ...item, restaurantId: 'other' }), /another restaurant/);
+  assert.match(cart.getState().addToCart({ ...item, restaurantId: 'other' }), /quán khác/);
   assert.equal(cart.getState().items.length, 2);
 });
 
@@ -47,7 +47,7 @@ test('note editing can merge identical lines and quantity limits hold', () => {
   cart.getState().setNote(cart.getState().items[1].lineId, item.note);
   assert.equal(cart.getState().items.length, 1);
   assert.equal(cart.getState().items[0].quantity, 2);
-  assert.match(cart.getState().addToCart({ ...item, quantity: 99 }), /1 to 99/);
+  assert.match(cart.getState().addToCart({ ...item, quantity: 99 }), /1 đến 99/);
 });
 
 test('pending checkout locks edits; retry reuses request ID; successful clear resets pending request', () => {
@@ -59,7 +59,7 @@ test('pending checkout locks edits; retry reuses request ID; successful clear re
   cart.getState().setCheckingOut(true);
   cart.getState().removeFromCart(cart.getState().items[0].lineId);
   assert.equal(cart.getState().items.length, 1);
-  assert.match(cart.getState().addToCart(item), /submitted/);
+  assert.match(cart.getState().addToCart(item), /Đang gửi đơn/);
   cart.getState().clearCart();
   assert.equal(cart.getState().items.length, 0);
   assert.equal(cart.getState().checkoutRequest, null);
@@ -107,6 +107,6 @@ test('failed RPC never clears the cart; invalid checkout does not issue any requ
   await assert.rejects(f.api.createOrder({ orderId: 'order1', items: cart.getState().items, address: 'Test address' }), e => e.message === 'Voucher expired');
   assert.equal(cart.getState().items.length, 1);
   const before = f.requests.length;
-  await assert.rejects(f.api.createOrder({ orderId: 'order2', items: [], address: '' }), /cart/);
+  await assert.rejects(f.api.createOrder({ orderId: 'order2', items: [], address: '' }), /Giỏ hàng/);
   assert.equal(f.requests.length, before);
 });

@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
-import CatalogScreen from '../../features/catalog/CatalogScreen';
+import RestaurantMenu from '../../features/catalog/RestaurantMenu';
 
 export default function RestaurantScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  return <CatalogScreen key={id} restaurantId={id} />;
+  return <RestaurantMenu key={id} restaurantId={id} />;
 }

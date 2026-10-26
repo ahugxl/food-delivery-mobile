@@ -14,6 +14,7 @@ import { purchaseApi } from '../services/purchase';
 import { useAuthStore } from '../store/authStore';
 import { REVIEW_TAGS, type ReviewInput } from '../features/reviews/review';
 import { messageError } from '../features/chat/messages';
+import { viLabel } from '../utils/vietnamese';
 
 function Stars({ label, value, onChange, disabled }: { label: string; value: number; onChange: (rating: number) => void; disabled: boolean }) {
   return <View accessibilityRole="radiogroup" accessibilityLabel={label} className="flex-row gap-2">
@@ -71,8 +72,8 @@ function OrderReview({ orderId }: { orderId: string }) {
         </FlowCard>
         <FlowCard><View className="flex-row items-center gap-3"><DriverAvatar size={54} /><View><Text className="font-bold text-lg text-ink">John Cooper</Text><Text className="text-xs text-muted">Tài xế mô phỏng của đồ án</Text></View></View>
           <Stars label="Đánh giá tài xế" value={driverRating} onChange={setDriverRating} disabled={disabled} />
-          <View className="flex-row flex-wrap gap-2">{REVIEW_TAGS.map(tag => <AppPressable key={tag} accessibilityRole="checkbox" accessibilityLabel={tag} accessibilityState={{ checked: tags.includes(tag), disabled }} disabled={disabled} onPress={() => setTags(current => current.includes(tag) ? current.filter(item => item !== tag) : [...current, tag])}
-            className={`min-h-11 justify-center rounded-full border px-4 ${tags.includes(tag) ? 'border-teal bg-tealLight' : 'border-line bg-card'}`}><Text className="font-medium text-sm text-ink">{tag}</Text></AppPressable>)}</View>
+          <View className="flex-row flex-wrap gap-2">{REVIEW_TAGS.map(tag => <AppPressable key={tag} accessibilityRole="checkbox" accessibilityLabel={viLabel(tag)} accessibilityState={{ checked: tags.includes(tag), disabled }} disabled={disabled} onPress={() => setTags(current => current.includes(tag) ? current.filter(item => item !== tag) : [...current, tag])}
+            className={`min-h-11 justify-center rounded-full border px-4 ${tags.includes(tag) ? 'border-teal bg-tealLight' : 'border-line bg-card'}`}><Text className="font-medium text-sm text-ink">{viLabel(tag)}</Text></AppPressable>)}</View>
           <TextInput accessibilityLabel="Nhận xét tài xế" value={driverFeedback} onChangeText={setDriverFeedback} maxLength={2000} editable={!disabled} multiline placeholder="Chia sẻ trải nghiệm giao hàng..." className="min-h-24 rounded-2xl border border-line p-4 text-sm text-ink" />
         </FlowCard>
         {mutation.isError && <Text accessibilityRole="alert" className="mb-4 text-sm text-coral">{messageError(mutation.error)}</Text>}

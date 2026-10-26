@@ -21,31 +21,30 @@ export default function WelcomeScreen() {
           </View>
         </View>
         <Text className="mb-4 font-semibold text-xs uppercase tracking-widest text-coral">
-          Food Delivery
+          Giao đồ ăn
         </Text>
         <Text
           accessibilityRole="header"
           className="mb-5 text-center font-bold text-4xl leading-tight text-ink"
         >
-          Good food.{'\n'}Great moments.
+          Món ngon mỗi ngày.{'\n'}Niềm vui tận cửa.
         </Text>
         <Text className="px-3 text-center font-regular text-base leading-7 text-muted">
-          Your favorite flavors, delivered to your door. A delicious day starts
-          here.
+          Khám phá quán ngon yêu thích và nhận món ngay tại nhà. Bắt đầu một ngày đầy hương vị!
         </Text>
       </View>
       <View className="gap-4 pb-6">
         <AuthButton
-          title="Login"
+          title="Đăng nhập"
           onPress={() => router.push('/(auth)/login')}
         />
         <AuthButton
-          title="Sign Up"
+          title="Đăng ký"
           secondary
           onPress={() => router.push('/(auth)/register')}
         />
         <Text className="mt-2 text-center font-regular text-xs text-muted">
-          Made for your everyday cravings.
+          Giao món ngon, trọn niềm vui.
         </Text>
       </View>
     </AuthScreen>

@@ -5,16 +5,16 @@ import { cartSubtotal, serializeCart, validatePurchase, voucherError } from '../
 import { validCoordinates, type Coordinates } from '../features/location/coordinates';
 
 export function createPurchaseApi(client: SupabaseClient<SupabaseDatabase> | null) {
-  function db() { if (!client) throw new Error('Supabase is not configured.'); return client; }
+  function db() { if (!client) throw new Error('Chưa cấu hình kết nối Supabase.'); return client; }
   return {
     async checkVoucher(code: string, items: CartItem[]) {
       const normalized = code.trim().toUpperCase();
-      if (!normalized || normalized.length > 100) throw new Error('Enter a valid voucher code.');
-      if (!items.length) throw new Error('Add items before applying a voucher.');
-      if (items.some(item => item.restaurantId !== items[0].restaurantId)) throw new Error('Each order must belong to one restaurant.');
+      if (!normalized || normalized.length > 100) throw new Error('Vui lòng nhập mã ưu đãi hợp lệ.');
+      if (!items.length) throw new Error('Vui lòng thêm món trước khi áp dụng mã.');
+      if (items.some(item => item.restaurantId !== items[0].restaurantId)) throw new Error('Mỗi đơn hàng chỉ được đặt từ một quán.');
       const { data, error } = await db().from('vouchers').select('*').eq('code', normalized).maybeSingle();
       if (error) throw error;
-      if (!data) throw new Error('Voucher code not found.');
+      if (!data) throw new Error('Không tìm thấy mã ưu đãi.');
       const reason = voucherError(data, cartSubtotal(items), items[0].restaurantId);
       if (reason) throw new Error(reason);
       return data;
@@ -25,14 +25,14 @@ export function createPurchaseApi(client: SupabaseClient<SupabaseDatabase> | nul
         p_order_id: input.orderId, p_items: serializeCart(input.items),
         p_address: input.address.trim(), p_voucher_code: input.voucherCode?.trim().toUpperCase() || null,
       };
-      if (input.coordinates && !validCoordinates(input.coordinates)) throw new Error('Invalid delivery coordinates.');
+      if (input.coordinates && !validCoordinates(input.coordinates)) throw new Error('Tọa độ giao hàng không hợp lệ.');
       const request = input.coordinates ? db().rpc('create_food_order_at_location', { ...args, p_latitude: input.coordinates.latitude, p_longitude: input.coordinates.longitude }) : db().rpc('create_food_order', args);
       const { data, error } = await request.single();
       if (error) {
         if (error.code === 'PGRST202') throw new Error('Checkout setup is missing on Supabase. Please run the matching Phase 2/3 SQL migration.');
         throw error;
       }
-      if (!data) throw new Error('The server did not confirm your order. Please retry.');
+      if (!data) throw new Error('Chưa nhận được xác nhận đơn từ máy chủ. Vui lòng thử lại.');
       return data;
     },
     async order(id: string, userId: string, signal?: AbortSignal) {

@@ -67,10 +67,10 @@ function OrderChat({ orderId }: { orderId: string }) {
     finally { setUploading(false); }
   };
   return <SafeAreaView className="flex-1 bg-cream">
-    <FlowHeader title="Chat theo đơn hàng" />
+    <FlowHeader title="Tin nhắn theo đơn hàng" />
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <View className="gap-1 px-5 pb-3"><Text className="font-semibold text-sm text-ink">{order.data?.restaurants?.name ?? 'Đơn hàng'} · {orderId.slice(0, 8)}</Text>
-        <Text className="text-xs text-muted">{chat.connection === 'connected' ? 'Realtime đã kết nối' : 'Đang kết nối lại; lịch sử sẽ tự tải bù'}</Text>
+        <Text className="text-xs text-muted">{chat.connection === 'connected' ? 'Đang đồng bộ trực tiếp' : 'Đang kết nối lại; lịch sử sẽ tự tải bù'}</Text>
         {order.isSuccess && !order.data && <Text className="text-sm text-coral">Không tìm thấy đơn hàng của bạn.</Text>}
         {(order.isError || chat.isError) && <AppPressable accessibilityRole="button" onPress={() => { void order.refetch(); void chat.refetch(); }}><Text className="text-sm text-coral">Không tải được cuộc trò chuyện. Chạm để thử lại.</Text></AppPressable>}
       </View>

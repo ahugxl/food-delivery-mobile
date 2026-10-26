@@ -19,10 +19,10 @@ import { catalogApi, catalogKeys } from '../../services/catalog';
 import { FoodDetailSkeleton } from '../../components/LoadingLayouts';
 import { FlowButton, FlowHeader } from '../../components/FlowUI';
 import { useCartStore } from '../../store/cartStore';
+import { currency } from '../../features/order/checkout';
+import { viLabel } from '../../utils/vietnamese';
 
-function currency(amount: number) {
-  return `$${amount.toFixed(2)}`;
-}
+
 
 export default function FoodDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -70,14 +70,14 @@ function FoodDetailContent({ id }: { id: string }) {
     });
     if (error) {
       addedToCart.current = false;
-      Toast.show({ type: 'error', text1: 'Unable to add dish', text2: error });
+      Toast.show({ type: 'error', text1: 'Không thêm được món', text2: error });
       return;
     }
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Toast.show({
       type: 'success',
-      text1: 'Added to cart!',
-      text2: `${quantity} × ${food.name}`,
+      text1: 'Đã thêm vào giỏ hàng!',
+      text2: `${quantity} × ${viLabel(food.name)}`,
     });
     router.canGoBack() ? router.back() : router.replace('/(tabs)');
   };
@@ -87,13 +87,13 @@ function FoodDetailContent({ id }: { id: string }) {
   if (isError)
     return (
       <SafeAreaView className="flex-1 bg-cream">
-        <FlowHeader title="Food details" />
+        <FlowHeader title="Chi tiết món ăn" />
         <View className="flex-1 justify-center gap-5 px-5">
           <Text className="text-center font-medium text-base text-ink">
-            We couldn't load this dish.
+            Không tải được món ăn.
           </Text>
           <FlowButton
-            title="Try again"
+            title="Thử lại"
             onPress={() => {
               void refetch();
             }}
@@ -106,7 +106,7 @@ function FoodDetailContent({ id }: { id: string }) {
     return (
       <SafeAreaView className="flex-1 bg-cream" style={styles.notFound}>
         <Text className="text-ink" style={styles.notFoundTitle}>
-          Dish not found
+          Không tìm thấy món ăn
         </Text>
         <Pressable
           accessibilityRole="button"
@@ -117,7 +117,7 @@ function FoodDetailContent({ id }: { id: string }) {
           <Text
             style={[styles.addButtonText, { color: colors.primaryForeground }]}
           >
-            Go back
+            Quay lại
           </Text>
         </Pressable>
       </SafeAreaView>
@@ -138,12 +138,12 @@ function FoodDetailContent({ id }: { id: string }) {
             contentFit="cover"
             transition={220}
             style={styles.heroImage}
-            accessibilityLabel={food.name}
+            accessibilityLabel={viLabel(food.name)}
           />
           <Pressable
             testID="food-detail-back"
             accessibilityRole="button"
-            accessibilityLabel="Go back"
+            accessibilityLabel="Quay lại"
             onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')}
             style={[styles.backButton, { backgroundColor: colors.card }]}
           >
@@ -168,12 +168,12 @@ function FoodDetailContent({ id }: { id: string }) {
           <View style={styles.namePriceRow}>
             <View style={styles.nameCopy}>
               <Text className="text-ink" style={styles.foodName}>
-                {food.name}
+                {viLabel(food.name)}
               </Text>
               <Text
                 style={[styles.foodSubtitle, { color: colors.mutedForeground }]}
               >
-                Freshly prepared by {food.restaurants.name}.
+                Được chuẩn bị bởi {food.restaurants.name}.
               </Text>
             </View>
             <Text className="text-coral" style={styles.basePrice}>
@@ -198,18 +198,18 @@ function FoodDetailContent({ id }: { id: string }) {
                 { color: colors.secondaryForeground },
               ]}
             >
-              Base price {currency(Number(food.price))}
+              Giá món {currency(Number(food.price))}
             </Text>
           </View>
 
-          {!!food.description && <Text className="mb-5 font-regular text-sm leading-6 text-muted">{food.description}</Text>}
+          {!!food.description && <Text className="mb-5 font-regular text-sm leading-6 text-muted">{viLabel(food.description)}</Text>}
           <FoodOptions groups={groups} selection={selection}
             onToggle={(group, itemId) => setSelection(current => toggleOption(current, group, itemId))} />
-          {!available && <Text accessibilityRole="alert" className="mt-4 font-medium text-sm text-coral">{food.is_available ? 'This restaurant is currently closed.' : 'This dish is currently unavailable.'}</Text>}
-          {missing.length > 0 && <Text accessibilityLiveRegion="polite" className="mt-4 font-regular text-sm text-muted">Please choose: {missing.map(group => group.name).join(', ')}.</Text>}
-          <Text className="mb-2 mt-5 font-semibold text-sm text-ink">Note for the restaurant</Text>
-          <TextInput accessibilityLabel="Note for the restaurant" value={note} onChangeText={setNote} maxLength={500} multiline
-            placeholder="Less salt, no onions..." className="min-h-20 rounded-2xl border border-line bg-card px-4 py-3 font-regular text-sm text-ink" />
+          {!available && <Text accessibilityRole="alert" className="mt-4 font-medium text-sm text-coral">{food.is_available ? 'Quán hiện đang đóng cửa.' : 'Món này hiện ngừng bán.'}</Text>}
+          {missing.length > 0 && <Text accessibilityLiveRegion="polite" className="mt-4 font-regular text-sm text-muted">Vui lòng chọn: {missing.map(group => viLabel(group.name)).join(', ')}.</Text>}
+          <Text className="mb-2 mt-5 font-semibold text-sm text-ink">Ghi chú cho quán</Text>
+          <TextInput accessibilityLabel="Ghi chú cho quán" value={note} onChangeText={setNote} maxLength={500} multiline
+            placeholder="Ít muối, không hành…" className="min-h-20 rounded-2xl border border-line bg-card px-4 py-3 font-regular text-sm text-ink" />
         </View>
       </ScrollView>
 
@@ -227,7 +227,7 @@ function FoodDetailContent({ id }: { id: string }) {
           <Pressable
             testID="decrease-food-quantity"
             accessibilityRole="button"
-            accessibilityLabel="Decrease quantity"
+            accessibilityLabel="Giảm số lượng"
             accessibilityState={{ disabled: quantity <= 1 }}
             disabled={quantity <= 1}
             onPress={() => setQuantity((current) => Math.max(1, current - 1))}
@@ -245,7 +245,7 @@ function FoodDetailContent({ id }: { id: string }) {
           <Pressable
             testID="increase-food-quantity"
             accessibilityRole="button"
-            accessibilityLabel="Increase quantity"
+            accessibilityLabel="Tăng số lượng"
             onPress={() => setQuantity((current) => current + 1)}
             style={styles.quantityButton}
           >
@@ -258,13 +258,13 @@ function FoodDetailContent({ id }: { id: string }) {
           disabled={!available || missing.length > 0}
           accessibilityState={{ disabled: !available || missing.length > 0 }}
           onPress={handleAddToCart}
-          className="bg-coral"
+          className="bg-teal"
           style={styles.addButton}
         >
           <Text
             style={[styles.addButtonText, { color: colors.primaryForeground }]}
           >
-            Add to cart · {currency(orderTotal)}
+            Thêm vào giỏ · {currency(orderTotal)}
           </Text>
           <Ionicons
             name="arrow-forward"

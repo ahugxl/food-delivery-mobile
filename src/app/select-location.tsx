@@ -7,6 +7,7 @@ import MapPanel from '../components/maps/MapPanel';
 import { currentCoordinates, getAddressFromCoords } from '../services/location';
 import { validCoordinates, type Coordinates } from '../features/location/coordinates';
 import { useOrderStore } from '../store/orderStore';
+import { viLabel } from '../utils/vietnamese';
 
 const DEFAULT_CENTER = { latitude: 10.7769, longitude: 106.7009 };
 export default function SelectLocationScreen() {
@@ -54,7 +55,7 @@ export default function SelectLocationScreen() {
       {!coordinate && <Text className="text-sm text-muted">Chạm bản đồ hoặc kéo ghim để chọn điểm giao. Vị trí ban đầu chỉ là tâm bản đồ.</Text>}
       {busy && <Text accessibilityLiveRegion="polite" className="text-sm text-muted">Đang dịch tọa độ thành địa chỉ...</Text>}
       {!!error && <Text accessibilityRole="alert" className="text-sm text-coral">{error}</Text>}
-      <View className="flex-row gap-3">{(['Home', 'Work', 'Other'] as const).map(value => <View key={value} className="flex-1"><FlowButton title={value === label ? `✓ ${value}` : value} onPress={() => setLabel(value)} /></View>)}</View>
+      <View className="flex-row gap-3">{(['Home', 'Work', 'Other'] as const).map(value => <View key={value} className="flex-1"><FlowButton title={value === label ? `✓ ${viLabel(value)}` : viLabel(value)} onPress={() => setLabel(value)} /></View>)}</View>
       <FlowButton title="Xác nhận điểm giao" disabled={!coordinate || busy || street.trim().length < 5} onPress={confirm} />
     </ScrollView>
   </SafeAreaView>;

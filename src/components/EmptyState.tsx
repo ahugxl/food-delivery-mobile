@@ -16,7 +16,7 @@ export function EmptyState({
         source={require('../../assets/images/empty-bag.svg')}
         contentFit="contain"
         style={{ width: 240, height: 204, maxWidth: '100%' }}
-        accessibilityLabel="A smiling takeout bag with a little heart"
+        accessibilityLabel="Túi đồ ăn với biểu tượng trái tim"
       />
       <Text
         accessibilityRole="header"
@@ -29,7 +29,7 @@ export function EmptyState({
       </Text>
       <View className="w-full max-w-xs">
         <FlowButton
-          title="Go to Menu"
+          title="Khám phá quán ngon"
           onPress={() => router.replace('/(tabs)')}
         />
       </View>

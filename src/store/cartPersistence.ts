@@ -36,7 +36,7 @@ export function createPersistedCartStore(storage: StateStorage) {
   // Serialize disk writes so a slow earlier save cannot restore an already-cleared cart.
   let writes = Promise.resolve();
   const queue = (action: () => unknown | Promise<unknown>) => {
-    writes = writes.then(action).then(() => {}, () => { console.warn('Unable to save the cart to local storage.'); });
+    writes = writes.then(action).then(() => {}, () => { console.warn('Không lưu được giỏ hàng trên thiết bị.'); });
     return writes;
   };
   const orderedStorage: StateStorage = {
@@ -57,7 +57,7 @@ export function createPersistedCartStore(storage: StateStorage) {
     },
     migrate: () => ({ ownerId: null, items: [], checkoutRequest: null }),
     onRehydrateStorage: () => (_state, error) => {
-      if (error) console.warn('Unable to restore the saved cart. Starting with an empty cart.');
+      if (error) console.warn('Không khôi phục được giỏ đã lưu. Đang mở giỏ trống.');
     },
   }));
 }

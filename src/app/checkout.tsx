@@ -14,6 +14,7 @@ import { purchaseApi } from '../services/purchase';
 import { useCartStore } from '../store/cartStore';
 import { useOrderStore } from '../store/orderStore';
 import { useAuthStore } from '../store/authStore';
+import { validCoordinates } from '../features/location/coordinates';
 
 export default function CheckoutScreen() {
   const items = useCartStore(state => state.items);
@@ -25,18 +26,19 @@ export default function CheckoutScreen() {
   const submitGuard = useRef(false);
   const totals = purchaseTotals(items, voucher);
   const mutation = useMutation({ mutationFn: purchaseApi.createOrder, retry: false });
-  const canOrder = !!userId && items.length > 0 && address.street.trim().length >= 5 && !totals.voucherError && !locked;
+  const coordinates = validCoordinates(address) ? { latitude: address.latitude, longitude: address.longitude } : undefined;
+  const canOrder = !!userId && items.length > 0 && address.street.trim().length >= 5 && !!coordinates && !totals.voucherError && !locked;
   const placeOrder = async () => {
     if (!canOrder || submitGuard.current || useCartStore.getState().isCheckingOut) return;
     submitGuard.current = true;
     let submittedRequestId: string | null = null;
     try {
       validatePurchase(items, address.street);
-      const signature = purchaseSignature(items, address.street, voucher?.code);
+      const signature = purchaseSignature(items, address.street, voucher?.code, coordinates);
       const orderId = useCartStore.getState().prepareCheckout(signature, randomUUID(), { address, voucher });
       submittedRequestId = orderId;
       useCartStore.getState().setCheckingOut(true);
-      const order = await mutation.mutateAsync({ orderId, items, address: address.street, voucherCode: voucher?.code });
+      const order = await mutation.mutateAsync({ orderId, items, address: address.street, voucherCode: voucher?.code, coordinates });
       if (useAuthStore.getState().user?.id !== userId || useCartStore.getState().checkoutRequest?.id !== order.id) return;
       useCartStore.getState().clearCart();
       useOrderStore.getState().setCheckoutVoucher(null);
@@ -56,6 +58,7 @@ export default function CheckoutScreen() {
       <FlowCard>
         <Text className="font-bold text-base text-ink">Deliver to {address.label}</Text>
         <Text className="font-regular text-sm text-muted">{address.street || 'Please enter a delivery address.'}</Text>
+        {!coordinates && <Text className="text-sm text-coral">Please select a delivery pin before ordering.</Text>}
         <Pressable accessibilityRole="button" disabled={locked} onPress={() => router.push('/select-location')} className="min-h-11 justify-center">
           <Text className="font-semibold text-sm text-teal">Change address</Text>
         </Pressable>

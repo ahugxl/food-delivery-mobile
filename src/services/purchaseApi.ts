@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SupabaseDatabase } from '../types/supabase';
 import type { CartItem } from '../types';
 import { cartSubtotal, serializeCart, validatePurchase, voucherError } from '../features/order/purchase';
+import { validCoordinates, type Coordinates } from '../features/location/coordinates';
 
 export function createPurchaseApi(client: SupabaseClient<SupabaseDatabase> | null) {
   function db() { if (!client) throw new Error('Supabase is not configured.'); return client; }
@@ -18,21 +19,24 @@ export function createPurchaseApi(client: SupabaseClient<SupabaseDatabase> | nul
       if (reason) throw new Error(reason);
       return data;
     },
-    async createOrder(input: { orderId: string; items: CartItem[]; address: string; voucherCode?: string }) {
+    async createOrder(input: { orderId: string; items: CartItem[]; address: string; voucherCode?: string; coordinates?: Coordinates }) {
       validatePurchase(input.items, input.address);
-      const { data, error } = await db().rpc('create_food_order', {
+      const args = {
         p_order_id: input.orderId, p_items: serializeCart(input.items),
         p_address: input.address.trim(), p_voucher_code: input.voucherCode?.trim().toUpperCase() || null,
-      }).single();
+      };
+      if (input.coordinates && !validCoordinates(input.coordinates)) throw new Error('Invalid delivery coordinates.');
+      const request = input.coordinates ? db().rpc('create_food_order_at_location', { ...args, p_latitude: input.coordinates.latitude, p_longitude: input.coordinates.longitude }) : db().rpc('create_food_order', args);
+      const { data, error } = await request.single();
       if (error) {
-        if (error.code === 'PGRST202') throw new Error('Checkout setup is missing on Supabase. Please run the Phase 2 SQL migration.');
+        if (error.code === 'PGRST202') throw new Error('Checkout setup is missing on Supabase. Please run the matching Phase 2/3 SQL migration.');
         throw error;
       }
       if (!data) throw new Error('The server did not confirm your order. Please retry.');
       return data;
     },
     async order(id: string, userId: string, signal?: AbortSignal) {
-      const query = db().from('orders').select('*, restaurants(id, name, image_url), order_items(*)').eq('id', id).eq('user_id', userId);
+      const query = db().from('orders').select('*, restaurants(id, name, image_url, latitude, longitude), order_items(*)').eq('id', id).eq('user_id', userId);
       const { data, error } = await (signal ? query.abortSignal(signal) : query).maybeSingle();
       if (error) throw error;
       return data;

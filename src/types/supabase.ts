@@ -28,6 +28,10 @@ export type SupabaseDatabase = {
     } };
     Views: Record<never, never>;
     Functions: {
+      create_food_order_at_location: {
+        Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code?: string | null; p_latitude: number; p_longitude: number };
+        Returns: Tables['orders']['Row'][];
+      };
       create_food_order: {
         Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code?: string | null };
         Returns: Tables['orders']['Row'][];

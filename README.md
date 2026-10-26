@@ -72,3 +72,24 @@ Bản sao lưu trước khi sửa nằm trong `backups/`, gồm mã nguồn, ass
 Trong lần kiểm tra này, `hermesc.exe` có sẵn trong `node_modules` khác binary từ gói npm chính thức cùng phiên bản `hermes-compiler@250829098.0.17` và không tạo file `.hbc`. Đã lưu binary cũ trong `backups/hermes-check/` và phục hồi binary từ đúng gói npm này. Không đổi phiên bản compiler hay tắt Hermes trong cấu hình ứng dụng. Khi cài lại dependencies, dùng `npm ci` từ registry chính thức thay vì sao chép `node_modules`.
 
 Kiểm thử live Pha 2 ngày 26/10/2026: voucher PIZZAHUT20 bị từ chối tại Hana Chicken; GIAM5K giảm $5 trên subtotal $17. Đơn kiểm thử `0805d837-1e73-4aea-bca2-0f6f958f54aa` được tạo qua UI, tổng $14 gồm phí giao $2, ghi chú/địa chỉ ghi rõ KHONG GIAO HANG. Tracking đọc lại đầy đủ các nhóm Size/Topping/Spiciness từ snapshot. Đây là bản ghi kiểm thử pending, không phải thanh toán online.
+
+
+## Pha 3: Location, simulated tracking v? chat realtime
+
+?? ch?y `npx expo install react-native-maps expo-location` theo SDK 57. `MapPanel.tsx` d?ng b?n ?? native m?c ??nh (Apple Maps iOS, Google Maps Android); kh?ng c?u h?nh Google Cloud key trong d? ?n. Th? b?ng Expo Go kh?ng c?n setup Maps ri?ng theo [Expo SDK 57](https://docs.expo.dev/versions/v57.0.0/sdk/map-view/). Binary Android ph?t h?nh ri?ng c?n c?u h?nh Maps theo h??ng d?n Expo; kh?ng xem k?t qu? export l? ki?m th? b?n ?? tr?n ?i?n tho?i.
+
+Select Location h? tr? ch?m b?n ??/k?o ghim, n?t l?y v? tr? hi?n t?i, reverse geocode b?ng expo-location, debounce 350ms v? b? k?t qu? c? khi ng??i d?ng k?o/nh?p ti?p. L?i m?ng ho?c t? ch?i quy?n kh?ng tr? th?nh chu?i ??a ch? h?p l?; ng??i d?ng c? th? nh?p ??a ch? cho ghim ?? ch?n. D? li?u ph??ng/qu?n t?y geocoder h? ?i?u h?nh, kh?ng b?o ??m lu?n ?? s? nh?. Web c? s? ?? v? ? nh?p t?a ??/??a ch?; reverse geocode ch? d?ng tr?n native. Kh?ng g?i geocoder tr? ph?.
+
+Checkout g?i `create_food_order_at_location` ?? ghi latitude/longitude giao h?ng trong c?ng transaction v?i h?a ??n/items, gi? request UUID khi retry. ??n Pha 2 c? c? t?a ?? null v?n ??c/chat b?nh th??ng, nh?ng kh?ng v? tuy?n khi thi?u t?a ??.
+
+`useOrderTracking` ??ng k? UPDATE c?a orders theo ID, ??c l?i joined order qua React Query, t?i b? sau reconnect/foreground v? fallback polling khi WebSocket ch?a k?t n?i. Khi delivering, xe m? ph?ng n?i suy ???ng th?ng t? qu?n t?i ?i?m giao trong 40 gi?y; native marker animate gi?a c?c b??c. ??y l? m? ph?ng c?c b?, kh?ng c? GPS t?i x?, kh?ng ?i?u h??ng ???ng b? v? kh?ng t? ??i tr?ng th?i completed. M? l?i m?n h?nh delivering b?t ??u l??t m? ph?ng m?i.
+
+Inbox li?t k? cu?c tr? chuy?n theo ??n th?t. `useChatRealtime` t?i 200 tin g?n nh?t, subscribe INSERT theo order_id, g?p/s?p x?p theo ID + th?i gian, gi? ri?ng buffer live ?? tr?nh history response ghi ?? tin v?a ??n, t?i b? khi reconnect/foreground. G?i c? request UUID, ch?n nh?n l?p v? t?i s? d?ng ID khi retry. Ch? g?i sender_type=user t? app; driver demo ch? th?m b?ng Dashboard.
+
+Chat h? tr? ch?n/ch?p ?nh JPEG/PNG/WebP t?i ?a 5 MB. Bucket `order-chat` private, object path `orderId/userId/UUID.ext`; messages.image_url l?u path. App t?o signed URL 1 gi?, refresh sau 50 ph?t; kh?ng public ?nh chat. ?nh ?? g?i th?nh c?ng ???c gi? ?? xem l?ch s?. Upload ch?a g?n v?o message sau l?i/tho?t c? th? c?n d?n ??nh k?.
+
+Ch? d? ?n ?? ch?y `supabase/migrations/20261026_phase3_location_chat.sql`: RPC t?a ??, RLS messages, Storage policies/bucket v? publication orders/messages. Kh?ng c?p quy?n gi? sender_type=driver cho app. ?? demo: m? Chat c?a ??n test Pha 2 r?i ch?y `supabase/phase3_demo.sql` trong Dashboard; file ch? nh?m ??n 0805d837-1e73-4aea-bca2-0f6f958f54aa c? nh?n KHONG GIAO HANG, th?m m?t tin driver v? ??i sang delivering v?i t?a ?? m? ph?ng g?n qu?n. Sau ?? m? Tracking xem xe ch?y.
+
+Ki?m tra: `npm run typecheck`, `npm test`, `node scripts/test-phase3-sql.cjs`, export Android/iOS/Web. PostgreSQL WASM test ch?y ri?ng trong b? nh?; kh?ng ghi d? li?u ki?m th? v?o backend th?t. Native k?o ghim/geocoder/camera v?n c?n x?c minh tr?n Expo Go/thi?t b?, kh?ng th? thay b?ng test web.
+
+Kết quả kiểm tra live Pha 3 (26/10/2026): Chat của đơn 0805d837 nhận tin tài xế từ Dashboard không reload; WebSocket báo connected. Tracking hiển thị delivering, xe mô phỏng chạy tới điểm giao trong 40 giây, không đổi trạng thái server thành completed. Web xác nhận điểm tọa độ/địa chỉ thủ công vào Checkout. Persist giữ 2 phần ăn, 3 nhóm tùy chọn và ghi chú sau reload; clear rồi reload vẫn rỗng. Không tạo thêm đơn trong lần kiểm tra Pha 3. TypeScript, 58/58 tests, SQL tests Pha 2/3 và export Android/iOS/Web pass. Gửi ảnh/camera và bản đồ/geocoder native chưa được kiểm thử trực tiếp trên thiết bị Expo Go.

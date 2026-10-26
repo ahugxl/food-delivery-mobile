@@ -1,6 +1,8 @@
 export type DeliveryAddress = {
   street: string;
   label: 'Home' | 'Work' | 'Other';
+  latitude?: number;
+  longitude?: number;
 };
 export type Voucher = {
   id: string;

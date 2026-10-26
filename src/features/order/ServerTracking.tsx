@@ -1,27 +1,30 @@
-import { useQuery } from '@tanstack/react-query';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FlowButton, FlowCard, FlowHeader } from '../../components/FlowUI';
 import { Skeleton, SkeletonGroup } from '../../components/Skeleton';
-import { purchaseApi } from '../../services/purchase';
-import { useAuthStore } from '../../store/authStore';
+import { useOrderTracking } from '../../hooks/useOrderTracking';
+import MapPanel from '../../components/maps/MapPanel';
+import { router } from 'expo-router';
 import { currency } from './checkout';
 import type { Json } from '../../types/database.types';
 
 const statuses: Record<string, string> = { pending: 'Waiting for restaurant confirmation', preparing: 'Preparing your food', delivering: 'On the way', completed: 'Delivered', cancelled: 'Cancelled' };
 
 export default function ServerTracking({ orderId }: { orderId: string }) {
-  const userId = useAuthStore(state => state.user?.id);
-  const order = useQuery({ queryKey: ['order', userId, orderId],
-    queryFn: ({ signal }) => purchaseApi.order(orderId, userId!, signal), enabled: !!userId,
-    refetchInterval: query => ['completed', 'cancelled'].includes(query.state.data?.status ?? '') ? false : 10000,
-  });
+  const order = useOrderTracking(orderId);
   return <SafeAreaView className="flex-1 bg-cream">
     <FlowHeader title="Order tracking" />
     {order.isPending ? <SkeletonGroup label="Loading order"><View className="gap-4 p-5"><Skeleton height={150} /><Skeleton height={120} /></View></SkeletonGroup>
       : order.isError ? <View className="gap-4 p-5"><Text className="text-ink">Unable to load your order.</Text><FlowButton title="Try again" onPress={() => { void order.refetch(); }} /></View>
       : !order.data ? <Text className="p-5 text-ink">Order not found.</Text>
       : <ScrollView contentContainerStyle={{ padding: 20 }}>
+        <View className="mb-5 gap-3">
+          <Text className="text-xs text-muted">{order.connection === 'connected' ? 'Realtime đã kết nối' : 'Đang kết nối lại; tự tải lại trạng thái'}</Text>
+          {order.destination && order.origin ? <MapPanel coordinate={order.destination} origin={order.origin} driver={order.driverLocation} simulation />
+            : <Text className="rounded-2xl bg-tealLight p-4 text-sm text-muted">Đơn hoặc nhà hàng chưa có tọa độ, nên chưa thể vẽ tuyến đường. Các đơn mới sẽ lưu tọa độ đã chọn khi checkout.</Text>}
+          {order.data.status === 'delivering' && order.destination && order.origin && <Text className="text-sm text-teal">{order.progress >= 1 ? 'Xe mô phỏng đã tới điểm giao. Trạng thái đơn vẫn do server quản lý.' : `Xe mô phỏng đang di chuyển · ${Math.round(order.progress * 100)}%`}</Text>}
+          <FlowButton title="Chat về đơn hàng" onPress={() => router.push({ pathname: '/chat', params: { orderId } })} />
+        </View>
         <FlowCard><Text className="font-bold text-xl text-ink">{statuses[order.data.status] ?? order.data.status}</Text>
           <Text selectable className="font-regular text-xs text-muted">Order #{order.data.id}</Text>
           <Text className="font-semibold text-base text-ink">{order.data.restaurants?.name ?? 'Restaurant'}</Text>

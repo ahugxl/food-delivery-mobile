@@ -1,5 +1,6 @@
 import type { CartItem } from '../../types';
 import type { Database, Json } from '../../types/database.types';
+import type { Coordinates } from '../location/coordinates';
 
 export type VoucherRow = Database['public']['Tables']['vouchers']['Row'];
 export type OrderRow = Database['public']['Tables']['orders']['Row'];
@@ -44,6 +45,6 @@ export function serializeCart(items: CartItem[]): Json {
   }));
 }
 
-export function purchaseSignature(items: CartItem[], address: string, code?: string) {
-  return JSON.stringify({ items: serializeCart(items), address: address.trim(), code: code?.trim().toUpperCase() || null });
+export function purchaseSignature(items: CartItem[], address: string, code?: string, coordinates?: Coordinates) {
+  return JSON.stringify({ items: serializeCart(items), address: address.trim(), code: code?.trim().toUpperCase() || null, ...(coordinates ? { coordinates } : {}) });
 }

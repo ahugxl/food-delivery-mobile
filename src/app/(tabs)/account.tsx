@@ -14,7 +14,7 @@ import { userMessage } from '../../utils/userMessage';
 const accountLinks = [
   { label: 'Địa chỉ đã lưu', icon: 'location-outline', route: '/addresses' },
   { label: 'Phương thức thanh toán', icon: 'card-outline', route: null },
-  { label: 'Mã ưu đãi', icon: 'ticket-outline', route: null },
+  { label: 'Mã ưu đãi', icon: 'ticket-outline', route: '/voucher-wallet' },
   { label: 'Cài đặt', icon: 'settings-outline', route: null },
   { label: 'Trung tâm trợ giúp', icon: 'help-circle-outline', route: null },
 ] as const;

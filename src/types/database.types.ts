@@ -465,6 +465,30 @@ export interface Database {
           is_default?: boolean;
         };
       };
+      user_vouchers: {
+        Row: {
+          id: string;
+          user_id: string;
+          voucher_id: string;
+          is_used: boolean | null;
+          collected_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          voucher_id: string;
+          is_used?: boolean | null;
+          collected_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          voucher_id?: string;
+          is_used?: boolean | null;
+          collected_at?: string | null;
+        };
+      };
+
       vouchers: {
         Row: {
           id: string;

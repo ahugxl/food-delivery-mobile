@@ -11,6 +11,7 @@ type ForeignKey<Name extends string, Column extends string, Target extends strin
 
 // FK names from the provided CREATE TABLE statements. Keep database.types.ts intact.
 type Relationships = {
+  user_vouchers: [ForeignKey<'user_vouchers_voucher_id_fkey', 'voucher_id', 'vouchers'>];
   favorites: [ForeignKey<'favorites_restaurant_id_fkey', 'restaurant_id', 'restaurants'>];
   orders: [ForeignKey<'orders_restaurant_id_fkey', 'restaurant_id', 'restaurants'>];
   order_items: [ForeignKey<'order_items_order_id_fkey', 'order_id', 'orders'>];
@@ -29,6 +30,7 @@ export type SupabaseDatabase = {
     } };
     Views: Record<never, never>;
     Functions: {
+      collect_my_voucher: { Args: { p_voucher_id: string }; Returns: Tables['vouchers']['Row'][] };
       update_my_profile: {
         Args: { p_full_name: string; p_phone: string | null; p_avatar_url: string | null };
         Returns: Tables['profiles']['Row'][];

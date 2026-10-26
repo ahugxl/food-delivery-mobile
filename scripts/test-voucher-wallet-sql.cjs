@@ -1,0 +1,56 @@
+const fs = require('node:fs'), assert = require('node:assert/strict');
+const { PGlite } = require('../backups/sql-check/node_modules/@electric-sql/pglite');
+(async () => {
+  const db = new PGlite();
+  try {
+    await db.exec(`create schema auth; create table auth.users(id uuid primary key); create role anon; create role authenticated;
+      create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('app.user_id',true),'')::uuid$$;
+      grant usage on schema auth to authenticated;
+      create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+      create table storage.objects(id uuid primary key,bucket_id text,name text);
+      create function storage.foldername(text) returns text[] language sql immutable as $$select string_to_array($1,'/')$$;`);
+    for (const file of ['tests/fixtures/schema.sql', 'supabase/migrations/20261026_phase2_checkout.sql', 'supabase/migrations/20261026_phase3_location_chat.sql', 'supabase/migrations/20261026_dynamic_shipping.sql']) await db.exec(fs.readFileSync(file, 'utf8'));
+    // Match the deployed schema supplied by the user.
+    await db.exec(`create table public.user_vouchers(id uuid primary key default gen_random_uuid(),user_id uuid not null references auth.users on delete cascade, voucher_id uuid not null references public.vouchers on delete cascade, is_used boolean default false, collected_at timestamptz default now(), unique(user_id,voucher_id));
+      create policy old_public_read on public.user_vouchers for select using(true);`);
+    const migration = fs.readFileSync('supabase/migrations/20261026_voucher_wallet.sql', 'utf8');
+    await db.exec(migration); await db.exec(migration);
+    const user = '11111111-1111-4111-8111-111111111111', other = '99999999-9999-4999-8999-999999999999', restaurant = '22222222-2222-4222-8222-222222222222', food = '33333333-3333-4333-8333-333333333333';
+    await db.exec(`insert into auth.users values('${user}'),('${other}'); select set_config('app.user_id','${user}',false);
+      insert into public.restaurants(id,name,address,latitude,longitude)values('${restaurant}','Test','Test',0,0);
+      insert into public.foods(id,restaurant_id,name,price)values('${food}','${restaurant}','Food',40000);
+      insert into public.vouchers(code,discount_type,discount_value,min_order_value)values('SAVE','fixed',10000,40000),('ROLLBACK','fixed',5000,0),('UNOWNED','fixed',5000,0);
+      insert into public.vouchers(code,discount_type,discount_value,expiry_date)values('EXPIRED','fixed',1000,now()-interval '1 day');`);
+    const ids = Object.fromEntries((await db.query('select id,code from vouchers')).rows.map(v => [v.code,v.id]));
+    await db.exec('set role authenticated');
+    const collect = id => db.query('select * from public.collect_my_voucher($1)', [id]);
+    await collect(ids.SAVE); await collect(ids.SAVE);
+    assert.equal((await db.query('select * from public.user_vouchers')).rows.length, 1);
+    await assert.rejects(collect(ids.EXPIRED), /hết hạn/);
+    await db.query("select set_config('app.user_id',$1,false)", [other]);
+    assert.equal((await db.query('select * from public.user_vouchers')).rows.length, 0);
+    await assert.rejects(db.query('insert into public.user_vouchers(user_id,voucher_id) values($1,$2)', [user,ids.ROLLBACK]), /permission denied/);
+    await db.query("select set_config('app.user_id',$1,false)", [user]);
+    let serial = 0; const next = () => `aaaaaaaa-aaaa-4aaa-8aaa-${String(++serial).padStart(12,'0')}`;
+    const items = JSON.stringify([{ foodId: food, quantity: 1, unitPrice: 40000, options: [], note: 'KHONG GIAO HANG' }]);
+    const place = (id, code) => db.query('select * from public.create_food_order($1,$2::jsonb,$3,$4,0,0,15000)', [id,items,'Test KHONG GIAO HANG',code]);
+    await assert.rejects(place(next(), 'UNOWNED'), /chưa được thu thập/);
+    const orderId = next(); const order = (await place(orderId, 'SAVE')).rows[0];
+    assert.equal(Number(order.total), 45000);
+    assert.equal((await db.query('select is_used from user_vouchers where voucher_id=$1',[ids.SAVE])).rows[0].is_used, true);
+    assert.equal((await place(orderId,'SAVE')).rows[0].id, orderId);
+    await assert.rejects(place(next(),'SAVE'), /đã sử dụng/);
+    await assert.rejects(collect(ids.SAVE), /đã sử dụng/);
+    await assert.rejects(db.exec('update public.user_vouchers set is_used=false'), /permission denied/);
+    await assert.rejects(db.exec('delete from public.user_vouchers'), /permission denied/);
+    await collect(ids.ROLLBACK);
+    await db.exec(`reset role; create function public.fail_wallet_item()returns trigger language plpgsql as $$begin raise exception 'Item failure';end$$;
+      create trigger fail_wallet before insert on public.order_items for each row execute function public.fail_wallet_item(); set role authenticated;`);
+    const failedId = next(); await assert.rejects(place(failedId,'ROLLBACK'), /Item failure/);
+    assert.equal((await db.query('select id from orders where id=$1',[failedId])).rows.length, 0);
+    assert.equal((await db.query('select is_used from user_vouchers where voucher_id=$1',[ids.ROLLBACK])).rows[0].is_used, false);
+    await db.query("select set_config('app.user_id','',false)");
+    await assert.rejects(collect(ids.ROLLBACK), /đăng nhập/);
+    console.log('Wallet SQL PASS: repeatable migration, duplicate collection, expiry, RLS isolation, direct writes blocked, ownership required, atomic consumption, idempotent order retry and rollback.');
+  } finally { await db.close(); }
+})().catch(e => { console.error(e); process.exitCode = 1; });

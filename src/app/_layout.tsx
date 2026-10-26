@@ -55,6 +55,8 @@ function RootLayoutNav() {
         <Stack.Screen name="category/[id]" />
         <Stack.Screen name="select-location" />
         <Stack.Screen name="select-offer" />
+        <Stack.Screen name="campaign" />
+        <Stack.Screen name="voucher-wallet" />
         <Stack.Screen name="tracking" />
         <Stack.Screen name="rating" />
         <Stack.Screen name="chat" />

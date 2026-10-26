@@ -18,6 +18,7 @@ import { validCoordinates } from '../features/location/coordinates';
 import { viLabel } from '../utils/vietnamese';
 import { userMessage } from '../utils/userMessage';
 import { useShippingQuote } from '../hooks/useShippingQuote';
+import { voucherKeys } from '../services/voucherApi';
 
 export default function CheckoutScreen() {
   const items = useCartStore(state => state.items);
@@ -49,6 +50,8 @@ export default function CheckoutScreen() {
       useCartStore.getState().clearCart();
       useOrderStore.getState().setCheckoutVoucher(null);
       void client.invalidateQueries({ queryKey: ['orders', userId] });
+      void client.invalidateQueries({ queryKey: voucherKeys.wallet(userId) });
+      void client.invalidateQueries({ queryKey: voucherKeys.owned(userId) });
       Toast.show({ type: 'success', text1: 'Đặt hàng thành công!', text2: 'Đơn hàng đang chờ quán xác nhận.' });
       router.replace({ pathname: '/tracking', params: { orderId: order.id } });
     } catch (error) {

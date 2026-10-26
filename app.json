@@ -18,7 +18,7 @@
     "splash": {
       "backgroundColor": "#FFFFFF"
     },
-    "plugins": ["expo-router", ["expo-location", {"locationWhenInUsePermission": "Cho phép Giao đồ ăn dùng vị trí để chọn điểm giao hàng."}], ["expo-image-picker", {"photosPermission": "Cho phép chọn ảnh để gửi trong cuộc trò chuyện đơn hàng.", "cameraPermission": "Cho phép chụp ảnh để gửi trong cuộc trò chuyện đơn hàng.", "microphonePermission": false}]],
+    "plugins": ["expo-router", ["expo-location", {"locationWhenInUsePermission": "Cho phép Giao đồ ăn dùng vị trí để chọn điểm giao hàng."}], ["expo-image-picker", {"photosPermission": "Cho phép chọn ảnh đại diện hoặc ảnh gửi trong cuộc trò chuyện.", "cameraPermission": "Cho phép chụp ảnh để gửi trong cuộc trò chuyện đơn hàng.", "microphonePermission": false}]],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true

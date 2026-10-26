@@ -1,4 +1,5 @@
 export type DeliveryAddress = {
+  savedAddressId?: string;
   street: string;
   label: 'Home' | 'Work' | 'Other';
   latitude?: number;
@@ -17,36 +18,43 @@ export const vouchers: Voucher[] = [
   {
     id: 'meal10',
     title: '-10%',
-    description: '10% off your food subtotal',
+    description: 'Giảm 10% giá trị món ăn',
     kind: 'percentage',
     value: 10,
   },
   {
     id: 'ship1',
-    title: '-$1 shipping fee',
-    description: 'Save $1 on delivery',
+    title: 'Giảm 1 ₫ phí giao hàng',
+    description: 'Tiết kiệm 1 ₫ phí giao hàng',
     kind: 'shipping',
     value: 1,
   },
   {
     id: 'meal30',
-    title: '-30% for bill over $50',
-    description: '30% off food when your subtotal is over $50',
+    title: 'Giảm 30% cho đơn trên 50 ₫',
+    description: 'Giảm 30% giá trị món ăn khi tạm tính trên 50 ₫',
     kind: 'percentage',
     value: 30,
     minimumSubtotal: 50,
   },
   {
     id: 'freeship',
-    title: 'Freeship',
-    description: 'Your delivery fee is on us',
+    title: 'Miễn phí giao hàng',
+    description: 'Bạn được miễn phí giao hàng',
     kind: 'shipping',
     value: 2,
   },
 ];
 
-// Keep the backend's existing USD amounts; localize number formatting without conversion.
-export const currency = (amount: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'USD' }).format(amount === 0 ? 0 : amount);
+// Display existing numeric amounts in VND without applying an exchange rate.
+const moneyFormatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 });
+export const currency = (amount: number) => moneyFormatter.format(amount === 0 ? 0 : amount);
+
+export function localizeCurrencyText(value: string) {
+  return value
+    .replace(/(?:US\$|\$)\s*(\d[\d,]*(?:\.\d+)?)/gi, (_, amount: string) => currency(Number(amount.replace(/,/g, ''))))
+    .replace(/(\d[\d,]*(?:\.\d+)?)\s*(?:USD\b|US\$)/gi, (_, amount: string) => currency(Number(amount.replace(/,/g, ''))));
+}
 export const isVoucherEligible = (voucher: Voucher, subtotal: number) =>
   Math.round(subtotal * 100) > 0 &&
   (voucher.minimumSubtotal === undefined ||

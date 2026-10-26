@@ -1,6 +1,7 @@
 import { AppPressable as Pressable } from '@/src/components/AppPressable';
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
+import { router } from 'expo-router';
+import { ProfileAvatar } from '../../components/ProfileAvatar';
 import { StatusBar } from 'expo-status-bar';
 import { ScrollView, StyleSheet, Text, View, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,11 +12,11 @@ import { fetchProfile } from '@/src/services/profile';
 import { userMessage } from '../../utils/userMessage';
 
 const accountLinks = [
-  { label: 'Địa chỉ đã lưu', icon: 'location-outline' },
-  { label: 'Phương thức thanh toán', icon: 'card-outline' },
-  { label: 'Mã ưu đãi', icon: 'ticket-outline' },
-  { label: 'Cài đặt', icon: 'settings-outline' },
-  { label: 'Trung tâm trợ giúp', icon: 'help-circle-outline' },
+  { label: 'Địa chỉ đã lưu', icon: 'location-outline', route: '/addresses' },
+  { label: 'Phương thức thanh toán', icon: 'card-outline', route: null },
+  { label: 'Mã ưu đãi', icon: 'ticket-outline', route: null },
+  { label: 'Cài đặt', icon: 'settings-outline', route: null },
+  { label: 'Trung tâm trợ giúp', icon: 'help-circle-outline', route: null },
 ] as const;
 
 export default function AccountScreen() {
@@ -29,7 +30,7 @@ export default function AccountScreen() {
     enabled: !!user?.id,
   });
   const name = profile.data?.full_name || user?.name || 'Tài khoản của bạn';
-  const avatar = profile.data?.avatar_url || user?.avatar;
+  const avatar = profile.data ? profile.data.avatar_url : user?.avatar;
 
   const showComingSoon = (label: string) => {
     Alert.alert(
@@ -55,32 +56,7 @@ export default function AccountScreen() {
             { backgroundColor: colors.card, borderColor: colors.border },
           ]}
         >
-          {avatar ? (
-            <Image
-              source={{ uri: avatar }}
-              contentFit="cover"
-              transition={180}
-              accessibilityLabel={`${name} ảnh đại diện`}
-              style={[styles.avatar, { backgroundColor: colors.accent }]}
-            />
-          ) : (
-            <View
-              style={[
-                styles.avatar,
-                {
-                  backgroundColor: colors.accent,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                },
-              ]}
-            >
-              <Ionicons
-                name="person"
-                size={28}
-                color={colors.accentForeground}
-              />
-            </View>
-          )}
+          <ProfileAvatar path={avatar} size={58} />
           <View style={styles.profileCopy}>
             <Text className="text-ink" style={styles.userName}>
               {name}
@@ -88,11 +64,12 @@ export default function AccountScreen() {
             <Text style={[styles.phone, { color: colors.mutedForeground }]}>
               {user?.email ?? ''}
             </Text>
+            {!!profile.data?.phone && <Text style={[styles.phone, { color: colors.mutedForeground }]}>{profile.data.phone}</Text>}
           </View>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Chỉnh sửa hồ sơ"
-            onPress={() => showComingSoon('Chỉnh sửa hồ sơ')}
+            onPress={() => router.push('/profile')}
             style={[styles.editButton, { backgroundColor: colors.accent }]}
           >
             <Ionicons
@@ -123,7 +100,7 @@ export default function AccountScreen() {
               key={item.label}
               testID={`account-link-${item.label.toLowerCase().replaceAll(' ', '-')}`}
               accessibilityRole="button"
-              onPress={() => showComingSoon(item.label)}
+              onPress={() => item.route ? router.push(item.route) : showComingSoon(item.label)}
               style={[
                 styles.linkRow,
                 index < accountLinks.length - 1
@@ -146,6 +123,7 @@ export default function AccountScreen() {
               <Text className="text-ink" style={styles.linkLabel}>
                 {item.label}
               </Text>
+              {!item.route && <Text className="text-xs text-muted">Sắp có</Text>}
               <Ionicons
                 name="chevron-forward"
                 size={16}

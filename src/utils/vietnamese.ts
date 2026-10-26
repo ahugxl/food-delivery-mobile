@@ -1,4 +1,5 @@
 /** Display translations keep database values and IDs unchanged. */
+import { localizeCurrencyText } from '../features/order/checkout';
 const labels: Record<string, string> = {
     Drink: 'Đồ uống', Fastfood: 'Đồ ăn nhanh', Healthy: 'Ăn lành mạnh', Rice: 'Cơm',
     Freeship: 'Miễn phí giao hàng', 'Near you': 'Gần bạn', 'Free delivery': 'Miễn phí giao hàng',
@@ -17,7 +18,7 @@ const labels: Record<string, string> = {
     'Thêm Topping': 'Thêm món kèm', 'Chọn Mức Đường': 'Chọn mức đường', Pudding: 'Bánh pudding',
 };
 export function viLabel(value: string) {
-    return labels[value] ?? value.replace(/\bFreeship\b/gi, 'Miễn phí giao hàng').replace(/\bNear you\b/gi, 'Gần bạn').replace(/\bDeal\b/gi, 'Ưu đãi').replace(/\bXtra\b/gi, 'mở rộng');
+    return localizeCurrencyText(labels[value] ?? value.replace(/\bFreeship\b/gi, 'Miễn phí giao hàng').replace(/\bNear you\b/gi, 'Gần bạn').replace(/\bDeal\b/gi, 'Ưu đãi').replace(/\bXtra\b/gi, 'mở rộng'));
 }
 export function viHours(value?: string | null) {
     return value ? value.replace(/(\d+)(?::(\d+))?\s*(am|pm)/gi, (_, h: string, m: string, period: string) => `${(Number(h) % 12) + (period.toLowerCase() === 'pm' ? 12 : 0)}:${m ?? '00'}`) : 'Chưa có giờ mở cửa';

@@ -1,6 +1,7 @@
 import type { CartItem } from '../../types';
 import type { Database, Json } from '../../types/database.types';
 import type { Coordinates } from '../location/coordinates';
+import { currency } from './checkout';
 
 export type VoucherRow = Database['public']['Tables']['vouchers']['Row'];
 export type OrderRow = Database['public']['Tables']['orders']['Row'];
@@ -11,7 +12,7 @@ export function voucherError(voucher: VoucherRow, subtotal: number, restaurantId
   if (!voucher.is_active) return 'Mã ưu đãi đã ngừng hoạt động.';
   if (voucher.expiry_date && (!Number.isFinite(Date.parse(voucher.expiry_date)) || Date.parse(voucher.expiry_date) <= now)) return 'Mã ưu đãi đã hết hạn.';
   if (voucher.restaurant_id && voucher.restaurant_id !== restaurantId) return 'Mã ưu đãi chỉ áp dụng tại quán khác.';
-  if (cents(subtotal) <= 0 || cents(subtotal) < cents(Number(voucher.min_order_value ?? 0))) return `Giá trị món tối thiểu: $${Number(voucher.min_order_value ?? 0).toFixed(2)}.`;
+  if (cents(subtotal) <= 0 || cents(subtotal) < cents(Number(voucher.min_order_value ?? 0))) return `Giá trị món tối thiểu: ${currency(Number(voucher.min_order_value ?? 0))}.`;
   if (!['percentage', 'fixed'].includes(voucher.discount_type)) return 'Loại mã ưu đãi chưa được hỗ trợ.';
   const amount = Number(voucher.discount_value);
   if (!Number.isFinite(amount) || amount < 0 || (voucher.discount_type === 'percentage' && amount > 100)) return 'Giá trị giảm giá không hợp lệ.';

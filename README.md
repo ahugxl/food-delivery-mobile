@@ -23,7 +23,7 @@ Email/password đã nối với `signInWithPassword`, `signUp` và `signOut`. Ph
 
 Đăng ký gửi `full_name` qua user metadata. Nếu bật Confirm email trên Supabase, người dùng cần xác nhận qua email rồi quay lại đăng nhập. Bước này chưa xử lý OAuth, deep link phiên hoặc đổi mật khẩu. Nút đăng nhập mạng xã hội vẫn là UI demo.
 
-Schema 16 bảng trong `src/types/database.types.ts` được sao chép nguyên từ `D:\TBDD\btl\database.types.ts`. Bảng `profiles` có `id`, `full_name`, `phone`, `avatar_url`, `role`, `loyalty_points`, `created_at`. Account dùng React Query đọc profile theo ID phiên đăng nhập; dùng auth metadata khi chưa có profile, và cho phép retry khi lỗi. Chưa ghi profiles hay thay đổi trigger/RLS. Cần kiểm tra trigger tạo profile trước khi thêm chỉnh sửa hồ sơ; file types không chứa thông tin trigger hay policies. Client bổ sung metadata kiểu dữ liệu theo SDK để đọc bảng có type checking, giữ nguyên file schema gốc.
+Schema 16 bảng trong `src/types/database.types.ts` được sao chép nguyên từ `D:\TBDD\btl\database.types.ts`. Account dùng React Query đọc hồ sơ theo tài khoản đăng nhập; màn chỉnh sửa lưu tên, số điện thoại và ảnh qua RPC `update_my_profile`. Tài khoản cũ thiếu profile được tạo hồ sơ của chính mình trong lần lưu đầu tiên. Role và loyalty_points không nằm trong dữ liệu người dùng được sửa. Client bổ sung metadata SDK trong src/types/supabase.ts và giữ nguyên file schema gốc.
 
 Pha 1 đã nối Home với `banners`, `categories`, `restaurants`; menu nhà hàng, Search và Category đọc `foods` theo UUID thật. Chi tiết món lấy một truy vấn lồng nhau `foods -> food_option_groups -> food_option_items`, kèm nhà hàng. Các nhóm tùy chọn lấy tên, giá, bắt buộc/tùy chọn và chế độ chọn một/nhiều từ database; giỏ hàng lưu snapshot của tất cả nhóm, kể cả Spiciness. Không thay lỗi hoặc dữ liệu trống bằng mock.
 
@@ -41,7 +41,7 @@ Migration `supabase/migrations/20261026_phase2_checkout.sql` đã được chủ
 
 Client tạo request UUID bằng expo-crypto và tái sử dụng ID với cùng payload khi retry trong cùng phiên ứng dụng. RPC có advisory lock và trả đơn đã tạo nếu request cùng ID gửi lại bởi cùng chủ sở hữu. Không tự retry mutation. Thành công mới xóa giỏ/voucher và chuyển `/tracking?orderId=...`. Khi lỗi, giỏ và ghi chú vẫn giữ nguyên. Địa chỉ phải được người dùng nhập (5–500 ký tự), không dùng địa chỉ demo mặc định.
 
-My orders đọc đơn thật qua React Query và Realtime. Tracking hiển thị hóa đơn, snapshot và trạng thái server. Thanh toán hiện chỉ là cash on delivery. Chat, đánh giá, yêu thích đã tích hợp backend trong Pha 3/4; thông báo và sổ địa chỉ chưa tích hợp. Giỏ dùng Zustand Persist + AsyncStorage theo tài khoản, lưu tùy chọn, ghi chú và request UUID; chỉ xóa sau checkout thành công hoặc đăng xuất/chuyển tài khoản. React Query cache được dọn khi đổi tài khoản.
+My orders đọc đơn thật qua React Query và Realtime. Tracking hiển thị hóa đơn, snapshot và trạng thái server. Thanh toán hiện chỉ là cash on delivery. Chat, đánh giá, yêu thích, hồ sơ và sổ địa chỉ đã tích hợp backend; thông báo chưa tích hợp. Giỏ dùng Zustand Persist + AsyncStorage theo tài khoản, lưu tùy chọn, ghi chú và request UUID; chỉ xóa sau checkout thành công hoặc đăng xuất/chuyển tài khoản. React Query cache được dọn khi đổi tài khoản.
 
 SQL kiểm thử chạy trên PostgreSQL WASM riêng trong bộ nhớ, không chạm backend:
 
@@ -107,3 +107,15 @@ Trang chủ dùng nền trắng, phần đầu xanh vàng, danh mục tròn và 
 Đơn vị tiền hiện có của backend là USD; chỉ định dạng số theo vi-VN, không tự quy đổi sang VND. Giữ nguyên checkout, Auth, Realtime và cấu trúc npm/Supabase.
 
 Kiểm tra cập nhật ngày 26/10/2026: TypeScript pass, 75/75 tests pass. Đã thử UI ở kích thước điện thoại: tìm “gà rán” trả về Hana Chicken, mở quán chỉ có món quán đó, chọn kích cỡ/món thêm/độ cay, thêm giỏ đúng tổng 17 USD + phí giao 2 USD và xem xác nhận đơn. Sau kiểm thử đã xóa món thử để trả giỏ về trống; không tạo đơn thật mới. Export Android/iOS/Web thành công. Bản sao trước chỉnh nằm tại backups/before-vietnamese-ui-20261026.zip. Kiểm thử phần cứng native vẫn cần thực hiện trên Expo Go. Gói source Pha 4 cũ là bản trước lần chỉnh UI này.
+
+## Hồ sơ và sổ địa chỉ
+
+Chủ dự án đã chạy supabase/migrations/20261026_profile_addresses.sql (gồm bản sửa hỗ trợ tài khoản cũ). Tài khoản → Chỉnh sửa hồ sơ cho phép lưu tên, số điện thoại tùy chọn, chọn/bỏ ảnh đại diện. Bucket profile-avatars riêng tư; profiles.avatar_url lưu đường dẫn, UI lấy URL ký có thời hạn 1 giờ và làm mới sau 50 phút. Ảnh mẫu cũ qua HTTPS vẫn đọc được. Ảnh phải JPEG/PNG/WebP, tối đa 5 MB. Khi lưu ảnh mới hoặc bỏ ảnh, ảnh trước đó của chính người dùng được dọn; policy ngăn xóa ảnh đang được profile tham chiếu. Các trường role và loyalty_points chỉ được quản lý phía server.
+
+Tài khoản → Địa chỉ đã lưu hỗ trợ thêm/sửa/xóa, chọn ghim và đặt mặc định trên bảng user_addresses. RPC save_my_address/delete_my_address thực hiện thay đổi mặc định trong transaction với khóa theo tài khoản; địa chỉ đầu tiên tự thành mặc định, xóa mặc định sẽ chọn một địa chỉ còn lại. Lưu mới dùng UUID ổn định khi retry. Không sửa địa chỉ trên hóa đơn đã đặt. Địa chỉ cũ thiếu tọa độ cần được cập nhật ghim trước khi dùng.
+
+Checkout và màn chọn vị trí có nút chọn từ sổ địa chỉ. SavedAddressSync tải mặc định khi mở app, đồng bộ địa chỉ được chọn nếu sửa/xóa và giữ nguyên ghim nhập thủ công. Không đổi địa chỉ trong lúc đang gửi đơn; đăng xuất/chuyển tài khoản dọn dữ liệu cục bộ. Request checkout được lưu cùng savedAddressId để phục hồi nguồn địa chỉ sau khởi động lại.
+
+Kiểm tra: npm run typecheck, npm test (83 tests), node scripts/test-profile-addresses-sql.cjs, export Android/iOS/Web. SQL tests chạy PostgreSQL WASM trong bộ nhớ, xác minh quyền theo user, CRUD, mặc định, khởi tạo profile cũ, khóa trường đặc quyền và ảnh riêng tư. Các mục Tài khoản chưa triển khai tiếp tục ghi rõ “Sắp có”. Ảnh và bàn phím/định vị trên native cần smoke test trực tiếp bằng Expo Go.
+
+Kiểm thử live đã xác nhận: khởi tạo hồ sơ cho tài khoản cũ, upload/lưu/bỏ ảnh đại diện thật qua Storage riêng tư, thêm/sửa địa chỉ mẫu, đổi mặc định, xóa địa chỉ mặc định và tự chuyển sang địa chỉ còn lại. Sau khi người dùng xác nhận, đã dọn địa chỉ mẫu B và ảnh mẫu; địa chỉ Nhà riêng hiện có được giữ nguyên. Checkout tải mặc định sau mở lại ứng dụng; chọn từ sổ địa chỉ quay về checkout đúng điểm giao. Không tạo đơn hàng mới trong lần kiểm thử này. Bản sao trước sửa: backups/before-profile-addresses-20261026.zip.

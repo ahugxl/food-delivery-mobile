@@ -19,6 +19,7 @@ import { AppToast } from '@/src/components/AppToast';
 import { AppState, Platform } from 'react-native';
 import { supabase } from '@/src/services/supabase';
 import { useCartStore } from '@/src/store/cartStore';
+import { SavedAddressSync } from '../hooks/useSavedAddresses';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -57,6 +58,9 @@ function RootLayoutNav() {
         <Stack.Screen name="tracking" />
         <Stack.Screen name="rating" />
         <Stack.Screen name="chat" />
+        <Stack.Screen name="profile" />
+        <Stack.Screen name="addresses" />
+        <Stack.Screen name="address-form" />
       </Stack.Protected>
     </Stack>
   );
@@ -111,6 +115,7 @@ export default function RootLayout() {
         <KeyboardProvider>
           <SafeAreaProvider>
             <ErrorBoundary>
+              <SavedAddressSync />
               <RootLayoutNav />
               <AppToast />
             </ErrorBoundary>

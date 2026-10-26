@@ -6,7 +6,7 @@ require.extensions['.ts'] = (m,file) => m._compile(ts.transpileModule(fs.readFil
 const { searchRestaurants } = require('../src/features/search/restaurantSearch.ts');
 const { userMessage } = require('../src/utils/userMessage.ts');
 const { defaultFilters } = require('../src/features/search/catalog.ts');
-const { currency } = require('../src/features/order/checkout.ts');
+const { currency, localizeCurrencyText } = require('../src/features/order/checkout.ts');
 const restaurants = [
   { id:'a',name:'Quán Gà',rating:4.3,promo_tags:['Freeship'],latitude:10,longitude:106 },
   { id:'b',name:'Bamsu Restaurant',rating:4.8,promo_tags:[],latitude:null,longitude:null },
@@ -42,7 +42,10 @@ test('SDK errors are localized without exposing raw technical errors',()=>{
   assert.equal(userMessage({message:'Unrecognized internal diagnostic'}),'Không thực hiện được thao tác. Vui lòng thử lại.');
   assert.equal(userMessage({message:'Món đã hết hàng.'}),'Món đã hết hàng.');
 });
-test('zero discount never appears as negative zero on a Vietnamese invoice',()=>{
+test('money uses VND across invoices and promotion text without negative zero',()=>{
+  assert.equal(currency(25000).replace(/\s/g,''),'25.000₫');
+  assert.equal(localizeCurrencyText('Giảm US$25,000'),`Giảm ${currency(25000)}`);
+  assert.equal(localizeCurrencyText('Ưu đãi 1 USD'),`Ưu đãi ${currency(1)}`);
   assert.equal(currency(-0),currency(0));
   assert.ok(!currency(-0).includes('-'));
 });

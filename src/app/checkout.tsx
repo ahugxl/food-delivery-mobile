@@ -64,6 +64,9 @@ export default function CheckoutScreen() {
         <Pressable accessibilityRole="button" disabled={locked} onPress={() => router.push('/select-location')} className="min-h-11 justify-center">
           <Text className="font-semibold text-sm text-teal">Đổi địa chỉ</Text>
         </Pressable>
+        <Pressable accessibilityRole="button" disabled={locked} onPress={() => router.push({ pathname: '/addresses', params: { select: '1' } })} className="min-h-11 justify-center">
+          <Text className="font-semibold text-sm text-teal">Chọn địa chỉ đã lưu</Text>
+        </Pressable>
       </FlowCard>
       <FlowCard>
         <Text className="font-bold text-base text-ink">{items[0]?.restaurantName || 'Đơn hàng của bạn'}</Text>

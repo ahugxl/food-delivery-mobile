@@ -29,6 +29,15 @@ export type SupabaseDatabase = {
     } };
     Views: Record<never, never>;
     Functions: {
+      update_my_profile: {
+        Args: { p_full_name: string; p_phone: string | null; p_avatar_url: string | null };
+        Returns: Tables['profiles']['Row'][];
+      };
+      save_my_address: {
+        Args: { p_id: string; p_title: string; p_address: string; p_latitude: number; p_longitude: number; p_is_default: boolean; p_create?: boolean };
+        Returns: Tables['user_addresses']['Row'][];
+      };
+      delete_my_address: { Args: { p_id: string }; Returns: undefined };
       create_food_order_at_location: {
         Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code?: string | null; p_latitude: number; p_longitude: number };
         Returns: Tables['orders']['Row'][];

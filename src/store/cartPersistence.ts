@@ -24,7 +24,7 @@ const savedSchema = z.object({
   checkoutRequest: z.object({
     id: z.string(), signature: z.string(),
     context: z.object({
-      address: z.object({ street: z.string().min(5).max(500), label: z.enum(['Home', 'Work', 'Other']), latitude: z.number().min(-90).max(90).optional(), longitude: z.number().min(-180).max(180).optional() }),
+      address: z.object({ savedAddressId: z.string().optional(), street: z.string().min(5).max(500), label: z.enum(['Home', 'Work', 'Other']), latitude: z.number().min(-90).max(90).optional(), longitude: z.number().min(-180).max(180).optional() }),
       voucher: voucherSchema.nullable(),
     }).optional(),
   }).nullable(),

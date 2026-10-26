@@ -4,11 +4,6 @@ export type ChatMessage = {
   text: string;
 };
 
-export const driverProfile = {
-  name: 'John Cooper',
-  status: 'Active now',
-};
-
 export const deliveryAddress = '128 Market Street, San Francisco, CA 94105';
 
 export const trackingMapImage =

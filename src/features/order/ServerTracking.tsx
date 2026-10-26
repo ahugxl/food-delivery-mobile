@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import { currency } from './checkout';
 import type { Json } from '../../types/database.types';
 import { viLabel } from '../../utils/vietnamese';
+import { OrderDriverInfo } from '../../components/OrderDriverInfo';
 
 const statuses: Record<string, string> = { pending: 'Chờ quán xác nhận', preparing: 'Quán đang chuẩn bị món', delivering: 'Đang giao hàng', completed: 'Đã giao hàng', cancelled: 'Đã hủy' };
 
@@ -30,7 +31,7 @@ export default function ServerTracking({ orderId }: { orderId: string }) {
         <FlowCard><Text className="font-bold text-xl text-ink">{statuses[order.data.status] ?? 'Đang cập nhật'}</Text>
           <Text selectable className="font-regular text-xs text-muted">Mã đơn #{order.data.id}</Text>
           <Text className="font-semibold text-base text-ink">{order.data.restaurants?.name ?? 'Quán ăn'}</Text>
-          <Text className="font-regular text-sm text-muted">{order.data.driver_id ? 'Đã có tài xế nhận đơn.' : 'Đơn hàng chưa được phân tài xế.'}</Text>
+          <OrderDriverInfo orderId={orderId} driverId={order.data.driver_id} />
         </FlowCard>
         <FlowCard><Text className="font-bold text-base text-ink">Địa chỉ giao hàng</Text><Text className="font-regular text-sm text-muted">{order.data.delivery_address}</Text></FlowCard>
         <FlowCard><Text className="font-bold text-base text-ink">Đơn hàng của bạn</Text>

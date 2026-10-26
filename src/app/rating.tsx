@@ -8,7 +8,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import { AppPressable } from '../components/AppPressable';
 import { FlowButton, FlowCard, FlowHeader } from '../components/FlowUI';
-import { DriverAvatar } from '../components/DriverAvatar';
+import { OrderDriverInfo } from '../components/OrderDriverInfo';
 import { engagementApi } from '../services/engagement';
 import { purchaseApi } from '../services/purchase';
 import { useAuthStore } from '../store/authStore';
@@ -70,7 +70,7 @@ function OrderReview({ orderId }: { orderId: string }) {
           <Stars label="Đánh giá quán ăn" value={restaurantRating} onChange={setRestaurantRating} disabled={disabled} />
           <TextInput accessibilityLabel="Nhận xét quán ăn" value={restaurantFeedback} onChangeText={setRestaurantFeedback} maxLength={2000} editable={!disabled} multiline placeholder="Món ăn và dịch vụ của quán..." className="min-h-24 rounded-2xl border border-line p-4 text-sm text-ink" />
         </FlowCard>
-        <FlowCard><View className="flex-row items-center gap-3"><DriverAvatar size={54} /><View><Text className="font-bold text-lg text-ink">John Cooper</Text><Text className="text-xs text-muted">Tài xế mô phỏng của đồ án</Text></View></View>
+        <FlowCard><OrderDriverInfo orderId={orderId} driverId={order.data.driver_id} />
           <Stars label="Đánh giá tài xế" value={driverRating} onChange={setDriverRating} disabled={disabled} />
           <View className="flex-row flex-wrap gap-2">{REVIEW_TAGS.map(tag => <AppPressable key={tag} accessibilityRole="checkbox" accessibilityLabel={viLabel(tag)} accessibilityState={{ checked: tags.includes(tag), disabled }} disabled={disabled} onPress={() => setTags(current => current.includes(tag) ? current.filter(item => item !== tag) : [...current, tag])}
             className={`min-h-11 justify-center rounded-full border px-4 ${tags.includes(tag) ? 'border-teal bg-tealLight' : 'border-line bg-card'}`}><Text className="font-medium text-sm text-ink">{viLabel(tag)}</Text></AppPressable>)}</View>

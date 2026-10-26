@@ -15,6 +15,7 @@ import { chatApi } from '../services/chat';
 import { purchaseApi } from '../services/purchase';
 import { messageError, type Message } from '../features/chat/messages';
 import { imageFromBase64 } from '../features/chat/imageData';
+import { OrderDriverInfo } from '../components/OrderDriverInfo';
 
 export default function ChatScreen() {
   const { orderId } = useLocalSearchParams<{ orderId?: string }>();
@@ -70,6 +71,7 @@ function OrderChat({ orderId }: { orderId: string }) {
     <FlowHeader title="Tin nhắn theo đơn hàng" />
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <View className="gap-1 px-5 pb-3"><Text className="font-semibold text-sm text-ink">{order.data?.restaurants?.name ?? 'Đơn hàng'} · {orderId.slice(0, 8)}</Text>
+        {!!order.data && <OrderDriverInfo orderId={orderId} driverId={order.data.driver_id} />}
         <Text className="text-xs text-muted">{chat.connection === 'connected' ? 'Đang đồng bộ trực tiếp' : 'Đang kết nối lại; lịch sử sẽ tự tải bù'}</Text>
         {order.isSuccess && !order.data && <Text className="text-sm text-coral">Không tìm thấy đơn hàng của bạn.</Text>}
         {(order.isError || chat.isError) && <AppPressable accessibilityRole="button" onPress={() => { void order.refetch(); void chat.refetch(); }}><Text className="text-sm text-coral">Không tải được cuộc trò chuyện. Chạm để thử lại.</Text></AppPressable>}

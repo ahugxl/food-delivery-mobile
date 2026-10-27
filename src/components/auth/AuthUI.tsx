@@ -144,12 +144,15 @@ export function AuthButton({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={loading ? 'Vui lòng chờ…' : title}
       accessibilityState={{ disabled: loading, busy: loading }}
       disabled={loading}
       onPress={onPress}
+      style={{ flexShrink: 0 }}
       className={`min-h-14 items-center justify-center rounded-2xl border px-5 py-4 active:opacity-80 ${secondary ? 'border-line bg-card' : 'border-teal bg-teal'}`}
     >
       <Text
+        style={{ alignSelf: 'stretch', textAlign: 'center', flexShrink: 0, includeFontPadding: true, paddingVertical: 2 }}
         className={`font-semibold text-base ${secondary ? 'text-ink' : 'text-white'}`}
       >
         {loading ? 'Vui lòng chờ…' : title}

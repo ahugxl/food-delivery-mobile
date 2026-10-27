@@ -14,6 +14,7 @@ const itemSchema = z.object({
   options: z.array(optionSchema).max(100), note: z.string().max(500),
 });
 const voucherSchema = z.object({
+  applies_to: z.enum(['food', 'shipping']).default('food'),
   id: z.string(), restaurant_id: z.string().nullable(), code: z.string(), discount_type: z.string(),
   discount_value: z.number().finite(), min_order_value: z.number().finite(),
   expiry_date: z.string().nullable(), is_active: z.boolean(),
@@ -26,6 +27,7 @@ const savedSchema = z.object({
     context: z.object({
       address: z.object({ recipientName: z.string().max(100).optional(), recipientPhone: z.string().max(25).optional(), savedAddressId: z.string().optional(), street: z.string().min(5).max(500), label: z.enum(['Home', 'Work', 'Other']), latitude: z.number().min(-90).max(90).optional(), longitude: z.number().min(-180).max(180).optional() }),
       voucher: voucherSchema.nullable(),
+      shippingVoucher: voucherSchema.nullable().optional(),
     }).optional(),
   }).nullable(),
 });

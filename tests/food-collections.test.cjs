@@ -3,40 +3,57 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs'), ts = require('typescript');
 const { createClient } = require('@supabase/supabase-js');
 require.extensions['.ts'] = (m, file) => m._compile(ts.transpileModule(fs.readFileSync(file, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, file);
-const { foodCollections, findFoodCollection, matchesFoodCollection } = require('../src/features/search/foodCollections.ts');
+const { findFoodCollection, matchesRestaurantTag } = require('../src/features/search/foodCollections.ts');
 const { searchRestaurants } = require('../src/features/search/restaurantSearch.ts');
 const { defaultFilters } = require('../src/features/search/catalog.ts');
 const { categoryIconUrl } = require('../src/services/categoryIcons.ts');
 const { createCatalogApi } = require('../src/services/catalogApi.ts');
 
-test('17 stable shortcut IDs match the agreed icon filenames', () => {
-  assert.equal(foodCollections.length, 17);
-  assert.equal(new Set(foodCollections.map(item => item.id)).size, 17);
-  for (const collection of foodCollections) assert.match(collection.id, /^[a-z]+(?:-[a-z]+)*$/);
-  assert.equal(foodCollections.at(-1).id, 'trai-cay');
-  for (const id of ['hai-san', 'sinh-to', 'pizza', 'mon-nuong']) assert.equal(findFoodCollection(id), undefined);
+const milkTea = { id: 'tra-sua', name: 'Trà sữa', kind: 'food', restaurant_tag: null, is_active: true };
+const newRestaurant = { id: 'quan-moi', name: 'Quán mới', kind: 'restaurant_tag', restaurant_tag: 'Quán mới', is_active: true };
+
+test('collections come from database configuration, including new names and disabled entries', () => {
+  assert.equal(findFoodCollection('tra-sua', [milkTea]), milkTea);
+  assert.equal(findFoodCollection('old-category', [milkTea]), undefined);
+  assert.equal(findFoodCollection('custom', [{ ...milkTea, id: 'custom', name: 'Tên mới' }]).name, 'Tên mới');
 });
-test('collection matches support accent-free Vietnamese, phrases and common English dish names', () => {
-  for (const name of ['Sinh tố bơ', 'SINH TO DAU', 'Mango Smoothie']) assert.equal(matchesFoodCollection({ name }, findFoodCollection('do-uong')), true);
-  assert.equal(matchesFoodCollection({ name: 'Cheeseburger' }, findFoodCollection('mon-my')), true);
-  assert.equal(matchesFoodCollection({ name: 'Hamburger bò' }, findFoodCollection('mon-my')), true);
-  assert.equal(matchesFoodCollection({ name: 'Fried Chicken' }, findFoodCollection('ga-ran')), true);
-  assert.equal(matchesFoodCollection({ name: 'Mango pudding' }, findFoodCollection('mon-ga')), false);
-  assert.equal(matchesFoodCollection({ name: 'Bánh tráng trộn' }, findFoodCollection('tra')), false);
-  assert.equal(matchesFoodCollection({ name: 'Bánh mì thịt' }, findFoodCollection('mi')), false);
-  assert.equal(matchesFoodCollection({ name: 'Mì xào bò' }, findFoodCollection('mi')), true);
+
+test('food collection membership uses explicit mapped dishes, never a restaurant name or fruit ingredient', () => {
+  const restaurants = [{ id: 'a', name: 'Quán trà sữa', promo_tags: [] }, { id: 'b', name: 'Quán khác', promo_tags: [] }];
+  // API provided a mapped item whose arbitrary name contains no category keyword.
+  const linkedFoods = [{ restaurant_id: 'b', name: 'Món số 01' }, { restaurant_id: 'b', name: 'Món số 02' }];
+  const search = (foods, collection = milkTea) => searchRestaurants(restaurants, foods, '', defaultFilters, [], null, undefined, collection.id, collection);
+  assert.deepEqual(search(linkedFoods).map(r => r.id), ['b']);
+  assert.deepEqual(search([]), []);
+  assert.deepEqual(search(linkedFoods, { ...milkTea, is_active: false }), []);
+  assert.deepEqual(searchRestaurants(restaurants, linkedFoods, '', defaultFilters, [], null, undefined, 'missing'), []);
 });
-test('only actual matching menus qualify a restaurant; duplicate dishes never duplicate the restaurant', () => {
-  const restaurants = [
-    { id: 'a', name: 'Quán nước', rating: 4, promo_tags: [] },
-    { id: 'b', name: 'Quán Sinh Tố', rating: 5, promo_tags: [] },
-    { id: 'c', name: 'Quán khác', rating: 3, promo_tags: [] },
-  ];
-  const foods = [{ restaurant_id: 'a', name: 'Sinh tố bơ' }, { restaurant_id: 'a', name: 'Sinh tố dâu' }, { restaurant_id: 'b', name: 'Cơm gà' }];
-  assert.deepEqual(searchRestaurants(restaurants, foods, '', defaultFilters, [], null, undefined, 'do-uong').map(r => r.id), ['a']);
-  assert.deepEqual(searchRestaurants(restaurants, foods, '', { ...defaultFilters, favorite: true }, ['b'], null, undefined, 'do-uong'), []);
-  assert.deepEqual(searchRestaurants(restaurants, foods, '', defaultFilters, [], null, undefined, 'missing'), []);
+
+test('restaurant-tag categories use complete labels with case/whitespace normalization, independent of menus', () => {
+  assert.equal(matchesRestaurantTag(['  QUÁN   MỚI '], 'Quán mới'), true);
+  assert.equal(matchesRestaurantTag(['Quán mới mở ưu đãi'], 'Quán mới'), false);
+  assert.equal(matchesRestaurantTag([null, {}], 'Quán mới'), false);
+  const restaurants = [{ id: 'a', name: 'A', promo_tags: ['Quán mới'] }, { id: 'b', name: 'Quán mới', promo_tags: ['Quán trứ danh'] }];
+  assert.deepEqual(searchRestaurants(restaurants, [], '', defaultFilters, [], null, undefined, 'quan-moi', newRestaurant).map(r => r.id), ['a']);
+  assert.deepEqual(searchRestaurants(restaurants, [], '', { ...defaultFilters, favorite: true }, ['b'], null, undefined, 'quan-moi', newRestaurant), []);
 });
+
+test('discovery API joins explicit food links, filters availability and active restaurants and propagates errors', async () => {
+  const requests = [];
+  let fail = false;
+  const client = createClient('https://example.supabase.co', 'key', { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: async url => {
+    requests.push(new URL(url));
+    return new Response(JSON.stringify(fail ? { message: 'Link query failed' } : [{ food_id: 'f', foods: { name: 'Món số 01', restaurant_id: 'r' } }]), { status: fail ? 500 : 200, headers: { 'content-type': 'application/json' } });
+  } } });
+  const api = createCatalogApi(client);
+  assert.deepEqual(await api.discoveryFoods('mon-chay'), [{ name: 'Món số 01', restaurant_id: 'r' }]);
+  assert.equal(requests[0].searchParams.get('discovery_category_id'), 'eq.mon-chay');
+  assert.equal(requests[0].searchParams.get('foods.is_available'), 'eq.true');
+  assert.equal(requests[0].searchParams.get('foods.restaurants.is_active'), 'eq.true');
+  fail = true;
+  await assert.rejects(api.discoveryFoods('mon-chay'), e => e.message === 'Link query failed');
+});
+
 test('public icon URLs default to category-icons and support a safely encoded folder override', () => {
   const keys = ['EXPO_PUBLIC_SUPABASE_URL', 'EXPO_PUBLIC_CATEGORY_ICON_BUCKET', 'EXPO_PUBLIC_CATEGORY_ICON_PREFIX'];
   const old = keys.map(key => process.env[key]);

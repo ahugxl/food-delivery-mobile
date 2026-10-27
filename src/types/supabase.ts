@@ -11,6 +11,7 @@ type ForeignKey<Name extends string, Column extends string, Target extends strin
 
 // FK names from the provided CREATE TABLE statements. Keep database.types.ts intact.
 type Relationships = {
+  food_discovery_categories: [ForeignKey<'food_discovery_categories_food_id_fkey', 'food_id', 'foods'>, ForeignKey<'food_discovery_categories_discovery_category_id_fkey', 'discovery_category_id', 'discovery_categories'>];
   user_vouchers: [ForeignKey<'user_vouchers_voucher_id_fkey', 'voucher_id', 'vouchers'>];
   favorites: [ForeignKey<'favorites_restaurant_id_fkey', 'restaurant_id', 'restaurants'>];
   orders: [ForeignKey<'orders_restaurant_id_fkey', 'restaurant_id', 'restaurants'>];
@@ -45,7 +46,7 @@ export type SupabaseDatabase = {
         Returns: Tables['orders']['Row'][];
       };
       create_food_order: {
-        Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code: string | null; p_latitude: number; p_longitude: number; p_delivery_fee: Tables['orders']['Row']['delivery_fee']; p_recipient_name: string; p_recipient_phone: string };
+        Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code: string | null; p_shipping_voucher_code: string | null; p_latitude: number; p_longitude: number; p_delivery_fee: Tables['orders']['Row']['delivery_fee']; p_recipient_name: string; p_recipient_phone: string };
         Returns: Tables['orders']['Row'][];
       };
     };

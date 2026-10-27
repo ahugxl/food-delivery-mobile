@@ -1,0 +1,27 @@
+Generated with the built-in image_gen tool.
+
+Shared brief: ads-marketing, ultra-wide horizontal 3:1 banner for a Vietnamese
+Food Delivery mobile app. Emerald #008B45, forest #124C42, lime and cream palette.
+Premium appetizing food photography, large readable Vietnamese text on the left,
+food hero on the right, essential content within 6% safety margins. Background
+fills the canvas. No brand logos, watermarks, prices, discounts or shipping claims.
+
+banner-mon-ngon-3x1.png
+Headline: MÓN NGON / ĐỦ VỊ
+Subtitle: Khám phá quán ngon quanh bạn
+CTA: ĐẶT MÓN NGAY
+Subject: Vietnamese rice bowl with golden chicken, fresh herbs and an iced drink.
+
+banner-tra-sua-3x1.png
+Headline: GIỜ TRÀ SỮA / THÊM NGỌT NGÀO
+Subtitle: Chọn vị yêu thích của bạn
+CTA: KHÁM PHÁ NGAY
+Subject: Iced milk tea with black tapioca pearls and matcha milk tea; condensation,
+tea leaves and restrained floating boba, clean commercial composition.
+
+banner-an-vat-3x1.png
+Headline: ĂN VẶT / THẬT ĐÃ!
+Subtitle: Món ngon cho những buổi tụ họp
+CTA: CHỌN MÓN YÊU THÍCH
+Subject: Crispy fries, spring rolls showing vegetables, snack bites, dipping sauce
+and iced fruit tea on a deep-green tabletop, subtle playful shapes.

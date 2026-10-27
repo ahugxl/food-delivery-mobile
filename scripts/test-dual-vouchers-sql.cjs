@@ -1,0 +1,108 @@
+const fs = require('node:fs'), assert = require('node:assert/strict');
+const { PGlite } = require('../backups/sql-check/node_modules/@electric-sql/pglite');
+(async () => {
+  const db = new PGlite();
+  try {
+    await db.exec(`create schema auth; create table auth.users(id uuid primary key); create role anon; create role authenticated;
+      create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('app.user_id',true),'')::uuid$$;
+      grant usage on schema auth to authenticated;
+      create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+      create table storage.objects(id uuid primary key,bucket_id text,name text);
+      create function storage.foldername(text) returns text[] language sql immutable as $$select string_to_array($1,'/')$$;`);
+    for (const file of ['tests/fixtures/schema.sql', 'supabase/migrations/20261026_phase2_checkout.sql', 'supabase/migrations/20261026_phase3_location_chat.sql', 'supabase/migrations/20261026_dynamic_shipping.sql', 'supabase/migrations/20261026_profile_addresses.sql']) await db.exec(fs.readFileSync(file, 'utf8'));
+    await db.exec(`create table public.user_vouchers(id uuid primary key default gen_random_uuid(),user_id uuid not null references auth.users on delete cascade,voucher_id uuid not null references vouchers on delete cascade,is_used boolean default false,collected_at timestamptz default now(),unique(user_id,voucher_id));`);
+    for (const file of ['supabase/migrations/20261026_voucher_wallet.sql', 'supabase/migrations/20261028_delivery_recipients.sql', 'supabase/migrations/20261028_recipient_flows.sql']) await db.exec(fs.readFileSync(file, 'utf8'));
+    const user = '11111111-1111-4111-8111-111111111111', other = '99999999-9999-4999-8999-999999999999';
+    const restaurant = '22222222-2222-4222-8222-222222222222', food = '33333333-3333-4333-8333-333333333333';
+    await db.exec(`insert into auth.users values('${user}'),('${other}');
+      insert into restaurants(id,name,address,latitude,longitude) values('${restaurant}','Test','Test',0,0);
+      insert into foods(id,restaurant_id,name,price) values('${food}','${restaurant}','Food',40000);
+      insert into vouchers(code,discount_type,discount_value,min_order_value) values('FREESHIPALL','fixed',15000,40000),('FOOD','fixed',10000,40000);
+      select set_config('app.user_id','${user}',false); set role authenticated;`);
+    let counter = 0;
+    const next = () => `aaaaaaaa-aaaa-4aaa-8aaa-${String(++counter).padStart(12, '0')}`;
+    const items = JSON.stringify([{ foodId: food, quantity: 1, unitPrice: 40000, options: [], note: 'KHONG GIAO HANG' }]);
+    const collect = async code => {
+      await db.exec('reset role');
+      const id = (await db.query('select id from vouchers where code=$1', [code])).rows[0].id;
+      await db.exec('set role authenticated');
+      await db.query('select * from collect_my_voucher($1)', [id]);
+      return id;
+    };
+    await collect('FREESHIPALL');
+    const historicalId = next();
+    await db.query("select * from create_food_order($1,$2::jsonb,'Address A','FREESHIPALL',0,0,15000,'Nguyễn An','0901234567')", [historicalId, items]);
+    await db.exec('reset role');
+    const migration = fs.readFileSync('supabase/migrations/20261028_dual_vouchers.sql', 'utf8');
+    await db.exec(migration); await db.exec(migration);
+    const historical = (await db.query('select * from orders where id=$1', [historicalId])).rows[0];
+    assert.equal(Number(historical.food_discount_amount), 15000);
+    assert.equal(Number(historical.shipping_discount_amount), 0);
+    assert.equal(Number(historical.total), 40000);
+    assert.equal((await db.query("select applies_to from vouchers where code='FREESHIPALL'")).rows[0].applies_to, 'shipping');
+    await db.exec(`update public.user_vouchers set is_used=false;
+      insert into vouchers(code,applies_to,discount_type,discount_value,min_order_value) values
+        ('SHIP_BIG','shipping','fixed',999999,0),('FOOD_BIG','food','fixed',999999,0),
+        ('SHIP_HALF','shipping','percentage',50,0),('FOOD_QUARTER','food','percentage',25,0),
+        ('SHIP_MIN','shipping','fixed',10000,40001),('SHIP_EXPIRED','shipping','fixed',10000,0),
+        ('FOOD_ROLLBACK','food','fixed',10000,0),('SHIP_ROLLBACK','shipping','fixed',15000,0),
+        ('SHIP_UNOWNED','shipping','fixed',15000,0),('SHIP_OTHER','shipping','fixed',15000,0),('SHIP_ONLY','shipping','fixed',15000,0);
+      update vouchers set expiry_date=now()-interval '1 day' where code='SHIP_EXPIRED';
+      insert into restaurants(id,name,address) values('88888888-8888-4888-8888-888888888888','Other restaurant','Other');
+      update vouchers set restaurant_id='88888888-8888-4888-8888-888888888888' where code='SHIP_OTHER';
+      set role authenticated;`);
+    const place = (id, foodCode = null, shippingCode = null) => db.query("select * from create_food_order($1,$2::jsonb,'Address A',$3,0,0,15000,'Nguyễn An','0901234567',$4)", [id, items, foodCode, shippingCode]);
+    await collect('FOOD');
+    const id = next(); const order = (await place(id, 'FOOD', 'FREESHIPALL')).rows[0];
+    assert.equal(Number(order.food_discount_amount), 10000);
+    assert.equal(Number(order.shipping_discount_amount), 15000);
+    assert.equal(Number(order.discount_amount), 25000);
+    assert.equal(Number(order.total), 30000);
+    assert.ok(order.voucher_id && order.shipping_voucher_id);
+    assert.notEqual(order.voucher_id, order.shipping_voucher_id);
+    assert.equal((await db.query('select is_used from user_vouchers')).rows.every(row => row.is_used), true);
+    assert.equal((await place(id, 'SHIP_EXPIRED', 'WRONG')).rows[0].id, id);
+    await assert.rejects(place(next(), 'FOOD', 'FREESHIPALL'), /sử dụng/);
+    await assert.rejects(place(next(), 'FREESHIPALL'), /giảm tiền món/);
+    await assert.rejects(place(next(), null, 'FOOD'), /giảm phí giao hàng/);
+    await assert.rejects(place(next(), null, 'SHIP_UNOWNED'), /chưa được thu thập/);
+    await collect('SHIP_MIN');
+    const minId = next(); await assert.rejects(place(minId, null, 'SHIP_MIN'), /tối thiểu/);
+    assert.equal((await db.query('select id from orders where id=$1', [minId])).rows.length, 0);
+    await assert.rejects(place(next(), null, 'SHIP_EXPIRED'), /hết hạn/);
+    await collect('SHIP_OTHER');
+    await assert.rejects(place(next(), null, 'SHIP_OTHER'), /quán khác/);
+    await collect('SHIP_ONLY');
+    const shippingOnly = (await place(next(), null, 'SHIP_ONLY')).rows[0];
+    assert.equal(Number(shippingOnly.food_discount_amount), 0);
+    assert.equal(Number(shippingOnly.shipping_discount_amount), 15000);
+    assert.equal(Number(shippingOnly.total), 40000);
+    assert.equal(shippingOnly.voucher_id, null);
+    await collect('SHIP_HALF'); await collect('FOOD_QUARTER');
+    const half = (await place(next(), 'FOOD_QUARTER', 'SHIP_HALF')).rows[0];
+    assert.equal(Number(half.food_discount_amount), 10000);
+    assert.equal(Number(half.shipping_discount_amount), 7500);
+    assert.equal(Number(half.total), 37500);
+    await collect('FOOD_BIG'); await collect('SHIP_BIG');
+    const capped = (await place(next(), 'FOOD_BIG', 'SHIP_BIG')).rows[0];
+    assert.equal(Number(capped.food_discount_amount), 40000);
+    assert.equal(Number(capped.shipping_discount_amount), 15000);
+    assert.equal(Number(capped.total), 0);
+    const noVoucher = (await place(next())).rows[0];
+    assert.equal(Number(noVoucher.total), 55000);
+    assert.equal(Number(noVoucher.discount_amount), 0);
+    await db.query("select set_config('app.user_id',$1,false)", [other]);
+    await assert.rejects(place(id), /không khả dụng/);
+    await db.query("select set_config('app.user_id',$1,false)", [user]);
+    await assert.rejects(db.query("select * from create_food_order($1,$2::jsonb,'Address A',null,0,0,15000,'Nguyễn An','0901234567')", [next(), items]), /permission denied/);
+    await collect('FOOD_ROLLBACK'); await collect('SHIP_ROLLBACK');
+    await db.exec(`reset role; create function public.fail_dual_snapshot()returns trigger language plpgsql as $$begin raise exception 'Snapshot failure';end$$;
+      create trigger fail_dual before update of shipping_discount_amount on orders for each row execute function public.fail_dual_snapshot(); set role authenticated;`);
+    const rollbackId = next(); await assert.rejects(place(rollbackId, 'FOOD_ROLLBACK', 'SHIP_ROLLBACK'), /Snapshot failure/);
+    assert.equal((await db.query('select id from orders where id=$1', [rollbackId])).rows.length, 0);
+    assert.equal((await db.query('select id from order_items where order_id=$1', [rollbackId])).rows.length, 0);
+    await db.exec('reset role');
+    assert.equal((await db.query("select uv.is_used from user_vouchers uv join vouchers v on v.id=uv.voucher_id where v.code in ('FOOD_ROLLBACK','SHIP_ROLLBACK')")).rows.every(row => row.is_used === false), true);
+    console.log('Dual voucher SQL PASS: repeatable migration, preserved historical totals, exact pre-discount minimum, separate fixed/percentage bases and caps, atomic dual consumption/rollback, target/ownership/expiry checks, idempotent retry and blocked legacy RPC.');
+  } finally { await db.close(); }
+})().catch(error => { console.error(error); process.exitCode = 1; });

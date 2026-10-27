@@ -9,6 +9,16 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      discovery_categories: {
+        Row: { id: string; name: string; kind: 'food' | 'restaurant_tag'; restaurant_tag: string | null; image_url: string | null; sort_order: number; is_active: boolean };
+        Insert: { id: string; name: string; kind: 'food' | 'restaurant_tag'; restaurant_tag?: string | null; image_url?: string | null; sort_order?: number; is_active?: boolean };
+        Update: { id?: string; name?: string; kind?: 'food' | 'restaurant_tag'; restaurant_tag?: string | null; image_url?: string | null; sort_order?: number; is_active?: boolean };
+      };
+      food_discovery_categories: {
+        Row: { food_id: string; discovery_category_id: string };
+        Insert: { food_id: string; discovery_category_id: string };
+        Update: { food_id?: string; discovery_category_id?: string };
+      };
       banners: {
         Row: {
           id: string;
@@ -274,6 +284,9 @@ export interface Database {
       };
       orders: {
         Row: {
+          food_discount_amount: number;
+          shipping_discount_amount: number;
+          shipping_voucher_id: string | null;
           recipient_name: string | null;
           recipient_phone: string | null;
           id: string;
@@ -293,6 +306,9 @@ export interface Database {
           created_at: string;
         };
         Insert: {
+          food_discount_amount?: number;
+          shipping_discount_amount?: number;
+          shipping_voucher_id?: string | null;
           recipient_name?: string | null;
           recipient_phone?: string | null;
           id?: string;
@@ -312,6 +328,9 @@ export interface Database {
           created_at?: string;
         };
         Update: {
+          food_discount_amount?: number;
+          shipping_discount_amount?: number;
+          shipping_voucher_id?: string | null;
           recipient_name?: string | null;
           recipient_phone?: string | null;
           id?: string;
@@ -503,6 +522,7 @@ export interface Database {
 
       vouchers: {
         Row: {
+          applies_to: 'food' | 'shipping';
           id: string;
           restaurant_id: string | null;
           code: string;
@@ -513,6 +533,7 @@ export interface Database {
           is_active: boolean;
         };
         Insert: {
+          applies_to?: 'food' | 'shipping';
           id?: string;
           restaurant_id?: string | null;
           code: string;
@@ -523,6 +544,7 @@ export interface Database {
           is_active?: boolean;
         };
         Update: {
+          applies_to?: 'food' | 'shipping';
           id?: string;
           restaurant_id?: string | null;
           code?: string;

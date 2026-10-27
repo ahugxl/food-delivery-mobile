@@ -26,12 +26,13 @@ export default function CheckoutScreen() {
   const locked = useCartStore(state => state.isCheckingOut);
   const address = useOrderStore(state => state.deliveryAddress);
   const voucher = useOrderStore(state => state.checkoutVoucher);
+  const shippingVoucher = useOrderStore(state => state.shippingVoucher);
   const userId = useAuthStore(state => state.user?.id);
   const client = useQueryClient();
   const submitGuard = useRef(false);
   const shipping = useShippingQuote(items[0]?.restaurantId, address);
   const shippingReady = items.length === 0 || shipping.deliveryFee !== null;
-  const totals = purchaseTotals(items, voucher, Date.now(), shipping.deliveryFee ?? 0);
+  const totals = purchaseTotals(items, voucher, Date.now(), shipping.deliveryFee ?? 0, shippingVoucher);
   const mutation = useMutation({ mutationFn: purchaseApi.createOrder, retry: false });
   const coordinates = validCoordinates(address) ? { latitude: address.latitude, longitude: address.longitude } : undefined;
   const canOrder = !!userId && items.length > 0 && address.street.trim().length >= 5 && hasRecipient(address) && !!coordinates && shippingReady && !shipping.isFetching && !totals.voucherError && !locked;
@@ -42,14 +43,14 @@ export default function CheckoutScreen() {
     try {
       validatePurchase(items, address.street);
       // A refreshed restaurant location/quote must not create a second order after a lost response.
-      const signature = purchaseSignature(items, address.street, voucher?.code, coordinates, address);
-      const orderId = useCartStore.getState().prepareCheckout(signature, randomUUID(), { address, voucher });
+      const signature = purchaseSignature(items, address.street, voucher?.code, coordinates, address, shippingVoucher?.code);
+      const orderId = useCartStore.getState().prepareCheckout(signature, randomUUID(), { address, voucher, shippingVoucher });
       submittedRequestId = orderId;
       useCartStore.getState().setCheckingOut(true);
-      const order = await mutation.mutateAsync({ orderId, items, address: address.street, voucherCode: voucher?.code, coordinates: coordinates!, deliveryFee: shipping.deliveryFee, recipientName: address.recipientName, recipientPhone: address.recipientPhone });
+      const order = await mutation.mutateAsync({ orderId, items, address: address.street, voucherCode: voucher?.code, shippingVoucherCode: shippingVoucher?.code, coordinates: coordinates!, deliveryFee: shipping.deliveryFee, recipientName: address.recipientName, recipientPhone: address.recipientPhone });
       if (useAuthStore.getState().user?.id !== userId || useCartStore.getState().checkoutRequest?.id !== order.id) return;
       useCartStore.getState().clearCart();
-      useOrderStore.getState().setCheckoutVoucher(null);
+      useOrderStore.getState().setCheckoutVouchers(null, null);
       void client.invalidateQueries({ queryKey: ['orders', userId] });
       void client.invalidateQueries({ queryKey: voucherKeys.wallet(userId) });
       void client.invalidateQueries({ queryKey: voucherKeys.owned(userId) });
@@ -87,17 +88,17 @@ export default function CheckoutScreen() {
           </View><Text className="font-semibold text-sm text-ink">{currency(item.unitPrice * item.quantity)}</Text>
         </View>)}
       </FlowCard>
-      <Pressable accessibilityRole="button" disabled={locked || !items.length} onPress={() => router.push('/select-offer')} className="mb-5 gap-2 rounded-3xl border border-line bg-card p-5">
-        <Text className="font-semibold text-base text-ink">Mã ưu đãi</Text>
-        <Text className="font-regular text-sm text-teal">{voucher?.code || 'Nhập mã ưu đãi'}</Text>
-        {!!totals.voucherError && <Text accessibilityRole="alert" className="text-sm text-coral">{totals.voucherError} Vui lòng bỏ hoặc đổi mã ưu đãi này.</Text>}
-      </Pressable>
+      {([{ target: 'food', title: 'Voucher giảm tiền món', value: voucher, error: totals.foodError }, { target: 'shipping', title: 'Voucher giảm phí giao hàng', value: shippingVoucher, error: totals.shippingError }] as const).map(slot => <Pressable key={slot.target} accessibilityRole="button" disabled={locked || !items.length} onPress={() => router.push('/select-offer')} className="mb-4 gap-2 rounded-3xl border border-line bg-card p-5">
+        <Text className="font-semibold text-base text-ink">{slot.title}</Text>
+        <Text className="text-sm text-teal">{slot.value?.code || 'Chọn hoặc nhập mã'}</Text>
+        {!!slot.error && <Text accessibilityRole="alert" className="text-sm text-coral">{slot.error}</Text>}
+      </Pressable>)}
       <FlowCard>
         <Text className="font-bold text-base text-ink">Chi tiết thanh toán</Text>
         {shipping.distanceKm !== null && <Text className="font-medium text-sm text-teal">Khoảng cách: {shipping.distanceKm.toFixed(1)} km (đường chim bay)</Text>}
         {!!shipping.error && <Text accessibilityLiveRegion="polite" className="text-sm text-muted">{shipping.error}</Text>}
         {!shippingReady && items.length > 0 && <FlowButton title="Tính lại phí giao hàng" disabled={shipping.isFetching || locked} onPress={() => { void shipping.refetch(); }} />}
-        {([['Tạm tính', totals.subtotal], ['Phí giao hàng', totals.deliveryFee], ['Giảm giá', -totals.discount], ['Tổng cộng', totals.total]] as const).map(([label, amount]) => <View key={label} className="flex-row justify-between">
+        {([['Tạm tính', totals.subtotal], ['Phí giao hàng', totals.deliveryFee], ['Giảm tiền món', -totals.foodDiscount], ['Giảm phí giao hàng', -totals.shippingDiscount], ['Tổng cộng', totals.total]] as const).map(([label, amount]) => <View key={label} className="flex-row justify-between">
           <Text className="font-medium text-sm text-muted">{label}</Text><Text className="font-semibold text-base text-ink">{!shippingReady && (label === 'Phí giao hàng' || label === 'Tổng cộng') ? 'Chưa xác định' : amount < 0 ? `-${currency(-amount)}` : currency(amount)}</Text>
         </View>)}
         <Text className="text-xs leading-5 text-muted">15.000 ₫ cho 2 km đầu. Mỗi km tiếp theo cộng 5.000 ₫, làm tròn lên. Phí tính theo khoảng cách đường chim bay.</Text>

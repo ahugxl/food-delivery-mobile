@@ -13,6 +13,25 @@ export function createCatalogApi(client: SupabaseClient<SupabaseDatabase> | null
     return client;
   }
   return {
+    async discoveryCategories(signal?: AbortSignal) {
+      const query = db().from('discovery_categories').select('*').eq('is_active', true).order('sort_order').order('id');
+      const { data, error } = await (signal ? query.abortSignal(signal) : query);
+      if (error) throw error;
+      return data ?? [];
+    },
+    async discoveryFoods(categoryId: string, signal?: AbortSignal) {
+      const query = db().from('food_discovery_categories')
+        .select('food_id, foods!inner(name,restaurant_id,is_available,restaurants!inner(is_active))')
+        .eq('discovery_category_id', categoryId).eq('foods.is_available', true).eq('foods.restaurants.is_active', true).order('food_id');
+      const rows: { name: string; restaurant_id: string }[] = [];
+      for (let offset = 0; ; offset += 500) {
+        const page = query.range(offset, offset + 499);
+        const { data, error } = await (signal ? page.abortSignal(signal) : page);
+        if (error) throw error;
+        for (const item of data ?? []) rows.push({ name: item.foods.name, restaurant_id: item.foods.restaurant_id });
+        if (!data || data.length < 500) return rows;
+      }
+    },
     async restaurant(id: string, signal?: AbortSignal) {
       if (!isUuid(id)) return null;
       const query = db().from('restaurants').select('*').eq('id', id).eq('is_active', true);

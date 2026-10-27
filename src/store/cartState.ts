@@ -4,7 +4,7 @@ import type { VoucherRow } from '../features/order/purchase';
 import type { CartItem } from '../types';
 import { cartLineId } from '../features/food-detail/selection';
 
-export type CheckoutContext = { address: DeliveryAddress; voucher: VoucherRow | null };
+export type CheckoutContext = { address: DeliveryAddress; voucher: VoucherRow | null; shippingVoucher?: VoucherRow | null };
 export type CartState = {
   ownerId: string | null;
   setOwner: (ownerId: string | null) => void;

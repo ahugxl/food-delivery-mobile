@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { DeliveryAddress, Voucher } from '../features/order/checkout';
 import type { VoucherRow } from '../features/order/purchase';
+import { voucherTarget } from '../features/order/purchase';
 
 type OrderState = {
   orders: Order[];
@@ -9,6 +10,8 @@ type OrderState = {
   deliveryAddress: DeliveryAddress;
   appliedVoucher: Voucher | null;
   checkoutVoucher: VoucherRow | null;
+  shippingVoucher: VoucherRow | null;
+  setCheckoutVouchers: (food: VoucherRow | null, shipping: VoucherRow | null) => void;
   setCheckoutVoucher: (voucher: VoucherRow | null) => void;
   setDeliveryAddress: (address: DeliveryAddress) => void;
   setAppliedVoucher: (voucher: Voucher | null) => void;
@@ -58,7 +61,9 @@ export const useOrderStore = create<OrderState>((set) => ({
     }),
   deliveryAddress: { street: '', label: 'Home' },
   checkoutVoucher: null,
-  setCheckoutVoucher: (checkoutVoucher) => set({ checkoutVoucher }),
+  shippingVoucher: null,
+  setCheckoutVouchers: (checkoutVoucher, shippingVoucher) => set({ checkoutVoucher, shippingVoucher }),
+  setCheckoutVoucher: (voucher) => set(voucher && voucherTarget(voucher) === 'shipping' ? { shippingVoucher: voucher } : { checkoutVoucher: voucher }),
   appliedVoucher: null,
   setDeliveryAddress: (deliveryAddress) => set({ deliveryAddress }),
   setAppliedVoucher: (appliedVoucher) => set({ appliedVoucher }),

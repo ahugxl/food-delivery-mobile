@@ -22,7 +22,7 @@ export function createPurchaseApi(client: SupabaseClient<SupabaseDatabase> | nul
       if (reason) throw new Error(reason);
       return data;
     },
-    async createOrder(input: { orderId: string; items: CartItem[]; address: string; voucherCode?: string; coordinates: Coordinates; deliveryFee: Database['public']['Tables']['orders']['Insert']['delivery_fee'] } & Recipient) {
+    async createOrder(input: { orderId: string; items: CartItem[]; address: string; voucherCode?: string; shippingVoucherCode?: string; coordinates: Coordinates; deliveryFee: Database['public']['Tables']['orders']['Insert']['delivery_fee'] } & Recipient) {
       validatePurchase(input.items, input.address);
       if (!validCoordinates(input.coordinates)) throw new Error('Tọa độ giao hàng không hợp lệ.');
       if (typeof input.deliveryFee !== 'number' || !Number.isInteger(input.deliveryFee) || input.deliveryFee < BASE_DELIVERY_FEE || (input.deliveryFee - BASE_DELIVERY_FEE) % EXTRA_KM_FEE !== 0) throw new Error('Phí giao hàng không hợp lệ. Vui lòng tính lại.');
@@ -31,12 +31,13 @@ export function createPurchaseApi(client: SupabaseClient<SupabaseDatabase> | nul
         p_recipient_name: recipient.recipientName, p_recipient_phone: recipient.recipientPhone,
         p_order_id: input.orderId, p_items: serializeCart(input.items),
         p_address: input.address.trim(), p_voucher_code: input.voucherCode?.trim().toUpperCase() || null,
+        p_shipping_voucher_code: input.shippingVoucherCode?.trim().toUpperCase() || null,
         p_latitude: input.coordinates.latitude, p_longitude: input.coordinates.longitude, p_delivery_fee: input.deliveryFee,
       };
       const request = db().rpc('create_food_order', args);
       const { data, error } = await request.single();
       if (error) {
-        if (error.code === 'PGRST202') throw new Error('Máy chủ chưa được cập nhật chức năng thông tin người nhận. Vui lòng liên hệ quản trị viên.');
+        if (error.code === 'PGRST202') throw new Error('Máy chủ chưa được cập nhật chức năng voucher giảm món và phí giao hàng. Vui lòng liên hệ quản trị viên.');
         throw error;
       }
       if (!data) throw new Error('Chưa nhận được xác nhận đơn từ máy chủ. Vui lòng thử lại.');

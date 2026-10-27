@@ -21,7 +21,8 @@ test('restores quantity, every option and note after creating a fresh store', as
 test('pending request/context survives but the in-flight lock never survives restart', async () => {
   const disk = memory(); const first = createPersistedCartStore(disk);
   first.getState().setOwner('alice'); first.getState().addToCart(item);
-  first.getState().prepareCheckout('signature', 'request-id', { address: { recipientName: 'Nguyễn An', recipientPhone: '0901234567', street: 'Test address', label: 'Home', savedAddressId: 'saved-address-id' }, voucher: null });
+  const voucher = { id: 'ship', code: 'SHIP', applies_to: 'shipping', restaurant_id: null, discount_type: 'fixed', discount_value: 15000, min_order_value: 40000, expiry_date: null, is_active: true };
+  first.getState().prepareCheckout('signature', 'request-id', { address: { recipientName: 'Nguyễn An', recipientPhone: '0901234567', street: 'Test address', label: 'Home', savedAddressId: 'saved-address-id' }, voucher: { ...voucher, id: 'food', code: 'FOOD', applies_to: 'food' }, shippingVoucher: voucher });
   first.getState().setCheckingOut(true); await flush(first);
   assert.equal('isCheckingOut' in JSON.parse(disk.data.get(CART_STORAGE_KEY)).state, false);
   const reopened = createPersistedCartStore(disk); await reopened.persist.rehydrate();
@@ -31,6 +32,8 @@ test('pending request/context survives but the in-flight lock never survives res
   assert.equal(reopened.getState().checkoutRequest.context.address.savedAddressId, 'saved-address-id');
   assert.equal(reopened.getState().checkoutRequest.context.address.recipientName, 'Nguyễn An');
   assert.equal(reopened.getState().checkoutRequest.context.address.recipientPhone, '0901234567');
+  assert.equal(reopened.getState().checkoutRequest.context.voucher.applies_to, 'food');
+  assert.equal(reopened.getState().checkoutRequest.context.shippingVoucher.applies_to, 'shipping');
 });
 test('account switch and explicit logout remove the previous owner cart', async () => {
   const disk = memory(); const first = createPersistedCartStore(disk);

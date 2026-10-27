@@ -1,0 +1,14 @@
+Built-in image_gen, ads-marketing banner, exact 3:1 composition (2172x724).
+Emerald #008B45 and forest #124C42 with lime and cream accents. Left 58% clear
+large Vietnamese lettering; right 42% premium 3D green scooter delivery courier,
+food bowl and coupon ticket. Keep essentials inside 6% safe margins, no clutter.
+
+Exact text:
+LẤY VOUCHER FREESHIP
+FREESHIPALL
+Giảm 15.000đ • Đơn từ 40.000đ
+LẤY MÃ NGAY
+
+Spell the code FREESHIPALL exactly. No claims of free shipping for every order,
+no zero minimum, discounts larger than 15.000đ, logos or watermarks.
+Source conditions were read from the active vouchers row FREESHIPALL.

@@ -42,7 +42,8 @@ export default function ServerTracking({ orderId }: { orderId: string }) {
           </View>)}
           <Text className="font-regular text-sm text-muted">Tạm tính: {currency(Number(order.data.subtotal))}</Text>
           <Text className="font-regular text-sm text-muted">Phí giao hàng: {currency(Number(order.data.delivery_fee))}</Text>
-          <Text className="font-regular text-sm text-muted">Giảm giá: -{currency(Number(order.data.discount_amount))}</Text>
+          <Text className="font-regular text-sm text-muted">Giảm tiền món: -{currency(Number(order.data.food_discount_amount ?? order.data.discount_amount))}</Text>
+          <Text className="font-regular text-sm text-muted">Giảm phí giao hàng: -{currency(Number(order.data.shipping_discount_amount ?? 0))}</Text>
           <Text className="font-bold text-lg text-teal">Tổng cộng: {currency(Number(order.data.total))}</Text>
           <Text className="font-regular text-xs text-muted">Thanh toán khi nhận hàng</Text>
         </FlowCard>

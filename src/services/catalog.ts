@@ -3,6 +3,8 @@ import { createCatalogApi } from './catalogApi';
 
 export const catalogApi = createCatalogApi(supabase);
 export const catalogKeys = {
+  discoveryCategories: ['catalog', 'discovery-categories'] as const,
+  discoveryFoods: (id: string) => ['catalog', 'discovery-foods', id] as const,
   restaurant: (id: string) => ['catalog', 'restaurant', id] as const,
   banners: ['catalog', 'banners'] as const,
   categories: ['catalog', 'categories'] as const,

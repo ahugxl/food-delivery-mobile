@@ -7,10 +7,14 @@ import { recipientInput, type Recipient } from './recipient';
 
 export type VoucherRow = Database['public']['Tables']['vouchers']['Row'];
 export type OrderRow = Database['public']['Tables']['orders']['Row'];
+export type VoucherTarget = 'food' | 'shipping';
+export const voucherTarget = (voucher: VoucherRow): VoucherTarget => voucher.applies_to ?? 'food';
 export const cents = (value: number) => Math.round(value * 100);
 export const cartSubtotal = (items: CartItem[]) => items.reduce((sum, item) => sum + cents(item.unitPrice) * item.quantity, 0) / 100;
 
-export function voucherError(voucher: VoucherRow, subtotal: number, restaurantId: string, now = Date.now()): string | null {
+export function voucherError(voucher: VoucherRow, subtotal: number, restaurantId: string, now = Date.now(), expectedTarget?: VoucherTarget): string | null {
+  if (!['food', 'shipping'].includes(voucherTarget(voucher))) return 'Phạm vi áp dụng mã không hợp lệ.';
+  if (expectedTarget && voucherTarget(voucher) !== expectedTarget) return expectedTarget === 'food' ? 'Vui lòng chọn voucher giảm tiền món.' : 'Vui lòng chọn voucher giảm phí giao hàng.';
   if (!voucher.is_active) return 'Mã ưu đãi đã ngừng hoạt động.';
   if (voucher.expiry_date && (!Number.isFinite(Date.parse(voucher.expiry_date)) || Date.parse(voucher.expiry_date) <= now)) return 'Mã ưu đãi đã hết hạn.';
   if (voucher.restaurant_id && voucher.restaurant_id !== restaurantId) return 'Mã ưu đãi chỉ áp dụng tại quán khác.';
@@ -21,14 +25,17 @@ export function voucherError(voucher: VoucherRow, subtotal: number, restaurantId
   return null;
 }
 
-export function purchaseTotals(items: CartItem[], voucher: VoucherRow | null, now = Date.now(), shippingFee = BASE_DELIVERY_FEE) {
+export function purchaseTotals(items: CartItem[], voucher: VoucherRow | null, now = Date.now(), shippingFee = BASE_DELIVERY_FEE, shippingVoucher: VoucherRow | null = null) {
   const subtotal = cartSubtotal(items);
   if (!Number.isFinite(shippingFee) || shippingFee < 0 || !Number.isInteger(shippingFee)) throw new Error('Phí giao hàng phải là số nguyên VND không âm.');
   const deliveryFee = items.length > 0 ? shippingFee : 0;
-  const error = voucher ? voucherError(voucher, subtotal, items[0]?.restaurantId ?? '', now) : null;
-  const discountCents = !voucher || error ? 0 : Math.min(cents(subtotal), voucher.discount_type === 'percentage'
-    ? Math.round(cents(subtotal) * Number(voucher.discount_value) / 100) : cents(Number(voucher.discount_value)));
-  return { subtotal, deliveryFee, discount: discountCents / 100, total: (cents(subtotal) + cents(deliveryFee) - discountCents) / 100, voucherError: error };
+  const foodError = voucher ? voucherError(voucher, subtotal, items[0]?.restaurantId ?? '', now, 'food') : null;
+  const shippingError = shippingVoucher ? voucherError(shippingVoucher, subtotal, items[0]?.restaurantId ?? '', now, 'shipping') : null;
+  const discountFor = (value: VoucherRow | null, base: number, error: string | null) => !value || error ? 0 : Math.min(cents(base), value.discount_type === 'percentage'
+    ? Math.round(cents(base) * Number(value.discount_value) / 100) : cents(Number(value.discount_value)));
+  const foodDiscount = discountFor(voucher, subtotal, foodError);
+  const shippingDiscount = discountFor(shippingVoucher, deliveryFee, shippingError);
+  return { subtotal, deliveryFee, foodDiscount: foodDiscount / 100, shippingDiscount: shippingDiscount / 100, discount: (foodDiscount + shippingDiscount) / 100, total: (cents(subtotal) + cents(deliveryFee) - foodDiscount - shippingDiscount) / 100, foodError, shippingError, voucherError: foodError || shippingError };
 }
 
 export function validatePurchase(items: CartItem[], address: string) {
@@ -49,6 +56,6 @@ export function serializeCart(items: CartItem[]): Json {
   }));
 }
 
-export function purchaseSignature(items: CartItem[], address: string, code?: string, coordinates?: Coordinates, recipient?: Recipient) {
-  return JSON.stringify({ items: serializeCart(items), address: address.trim(), code: code?.trim().toUpperCase() || null, ...(coordinates ? { coordinates } : {}), ...(recipient ? recipientInput(recipient) : {}) });
+export function purchaseSignature(items: CartItem[], address: string, code?: string, coordinates?: Coordinates, recipient?: Recipient, shippingCode?: string) {
+  return JSON.stringify({ items: serializeCart(items), address: address.trim(), code: code?.trim().toUpperCase() || null, ...(coordinates ? { coordinates } : {}), ...(recipient ? recipientInput(recipient) : {}), ...(shippingCode ? { shippingCode: shippingCode.trim().toUpperCase() } : {}) });
 }

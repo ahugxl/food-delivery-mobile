@@ -106,12 +106,13 @@ export default function CartScreen() {
   const incrementQuantity = useCartStore((state) => state.incrementQuantity);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const appliedVoucher = useOrderStore((state) => state.checkoutVoucher);
+  const shippingVoucher = useOrderStore(state => state.shippingVoucher);
   const locked = useCartStore(state => state.isCheckingOut);
   const isEmpty = items.length === 0;
   const address = useOrderStore(state => state.deliveryAddress);
   const shipping = useShippingQuote(items[0]?.restaurantId, address);
   const shippingReady = isEmpty || shipping.deliveryFee !== null;
-  const { subtotal, deliveryFee, discount, total } = purchaseTotals(items, appliedVoucher, Date.now(), shipping.deliveryFee ?? 0);
+  const { subtotal, deliveryFee, foodDiscount, shippingDiscount, total } = purchaseTotals(items, appliedVoucher, Date.now(), shipping.deliveryFee ?? 0, shippingVoucher);
 
   const handleOrder = () => {
     if (isEmpty) return;
@@ -139,7 +140,7 @@ export default function CartScreen() {
             {items.length} món trong giỏ hàng
           </Text>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Xóa giỏ hàng" disabled={locked || isEmpty} onPress={() => { useCartStore.getState().clearCart(); useOrderStore.getState().setCheckoutVoucher(null); }} className="min-h-11 justify-center px-2"><Text className="font-semibold text-sm text-coral">Xóa</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Xóa giỏ hàng" disabled={locked || isEmpty} onPress={() => { useCartStore.getState().clearCart(); useOrderStore.getState().setCheckoutVouchers(null, null); }} className="min-h-11 justify-center px-2"><Text className="font-semibold text-sm text-coral">Xóa</Text></Pressable>
       </View>
 
       <FlashList<CartItem>
@@ -200,16 +201,16 @@ export default function CartScreen() {
               {shippingReady ? currency(deliveryFee) : 'Chọn điểm giao để tính phí'}
             </Text>
           </View>
-          {discount > 0 && (
-            <View style={styles.paymentRow}>
+          {([['Giảm tiền món', foodDiscount], ['Giảm phí giao hàng', shippingDiscount]] as const).filter(([, amount]) => amount > 0).map(([label, amount]) => (
+            <View key={label} style={styles.paymentRow}>
               <Text className="font-medium text-xs text-teal">
-                Giảm giá
+                {label}
               </Text>
               <Text className="font-semibold text-xs text-teal">
-                -{currency(discount)}
+                -{currency(amount)}
               </Text>
             </View>
-          )}
+          ))}
           <View
             style={[styles.paymentDivider, { backgroundColor: colors.border }]}
           />

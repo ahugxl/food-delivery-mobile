@@ -19,6 +19,7 @@ useAuthStore.subscribe((state, previous) => {
     useOrderStore.setState({
       deliveryAddress: cart.checkoutRequest.context.address,
       checkoutVoucher: cart.checkoutRequest.context.voucher,
+      shippingVoucher: cart.checkoutRequest.context.shippingVoucher ?? null,
     });
   }
 });

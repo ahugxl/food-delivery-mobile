@@ -3,7 +3,7 @@ import type { SupabaseDatabase } from '../types/supabase';
 import type { Database } from '../types/database.types';
 import type { CartItem } from '../types';
 import { createPurchaseApi } from './purchaseApi';
-import { cartSubtotal, voucherError } from '../features/order/purchase';
+import { cartSubtotal, voucherError, voucherTarget } from '../features/order/purchase';
 
 export type Voucher = Database['public']['Tables']['vouchers']['Row'];
 export type WalletEntry = Pick<Database['public']['Tables']['user_vouchers']['Row'], 'user_id' | 'voucher_id' | 'is_used'>;
@@ -14,6 +14,7 @@ export const voucherKeys = {
 };
 
 export function collectionError(voucher: Voucher, now = Date.now()): string | null {
+  if (!['food', 'shipping'].includes(voucherTarget(voucher))) return 'Chưa khả dụng';
   if (!voucher.is_active || (voucher.expiry_date !== null && (!Number.isFinite(Date.parse(voucher.expiry_date)) || Date.parse(voucher.expiry_date) <= now))) return 'Cháy hàng';
   if (!['fixed', 'percentage'].includes(voucher.discount_type) || !Number.isFinite(voucher.discount_value) || voucher.discount_value < 0 || (voucher.discount_type === 'percentage' && voucher.discount_value > 100)) return 'Chưa khả dụng';
   return null;

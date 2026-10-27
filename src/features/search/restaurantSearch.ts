@@ -1,7 +1,9 @@
 import type { Row } from '../../types/supabase';
 import { distanceKm, type Coordinates } from './liveCatalog';
 import { viLabel } from '../../utils/vietnamese';
-export const normalizeSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+import { normalizeSearch } from './normalizeSearch';
+import { findFoodCollection, matchesFoodCollection } from './foodCollections';
+export { normalizeSearch } from './normalizeSearch';
 type MenuMatch = {
     restaurant_id: string;
     name: string;
@@ -11,14 +13,17 @@ export function searchRestaurants(restaurants: Row<'restaurants'>[], foods: Menu
     freeship: boolean;
     nearby: boolean;
     sort: string;
-}, saved: string[], location: Coordinates | null, categoryId?: string) {
+}, saved: string[], location: Coordinates | null, categoryId?: string, collectionId?: string) {
     const words = normalizeSearch(keyword).trim().split(/\s+/).filter(Boolean);
+    const collection = findFoodCollection(collectionId);
+    if (collectionId && !collection) return [];
+    const matchingFoods = collection ? foods.filter(food => matchesFoodCollection(food, collection)) : foods;
     const result = restaurants.filter(restaurant => {
-        const menu = foods.filter(food => food.restaurant_id === restaurant.id);
+        const menu = matchingFoods.filter(food => food.restaurant_id === restaurant.id);
         const text = normalizeSearch(`${restaurant.name} ${menu.map(food => `${food.name} ${viLabel(food.name)}`).join(' ')}`);
         const tokens = text.split(/[^\p{L}\p{N}]+/u);
         const distance = location && restaurant.latitude != null && restaurant.longitude != null ? distanceKm(location, { latitude: restaurant.latitude, longitude: restaurant.longitude }) : Infinity;
-        return (!categoryId || menu.length > 0) && words.every(word => tokens.some(token => token.startsWith(word)))
+        return (!(categoryId || collection) || menu.length > 0) && words.every(word => tokens.some(token => token.startsWith(word)))
             && (!filters.favorite || saved.includes(restaurant.id))
             && (!filters.freeship || (Array.isArray(restaurant.promo_tags) && restaurant.promo_tags.some(tag => typeof tag === 'string' && /freeship|free delivery|miễn phí giao/i.test(viLabel(tag)))))
             && (!filters.nearby || distance <= 2);

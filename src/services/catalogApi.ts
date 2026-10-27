@@ -52,9 +52,16 @@ export function createCatalogApi(client: SupabaseClient<SupabaseDatabase> | null
         .eq('is_available', true).eq('restaurants.is_active', true).order('name').order('id');
       if (filters.categoryId) query = query.eq('category_id', filters.categoryId);
       if (filters.restaurantId) query = query.eq('restaurant_id', filters.restaurantId);
-      const { data, error } = await (signal ? query.abortSignal(signal) : query);
-      if (error) throw error;
-      return data ?? [];
+      // Supabase limits individual responses. Search every available menu page,
+      // rather than silently missing dishes beyond the first response.
+      const rows: NonNullable<Awaited<typeof query>['data']> = [];
+      for (let offset = 0; ; offset += 500) {
+        const page = query.range(offset, offset + 499);
+        const { data, error } = await (signal ? page.abortSignal(signal) : page);
+        if (error) throw error;
+        rows.push(...(data ?? []));
+        if (!data || data.length < 500) return rows;
+      }
     },
   };
 }

@@ -106,11 +106,12 @@ test('cart merges only identical food/option combinations regardless of selectio
   assert.equal(cartLineId(id, []), `${id}:standard`);
 });
 
-test('restaurant cards use real hours/promotions and handle nullable images', () => {
-  const card = toRestaurantCard({ id, name: 'Restaurant', image_url: null, opening_hours: '8am - 9pm', promo_tags: ['Freeship', null, {}], rating: 4.8, is_open: false });
+test('restaurant cards display database label text without an allowlist and ignore invalid entries', () => {
+  const card = toRestaurantCard({ id, name: 'Restaurant', image_url: null, opening_hours: '8am - 9pm', promo_tags: ['Freeship', 'Giảm 20%', 'Mua 1 Tặng 1', 'Quán trứ danh', ' ban chay ', 'Bán chạy', 'Đối tác uy tín', 'Mở cửa xuyên đêm', null, {}], rating: 4.8, is_open: false });
   assert.equal(card.image, '');
   assert.equal(card.openingHours, '8:00 - 21:00');
-  assert.deepEqual(card.tags, ['Miễn phí giao hàng']);
+  assert.deepEqual(card.tags, ['Freeship', 'Giảm 20%', 'Mua 1 Tặng 1', 'Quán trứ danh', ' ban chay ', 'Bán chạy', 'Đối tác uy tín', 'Mở cửa xuyên đêm']);
+  assert.deepEqual(toRestaurantCard({ ...card, promo_tags: ['Nhãn mới bất kỳ', '', '  ', null] }).tags, ['Nhãn mới bất kỳ']);
   assert.equal(card.isOpen, false);
 });
 

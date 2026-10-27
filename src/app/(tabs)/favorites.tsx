@@ -120,7 +120,7 @@ export default function FavoritesScreen() {
                 numberOfLines={1}
                 style={[styles.tags, { color: colors.mutedForeground }]}
               >
-                {item.tags.map(viLabel).join(' · ')}
+                {item.tags.join(' · ')}
               </Text>
             </Pressable>
           </View>

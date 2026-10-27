@@ -71,7 +71,7 @@ export function LocationEditor({ initial, onSubmit, title = 'Xác nhận điểm
         clearTimeout(timer.current); setBusy(false); setError(''); setDraft(value => ({ ...value, street, savedAddressId: undefined })); }} editable={!disabled} maxLength={500} multiline placeholder={busy ? 'Đang tìm địa chỉ cho ghim…' : 'Số nhà, tên đường, phường, quận…'} className="min-h-16 rounded-2xl border border-line bg-card px-4 py-3 text-base text-ink"/>
     <FlowButton title={locating ? 'Đang định vị…' : 'Dùng vị trí hiện tại'} disabled={locating || disabled} onPress={() => { void locate(); }}/>
     <MapPanel coordinate={validCoordinates(draft) ? draft : { latitude: 10.7769, longitude: 106.7009 }} onSelect={disabled ? undefined : choose}/>
-    {!validCoordinates(draft) && <Text className="text-sm text-muted">Chọn điểm giao trên bản đồ. Tâm bản đồ ban đầu chưa phải vị trí đã chọn.</Text>}
+    {!validCoordinates(draft) && <Text className="text-sm text-muted">Dùng vị trí hiện tại hoặc chọn tọa độ giao hàng. Vị trí hiển thị ban đầu chưa phải điểm giao đã xác nhận.</Text>}
     {busy && <Text accessibilityLiveRegion="polite" className="text-sm text-muted">Đang dịch tọa độ thành địa chỉ…</Text>}
     {!!error && <Text accessibilityRole="alert" className="text-sm text-coral">{error} Bạn có thể nhập địa chỉ thủ công cho ghim đã chọn.</Text>}
     <View className="flex-row gap-2">{(['Home', 'Work', 'Other'] as const).map(value => <View key={value} className="flex-1"><FlowButton disabled={disabled} title={`${draft.label === value ? '✓ ' : ''}${viLabel(value)}`} onPress={() => setDraft(current => ({ ...current, label: value, savedAddressId: undefined }))}/></View>)}</View>

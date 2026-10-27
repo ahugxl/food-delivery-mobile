@@ -274,6 +274,8 @@ export interface Database {
       };
       orders: {
         Row: {
+          recipient_name: string | null;
+          recipient_phone: string | null;
           id: string;
           user_id: string;
           restaurant_id: string;
@@ -291,6 +293,8 @@ export interface Database {
           created_at: string;
         };
         Insert: {
+          recipient_name?: string | null;
+          recipient_phone?: string | null;
           id?: string;
           user_id: string;
           restaurant_id: string;
@@ -308,6 +312,8 @@ export interface Database {
           created_at?: string;
         };
         Update: {
+          recipient_name?: string | null;
+          recipient_phone?: string | null;
           id?: string;
           user_id?: string;
           restaurant_id?: string;
@@ -438,6 +444,8 @@ export interface Database {
       };
       user_addresses: {
         Row: {
+          recipient_name: string | null;
+          recipient_phone: string | null;
           id: string;
           user_id: string;
           title: string;
@@ -447,6 +455,8 @@ export interface Database {
           is_default: boolean;
         };
         Insert: {
+          recipient_name?: string | null;
+          recipient_phone?: string | null;
           id?: string;
           user_id: string;
           title: string;
@@ -456,6 +466,8 @@ export interface Database {
           is_default?: boolean;
         };
         Update: {
+          recipient_name?: string | null;
+          recipient_phone?: string | null;
           id?: string;
           user_id?: string;
           title?: string;

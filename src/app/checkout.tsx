@@ -19,6 +19,7 @@ import { viLabel } from '../utils/vietnamese';
 import { userMessage } from '../utils/userMessage';
 import { useShippingQuote } from '../hooks/useShippingQuote';
 import { voucherKeys } from '../services/voucherApi';
+import { hasRecipient } from '../features/order/recipient';
 
 export default function CheckoutScreen() {
   const items = useCartStore(state => state.items);
@@ -33,7 +34,7 @@ export default function CheckoutScreen() {
   const totals = purchaseTotals(items, voucher, Date.now(), shipping.deliveryFee ?? 0);
   const mutation = useMutation({ mutationFn: purchaseApi.createOrder, retry: false });
   const coordinates = validCoordinates(address) ? { latitude: address.latitude, longitude: address.longitude } : undefined;
-  const canOrder = !!userId && items.length > 0 && address.street.trim().length >= 5 && !!coordinates && shippingReady && !shipping.isFetching && !totals.voucherError && !locked;
+  const canOrder = !!userId && items.length > 0 && address.street.trim().length >= 5 && hasRecipient(address) && !!coordinates && shippingReady && !shipping.isFetching && !totals.voucherError && !locked;
   const placeOrder = async () => {
     if (!canOrder || shipping.deliveryFee === null || submitGuard.current || useCartStore.getState().isCheckingOut) return;
     submitGuard.current = true;
@@ -41,11 +42,11 @@ export default function CheckoutScreen() {
     try {
       validatePurchase(items, address.street);
       // A refreshed restaurant location/quote must not create a second order after a lost response.
-      const signature = purchaseSignature(items, address.street, voucher?.code, coordinates);
+      const signature = purchaseSignature(items, address.street, voucher?.code, coordinates, address);
       const orderId = useCartStore.getState().prepareCheckout(signature, randomUUID(), { address, voucher });
       submittedRequestId = orderId;
       useCartStore.getState().setCheckingOut(true);
-      const order = await mutation.mutateAsync({ orderId, items, address: address.street, voucherCode: voucher?.code, coordinates: coordinates!, deliveryFee: shipping.deliveryFee });
+      const order = await mutation.mutateAsync({ orderId, items, address: address.street, voucherCode: voucher?.code, coordinates: coordinates!, deliveryFee: shipping.deliveryFee, recipientName: address.recipientName, recipientPhone: address.recipientPhone });
       if (useAuthStore.getState().user?.id !== userId || useCartStore.getState().checkoutRequest?.id !== order.id) return;
       useCartStore.getState().clearCart();
       useOrderStore.getState().setCheckoutVoucher(null);
@@ -68,12 +69,12 @@ export default function CheckoutScreen() {
       <FlowCard>
         <Text className="font-bold text-base text-ink">Giao đến {viLabel(address.label)}</Text>
         <Text className="font-regular text-sm text-muted">{address.street || 'Vui lòng nhập địa chỉ giao hàng.'}</Text>
+        <Text className="font-semibold text-sm text-ink">{[address.recipientName, address.recipientPhone].filter(Boolean).join(' · ')}</Text>
+        {!hasRecipient(address) && <Text className="text-sm text-coral">Vui lòng bổ sung tên và số điện thoại người nhận.</Text>}
+        {address.savedAddressId && <Pressable accessibilityRole="button" disabled={locked} onPress={() => router.push({ pathname: '/address-form', params: { id: address.savedAddressId } })} className="min-h-11 justify-center"><Text className="font-semibold text-sm text-teal">Sửa địa chỉ và người nhận</Text></Pressable>}
         {!coordinates && <Text className="text-sm text-coral">Vui lòng chọn điểm giao trên bản đồ trước khi đặt hàng.</Text>}
         <Pressable accessibilityRole="button" disabled={locked} onPress={() => router.push('/select-location')} className="min-h-11 justify-center">
           <Text className="font-semibold text-sm text-teal">Đổi địa chỉ</Text>
-        </Pressable>
-        <Pressable accessibilityRole="button" disabled={locked} onPress={() => router.push({ pathname: '/addresses', params: { select: '1' } })} className="min-h-11 justify-center">
-          <Text className="font-semibold text-sm text-teal">Chọn địa chỉ đã lưu</Text>
         </Pressable>
       </FlowCard>
       <FlowCard>

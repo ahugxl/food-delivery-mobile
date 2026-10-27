@@ -8,6 +8,8 @@ import type { DeliveryAddress } from '../features/order/checkout';
 import { viLabel } from '../utils/vietnamese';
 import { userMessage } from '../utils/userMessage';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { RecipientFields } from './RecipientFields';
+import { hasRecipient, recipientInput } from '../features/order/recipient';
 export function LocationEditor({ initial, onSubmit, title = 'Xác nhận điểm giao', disabled = false, children }: {
     initial: DeliveryAddress;
     onSubmit: (value: DeliveryAddress) => void | Promise<void>;
@@ -59,14 +61,16 @@ export function LocationEditor({ initial, onSubmit, title = 'Xác nhận điểm
         }
     };
     const confirm = async () => {
-        if (confirming.current || disabled || busy || locating || !validCoordinates(draft) || draft.street.trim().length < 5) return;
+        if (confirming.current || disabled || busy || locating || !validCoordinates(draft) || draft.street.trim().length < 5 || !hasRecipient(draft)) return;
         confirming.current = true;
         setSubmitError('');
-        try { await onSubmit({ ...draft, street: draft.street.trim() }); }
+        try { await onSubmit({ ...draft, ...recipientInput(draft), street: draft.street.trim() }); }
         catch (reason) { setSubmitError(userMessage(reason)); }
         finally { confirming.current = false; }
     };
     return <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding"><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 20, gap: 18 }}>
+    <RecipientFields value={draft} disabled={disabled} onChange={recipient => setDraft(value => ({ ...value, ...recipient, savedAddressId: undefined }))} />
+    {!hasRecipient(draft) && <Text className="text-sm text-muted">Nhập tên (2–100 ký tự) và số điện thoại (9–15 chữ số) để xác nhận địa chỉ.</Text>}
     <TextInput accessibilityLabel="Địa chỉ giao hàng" value={draft.street} onChangeText={street => { generation.current++; if (timer.current)
         clearTimeout(timer.current); setBusy(false); setError(''); setDraft(value => ({ ...value, street, savedAddressId: undefined })); }} editable={!disabled} maxLength={500} multiline placeholder={busy ? 'Đang tìm địa chỉ cho ghim…' : 'Số nhà, tên đường, phường, quận…'} className="min-h-16 rounded-2xl border border-line bg-card px-4 py-3 text-base text-ink"/>
     <FlowButton title={locating ? 'Đang định vị…' : 'Dùng vị trí hiện tại'} disabled={locating || disabled} onPress={() => { void locate(); }}/>
@@ -77,6 +81,6 @@ export function LocationEditor({ initial, onSubmit, title = 'Xác nhận điểm
     <View className="flex-row gap-2">{(['Home', 'Work', 'Other'] as const).map(value => <View key={value} className="flex-1"><FlowButton disabled={disabled} title={`${draft.label === value ? '✓ ' : ''}${viLabel(value)}`} onPress={() => setDraft(current => ({ ...current, label: value, savedAddressId: undefined }))}/></View>)}</View>
     {children}
     {!!submitError && <Text accessibilityRole="alert" className="text-sm text-coral">{submitError}</Text>}
-    <FlowButton title={title} disabled={disabled || busy || locating || !validCoordinates(draft) || draft.street.trim().length < 5} onPress={() => { void confirm(); }}/>
+    <FlowButton title={title} disabled={disabled || busy || locating || !validCoordinates(draft) || draft.street.trim().length < 5 || !hasRecipient(draft)} onPress={() => { void confirm(); }}/>
   </ScrollView></KeyboardAvoidingView>;
 }

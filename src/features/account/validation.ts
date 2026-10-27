@@ -1,6 +1,7 @@
 import type { Row } from '../../types/supabase';
 import type { DeliveryAddress } from '../order/checkout';
 import { validCoordinates } from '../location/coordinates';
+import { recipientInput } from '../order/recipient';
 export function profileInput(fullName: string, phone: string, avatar: string | null) {
     const name = fullName.trim();
     const normalizedPhone = phone.trim().replace(/[\s().-]/g, '');
@@ -18,12 +19,13 @@ export function addressInput(id: string, address: DeliveryAddress, isDefault: bo
         throw new Error('Địa chỉ cần từ 5 đến 500 ký tự.');
     if (!validCoordinates(address))
         throw new Error('Vui lòng chọn tọa độ giao hàng hợp lệ.');
-    return { p_id: id, p_title: address.label, p_address: address.street.trim(), p_latitude: address.latitude, p_longitude: address.longitude, p_is_default: isDefault, p_create: create };
+    const recipient = recipientInput(address);
+    return { p_id: id, p_title: address.label, p_address: address.street.trim(), p_latitude: address.latitude, p_longitude: address.longitude, p_is_default: isDefault, p_create: create, p_recipient_name: recipient.recipientName, p_recipient_phone: recipient.recipientPhone };
 }
 export function deliveryFromSaved(row: SavedAddress): DeliveryAddress | null {
     if (!validCoordinates(row))
         return null;
-    return { savedAddressId: row.id, street: row.address, label: row.title === 'Home' || row.title === 'Work' ? row.title : 'Other', latitude: row.latitude, longitude: row.longitude };
+    return { savedAddressId: row.id, street: row.address, label: row.title === 'Home' || row.title === 'Work' ? row.title : 'Other', latitude: row.latitude, longitude: row.longitude, recipientName: row.recipient_name ?? '', recipientPhone: row.recipient_phone ?? '' };
 }
 export function reconcileDeliveryAddress(current: DeliveryAddress, rows: SavedAddress[]): DeliveryAddress {
     const selected = current.savedAddressId ? rows.find(row => row.id === current.savedAddressId) : undefined;
@@ -32,7 +34,7 @@ export function reconcileDeliveryAddress(current: DeliveryAddress, rows: SavedAd
     const next = (selected && deliveryFromSaved(selected)) || deliveryFromSavedDefault(rows);
     if (!next)
         return current.savedAddressId ? { street: '', label: 'Home' } : current;
-    return current.savedAddressId === next.savedAddressId && current.street === next.street && current.label === next.label && current.latitude === next.latitude && current.longitude === next.longitude ? current : next;
+    return current.savedAddressId === next.savedAddressId && current.street === next.street && current.label === next.label && current.latitude === next.latitude && current.longitude === next.longitude && current.recipientName === next.recipientName && current.recipientPhone === next.recipientPhone ? current : next;
 }
 function deliveryFromSavedDefault(rows: SavedAddress[]) {
     const row = rows.find(item => item.is_default && validCoordinates(item));

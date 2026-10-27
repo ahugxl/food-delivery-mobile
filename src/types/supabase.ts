@@ -36,7 +36,7 @@ export type SupabaseDatabase = {
         Returns: Tables['profiles']['Row'][];
       };
       save_my_address: {
-        Args: { p_id: string; p_title: string; p_address: string; p_latitude: number; p_longitude: number; p_is_default: boolean; p_create?: boolean };
+        Args: { p_id: string; p_title: string; p_address: string; p_latitude: number; p_longitude: number; p_is_default: boolean; p_create: boolean; p_recipient_name: string; p_recipient_phone: string };
         Returns: Tables['user_addresses']['Row'][];
       };
       delete_my_address: { Args: { p_id: string }; Returns: undefined };
@@ -45,7 +45,7 @@ export type SupabaseDatabase = {
         Returns: Tables['orders']['Row'][];
       };
       create_food_order: {
-        Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code: string | null; p_latitude: number; p_longitude: number; p_delivery_fee: Tables['orders']['Row']['delivery_fee'] };
+        Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code: string | null; p_latitude: number; p_longitude: number; p_delivery_fee: Tables['orders']['Row']['delivery_fee']; p_recipient_name: string; p_recipient_phone: string };
         Returns: Tables['orders']['Row'][];
       };
     };

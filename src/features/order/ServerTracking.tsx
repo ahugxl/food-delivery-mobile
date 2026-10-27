@@ -33,7 +33,7 @@ export default function ServerTracking({ orderId }: { orderId: string }) {
           <Text className="font-semibold text-base text-ink">{order.data.restaurants?.name ?? 'Quán ăn'}</Text>
           <OrderDriverInfo orderId={orderId} driverId={order.data.driver_id} />
         </FlowCard>
-        <FlowCard><Text className="font-bold text-base text-ink">Địa chỉ giao hàng</Text><Text className="font-regular text-sm text-muted">{order.data.delivery_address}</Text></FlowCard>
+        <FlowCard><Text className="font-bold text-base text-ink">Địa chỉ giao hàng</Text><Text className="font-regular text-sm text-muted">{order.data.delivery_address}</Text><Text className="font-semibold text-sm text-ink">{[order.data.recipient_name, order.data.recipient_phone].filter(Boolean).join(' · ') || 'Đơn cũ chưa lưu thông tin người nhận.'}</Text></FlowCard>
         <FlowCard><Text className="font-bold text-base text-ink">Đơn hàng của bạn</Text>
           {order.data.order_items.map(item => <View key={item.id} className="gap-2 border-b border-line pb-3">
             <Text className="font-semibold text-sm text-ink">{item.quantity} × {snapshotName(item.options_snapshot, item.food_id)}</Text>

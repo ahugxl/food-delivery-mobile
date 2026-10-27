@@ -21,7 +21,7 @@ test('restores quantity, every option and note after creating a fresh store', as
 test('pending request/context survives but the in-flight lock never survives restart', async () => {
   const disk = memory(); const first = createPersistedCartStore(disk);
   first.getState().setOwner('alice'); first.getState().addToCart(item);
-  first.getState().prepareCheckout('signature', 'request-id', { address: { street: 'Test address', label: 'Home', savedAddressId: 'saved-address-id' }, voucher: null });
+  first.getState().prepareCheckout('signature', 'request-id', { address: { recipientName: 'Nguyễn An', recipientPhone: '0901234567', street: 'Test address', label: 'Home', savedAddressId: 'saved-address-id' }, voucher: null });
   first.getState().setCheckingOut(true); await flush(first);
   assert.equal('isCheckingOut' in JSON.parse(disk.data.get(CART_STORAGE_KEY)).state, false);
   const reopened = createPersistedCartStore(disk); await reopened.persist.rehydrate();
@@ -29,6 +29,8 @@ test('pending request/context survives but the in-flight lock never survives res
   assert.equal(reopened.getState().prepareCheckout('signature', 'other-id'), 'request-id');
   assert.equal(reopened.getState().checkoutRequest.context.address.street, 'Test address');
   assert.equal(reopened.getState().checkoutRequest.context.address.savedAddressId, 'saved-address-id');
+  assert.equal(reopened.getState().checkoutRequest.context.address.recipientName, 'Nguyễn An');
+  assert.equal(reopened.getState().checkoutRequest.context.address.recipientPhone, '0901234567');
 });
 test('account switch and explicit logout remove the previous owner cart', async () => {
   const disk = memory(); const first = createPersistedCartStore(disk);

@@ -3,6 +3,7 @@ import type { Database, Json } from '../../types/database.types';
 import type { Coordinates } from '../location/coordinates';
 import { currency } from './checkout';
 import { BASE_DELIVERY_FEE } from '../../utils/distance';
+import { recipientInput, type Recipient } from './recipient';
 
 export type VoucherRow = Database['public']['Tables']['vouchers']['Row'];
 export type OrderRow = Database['public']['Tables']['orders']['Row'];
@@ -48,6 +49,6 @@ export function serializeCart(items: CartItem[]): Json {
   }));
 }
 
-export function purchaseSignature(items: CartItem[], address: string, code?: string, coordinates?: Coordinates) {
-  return JSON.stringify({ items: serializeCart(items), address: address.trim(), code: code?.trim().toUpperCase() || null, ...(coordinates ? { coordinates } : {}) });
+export function purchaseSignature(items: CartItem[], address: string, code?: string, coordinates?: Coordinates, recipient?: Recipient) {
+  return JSON.stringify({ items: serializeCart(items), address: address.trim(), code: code?.trim().toUpperCase() || null, ...(coordinates ? { coordinates } : {}), ...(recipient ? recipientInput(recipient) : {}) });
 }

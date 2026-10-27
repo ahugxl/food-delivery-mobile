@@ -5,7 +5,8 @@ const {createClient}=require('@supabase/supabase-js');
 require.extensions['.ts']=(m,file)=>m._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,file);
 const {profileInput,addressInput,deliveryFromSaved,reconcileDeliveryAddress}=require('../src/features/account/validation.ts');
 const {createAccountApi}=require('../src/services/accountApi.ts');
-const row={id:'a',user_id:'u',title:'Home',address:'Address A',latitude:0,longitude:0,is_default:true};
+const recipient={recipientName:'Nguyễn An',recipientPhone:'0901234567'};
+const row={recipient_name:recipient.recipientName,recipient_phone:recipient.recipientPhone,id:'a',user_id:'u',title:'Home',address:'Address A',latitude:0,longitude:0,is_default:true};
 function fixture(responses){
  const requests=[];
  const client=createClient('https://account.test.supabase.co','test-key',{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:async(url,init)=>{
@@ -21,7 +22,7 @@ test('profile validation trims names, normalizes phone, and never accepts role/p
  assert.throws(()=>profileInput('Name','not a phone',null),/điện thoại/);
 });
 test('address validation requires a real pin including zero coordinates and a usable street',()=>{
- const payload=addressInput('id',{street:' Address A ',label:'Home',latitude:0,longitude:0},true,true);
+ const payload=addressInput('id',{...recipient,street:' Address A ',label:'Home',latitude:0,longitude:0},true,true);
  assert.equal(payload.p_latitude,0);assert.equal(payload.p_address,'Address A');
  assert.throws(()=>addressInput('id',{street:'Address A',label:'Home'},true,true),/tọa độ/);
  assert.throws(()=>addressInput('id',{street:'short enough',label:'Home',latitude:NaN,longitude:0},true,true),/tọa độ/);

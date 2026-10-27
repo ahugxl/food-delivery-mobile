@@ -30,7 +30,7 @@ function AddressForm({ row }: {
     const mutation = useAddressActions();
     const locked = useCartStore(state => state.isCheckingOut);
     const userId = useAuthStore(state => state.user?.id);
-    const initial = row ? (deliveryFromSaved(row) ?? { street: row.address, label: row.title === 'Home' || row.title === 'Work' ? row.title : 'Other' as const }) : { street: '', label: 'Home' as const };
+    const initial = row ? (deliveryFromSaved(row) ?? { street: row.address, label: row.title === 'Home' || row.title === 'Work' ? row.title : 'Other' as const, recipientName: row.recipient_name ?? '', recipientPhone: row.recipient_phone ?? '' }) : { street: '', label: 'Home' as const, recipientName: '', recipientPhone: '' };
     return <LocationEditor initial={initial} disabled={locked || mutation.isPending} title={mutation.isPending ? 'Đang lưu…' : 'Lưu địa chỉ'} onSubmit={async (address) => {
             if (mutation.isPending)
                 return;

@@ -1,4 +1,6 @@
 export type DeliveryAddress = {
+  recipientName?: string;
+  recipientPhone?: string;
   savedAddressId?: string;
   street: string;
   label: 'Home' | 'Work' | 'Other';

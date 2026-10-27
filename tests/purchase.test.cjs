@@ -94,7 +94,7 @@ test('voucher lookup sends a normalized code with equality, not a wildcard searc
 
 test('createOrder calls the atomic RPC with the supplied idempotency ID and JSON snapshot', async () => {
   const f = fixture({ id: 'order1', total: 14 });
-  assert.equal((await f.api.createOrder({ orderId: 'order1', items: [item], address: 'Test address', voucherCode: ' save5 ', coordinates: { latitude: 0, longitude: 0 }, deliveryFee: 15000 })).id, 'order1');
+  assert.equal((await f.api.createOrder({ orderId: 'order1', items: [item], address: 'Test address', voucherCode: ' save5 ', coordinates: { latitude: 0, longitude: 0 }, deliveryFee: 15000, recipientName: 'Nguyễn An', recipientPhone: '0901234567' })).id, 'order1');
   assert.equal(f.requests[0].url.pathname, '/rest/v1/rpc/create_food_order');
   const body = JSON.parse(f.requests[0].init.body);
   assert.equal(body.p_order_id, 'order1');
@@ -106,7 +106,7 @@ test('createOrder calls the atomic RPC with the supplied idempotency ID and JSON
 test('failed RPC never clears the cart; invalid checkout does not issue any request', async () => {
   const f = fixture({ code: 'P0001', message: 'Voucher expired' }, 400);
   cart.setState(cart.getInitialState()); cart.getState().addToCart(item);
-  await assert.rejects(f.api.createOrder({ orderId: 'order1', items: cart.getState().items, address: 'Test address', coordinates: { latitude: 0, longitude: 0 }, deliveryFee: 15000 }), e => e.message === 'Voucher expired');
+  await assert.rejects(f.api.createOrder({ orderId: 'order1', items: cart.getState().items, address: 'Test address', coordinates: { latitude: 0, longitude: 0 }, deliveryFee: 15000, recipientName: 'Nguyễn An', recipientPhone: '0901234567' }), e => e.message === 'Voucher expired');
   assert.equal(cart.getState().items.length, 1);
   const before = f.requests.length;
   await assert.rejects(f.api.createOrder({ orderId: 'order2', items: [], address: '' }), /Giỏ hàng/);

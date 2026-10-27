@@ -70,7 +70,7 @@ test('private image upload sends ArrayBuffer with an allowed MIME type', async (
 test('location checkout uses the new RPC and includes zero coordinates', async () => {
   const f = fixture([{ body: { id: 'order' } }]);
   const item = { foodId: 'f', restaurantId: 'r', quantity: 1, unitPrice: 10, basePrice: 10, note: '', options: [] };
-  await f.purchase.createOrder({ orderId: 'order', items: [item], address: 'Test address', coordinates: { latitude: 0, longitude: 0 }, deliveryFee: 15000 });
+  await f.purchase.createOrder({ orderId: 'order', items: [item], address: 'Test address', coordinates: { latitude: 0, longitude: 0 }, deliveryFee: 15000, recipientName: 'Nguyễn An', recipientPhone: '0901234567' });
   assert.equal(f.requests[0].url.pathname, '/rest/v1/rpc/create_food_order');
   assert.equal(JSON.parse(f.requests[0].init.body).p_latitude, 0);
 });

@@ -15,6 +15,7 @@ export function StartupLocationSync() {
   const attempt = useLocationStore(state => state.attempt);
   const client = useQueryClient();
   useEffect(() => {
+    useLocationStore.setState({ reminderDismissed: false });
     let previous = AppState.currentState;
     const listener = AppState.addEventListener('change', next => {
       if (previous !== 'active' && next === 'active' && userId && useLocationStore.getState().status === 'error') useLocationStore.getState().retry();

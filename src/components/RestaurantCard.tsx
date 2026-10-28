@@ -5,6 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useColors } from '@/hooks/useColors';
 import type { Restaurant } from '../types';
 import { useFavorites } from '../hooks/useFavorites';
+import { RestaurantClosedOverlay } from './RestaurantClosedOverlay';
 
 type RestaurantCardProps = {
   restaurant: Restaurant;
@@ -46,14 +47,15 @@ export function RestaurantCard({
             style={styles.image}
             accessibilityLabel={`Ảnh quán ${restaurant.name}`}
           />
-          <View
+          {restaurant.isOpen !== false && <View
             style={[styles.deliveryBadge, { backgroundColor: colors.card }]}
           >
             <Ionicons name="time-outline" size={12} color={colors.foreground} />
             <Text style={[styles.deliveryText, { color: colors.foreground }]}>
-              {restaurant.isOpen === false ? 'Đã đóng cửa' : restaurant.deliveryTime}
+              {restaurant.deliveryTime}
             </Text>
-          </View>
+          </View>}
+          <RestaurantClosedOverlay closed={restaurant.isOpen === false}/>
         </View>
         <View style={styles.details}>
           <Text

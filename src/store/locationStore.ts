@@ -8,7 +8,11 @@ export const useLocationStore = create<{
   coordinates: Coordinates | null;
   error: string;
   attempt: number;
+  reminderDismissed: boolean;
+  dismissReminder: () => void;
   retry: () => void;
 }>(set => ({ status: 'idle', detected: null, coordinates: null, error: '', attempt: 0,
+  reminderDismissed: false,
+  dismissReminder: () => set({ reminderDismissed: true }),
   retry: () => set(state => ({ attempt: state.attempt + 1 })),
 }));

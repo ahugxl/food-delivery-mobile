@@ -11,6 +11,7 @@ import { validCoordinates } from '../location/coordinates';
 import { haversineDistance } from '../../utils/distance';
 import { restaurantInfoLabels } from './adapters';
 import type { Row } from '../../types/supabase';
+import { RestaurantClosedOverlay } from '../../components/RestaurantClosedOverlay';
 
 export function RestaurantHighlights({ restaurants, loading, error, onRetry }: {
   restaurants: Row<'restaurants'>[]; loading: boolean; error: boolean; onRetry: () => void;
@@ -37,6 +38,7 @@ export function RestaurantHighlights({ restaurants, loading, error, onRetry }: {
             <View style={{ width: cardWidth, height: cardWidth, borderRadius: 12, overflow: 'hidden', backgroundColor: '#F3F4F4' }}>
               <Image source={restaurant.image_url ? { uri: restaurant.image_url } : undefined} contentFit="cover" style={{ width: '100%', height: '100%' }}/>
               {saved && <View style={{ position: 'absolute', left: 0, top: 8, backgroundColor: '#008B45', paddingHorizontal: 8, paddingVertical: 4, borderTopRightRadius: 5, borderBottomRightRadius: 5 }}><Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 11, color: 'white' }}>Yêu thích</Text></View>}
+              <RestaurantClosedOverlay closed={restaurant.is_open === false}/>
             </View>
             <Text numberOfLines={2} style={{ minHeight: 40, fontFamily: 'Inter_700Bold', fontSize: 14, lineHeight: 20, color: '#17241B' }}>{restaurant.name}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}><Ionicons name="star" size={14} color="#FFBC23"/><Text style={{ fontSize: 12, color: '#727772' }}>{Number(restaurant.rating ?? 0).toFixed(1)}{distance !== null ? ` · ${distance.toFixed(1)} km` : ''}</Text></View>

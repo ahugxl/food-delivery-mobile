@@ -16,6 +16,7 @@ import { BannerCarousel } from './BannerCarousel';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RestaurantHighlights } from './RestaurantHighlights';
 import { useLocationStore } from '../../store/locationStore';
+import { DeliveryAddressReminder } from '../../components/DeliveryAddressReminder';
 export default function HomeScreen() {
     const restaurants = useQuery({ queryKey: catalogKeys.restaurants, queryFn: ({ signal }) => catalogApi.restaurants(signal) });
     const banners = useQuery({ queryKey: catalogKeys.banners, queryFn: ({ signal }) => catalogApi.banners(signal) });
@@ -37,10 +38,13 @@ export default function HomeScreen() {
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }} refreshControl={<RefreshControl tintColor="#008B45" refreshing={restaurants.isRefetching || banners.isRefetching || discovery.isRefetching} onRefresh={() => { void Promise.allSettled([restaurants.refetch(), banners.refetch(), discovery.refetch()]); }}/>}>
       <LinearGradient colors={['#008B45', '#124C42']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ paddingHorizontal: 16, paddingTop: 18, paddingBottom: 44, overflow: 'hidden' }}>
         <View pointerEvents="none" style={{ position: 'absolute', right: 12, top: -12, opacity: .08, transform: [{ rotate: '-12deg' }] }}><Ionicons name="restaurant" size={145} color="white"/></View>
+        <View style={{ position: 'relative', zIndex: 20 }}>
         <AppPressable accessibilityRole="button" accessibilityLabel="Chọn địa chỉ giao hàng" onPress={() => router.push('/select-location')} style={{ gap: 10, marginBottom: 18 }}>
           <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: 'white' }}>Giao đến:</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><Ionicons name="location" size={23} color="white"/><Text numberOfLines={1} style={{ flex: 1, fontFamily: 'Inter_700Bold', fontSize: 17, color: 'white' }}>{address || 'Chọn địa chỉ giao hàng'}</Text><Ionicons name="chevron-forward" size={23} color="white"/></View>
         </AppPressable>
+        <DeliveryAddressReminder />
+        </View>
         <AppPressable accessibilityRole="button" accessibilityLabel="Tìm quán ăn" onPress={() => router.push('/search')} style={{ minHeight: 54, flexDirection: 'row', alignItems: 'center', gap: 11, borderRadius: 15, backgroundColor: 'white', paddingHorizontal: 15 }}><Ionicons name="search-outline" size={27} color="#008B45"/><Text style={{ flex: 1, fontFamily: 'Inter_500Medium', fontSize: 16, color: '#008B45' }}>Bạn đang thèm gì nào?</Text></AppPressable>
       </LinearGradient>
       <View style={{ marginTop: -28, marginHorizontal: 8, marginBottom: 12 }}>

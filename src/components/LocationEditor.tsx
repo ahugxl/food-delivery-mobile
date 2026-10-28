@@ -10,6 +10,8 @@ import { userMessage } from '../utils/userMessage';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { RecipientFields } from './RecipientFields';
 import { hasRecipient, recipientInput } from '../features/order/recipient';
+import { AppPressable } from './AppPressable';
+import { Ionicons } from '@expo/vector-icons';
 export function LocationEditor({ initial, onSubmit, title = 'Xác nhận điểm giao', disabled = false, children }: {
     initial: DeliveryAddress;
     onSubmit: (value: DeliveryAddress) => void | Promise<void>;
@@ -78,7 +80,15 @@ export function LocationEditor({ initial, onSubmit, title = 'Xác nhận điểm
     {!validCoordinates(draft) && <Text className="text-sm text-muted">Dùng vị trí hiện tại hoặc chọn tọa độ giao hàng. Vị trí hiển thị ban đầu chưa phải điểm giao đã xác nhận.</Text>}
     {busy && <Text accessibilityLiveRegion="polite" className="text-sm text-muted">Đang dịch tọa độ thành địa chỉ…</Text>}
     {!!error && <Text accessibilityRole="alert" className="text-sm text-coral">{error} Bạn có thể nhập địa chỉ thủ công cho ghim đã chọn.</Text>}
-    <View className="flex-row gap-2">{(['Home', 'Work', 'Other'] as const).map(value => <View key={value} className="flex-1"><FlowButton disabled={disabled} title={`${draft.label === value ? '✓ ' : ''}${viLabel(value)}`} onPress={() => setDraft(current => ({ ...current, label: value, savedAddressId: undefined }))}/></View>)}</View>
+    <View accessibilityRole="radiogroup" accessibilityLabel="Loại địa chỉ" style={{ flexDirection: 'row', gap: 8 }}>{(['Home', 'Work', 'Other'] as const).map(value => {
+      const selected = draft.label === value;
+      return <AppPressable key={value} accessibilityRole="radio" accessibilityLabel={viLabel(value)} accessibilityState={{ checked: selected, disabled }} disabled={disabled}
+        onPress={() => setDraft(current => ({ ...current, label: value, savedAddressId: undefined }))}
+        style={{ flex: 1, minWidth: 0, minHeight: 56, borderRadius: 16, paddingHorizontal: 6, paddingVertical: 12, backgroundColor: disabled ? '#E7E7E7' : '#008B45', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+        {selected && <Ionicons name="checkmark" size={15} color="white" style={{ flexShrink: 0 }} />}
+        <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} style={{ flexShrink: 1, minWidth: 0, textAlign: 'center', fontFamily: 'Inter_600SemiBold', fontSize: 14, color: disabled ? '#827A71' : 'white' }}>{viLabel(value)}</Text>
+      </AppPressable>;
+    })}</View>
     {children}
     {!!submitError && <Text accessibilityRole="alert" className="text-sm text-coral">{submitError}</Text>}
     <FlowButton title={title} disabled={disabled || busy || locating || !validCoordinates(draft) || draft.street.trim().length < 5 || !hasRecipient(draft)} onPress={() => { void confirm(); }}/>

@@ -48,7 +48,8 @@ test('tile configuration accepts HTTPS providers and rejects insecure or incompl
     assert.equal(mapTilesConfig().origin, 'https://tiles.example.test');
     for (const url of ['http://example.test/{z}/{x}/{y}', 'javascript:alert(1)', 'https://user:secret@example.test/{z}/{x}/{y}', 'https://example.test/static.png']) {
       process.env.EXPO_PUBLIC_MAP_TILE_URL = url;
-      assert.equal(mapTilesConfig().origin, 'https://tile.openstreetmap.org');
+      assert.equal(mapTilesConfig().origin, 'https://tile.openstreetmap.de');
+      assert.equal(mapTilesConfig().credit, 'OSM Deutschland');
     }
   } finally { if (old === undefined) delete process.env.EXPO_PUBLIC_MAP_TILE_URL; else process.env.EXPO_PUBLIC_MAP_TILE_URL = old; }
 });

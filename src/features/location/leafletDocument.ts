@@ -1,13 +1,15 @@
 import { leafletCss, leafletJavaScript } from './leafletBundle';
 import { MAP_CHANNEL, MAP_COPYRIGHT_URL, scriptJson, type MapScene } from './leafletProtocol';
 
+const DEFAULT_MAP_TILES = { template: 'https://tile.openstreetmap.de/{z}/{x}/{y}.png', origin: 'https://tile.openstreetmap.de', credit: 'OSM Deutschland' };
+
 export function mapTilesConfig() {
-  const template = process.env.EXPO_PUBLIC_MAP_TILE_URL || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const template = process.env.EXPO_PUBLIC_MAP_TILE_URL || DEFAULT_MAP_TILES.template;
   try {
     const url = new URL(template.replace(/\{[zxy]\}/g, '0'));
     if (url.protocol !== 'https:' || url.username || url.password || !['{z}', '{x}', '{y}'].every(part => template.includes(part))) throw new Error();
-    return { template, origin: url.origin, credit: process.env.EXPO_PUBLIC_MAP_TILE_CREDIT || '' };
-  } catch { return { template: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', origin: 'https://tile.openstreetmap.org', credit: '' }; }
+    return { template, origin: url.origin, credit: process.env.EXPO_PUBLIC_MAP_TILE_CREDIT || (url.origin === DEFAULT_MAP_TILES.origin ? DEFAULT_MAP_TILES.credit : '') };
+  } catch { return { ...DEFAULT_MAP_TILES }; }
 }
 
 export function leafletDocument(initial: MapScene, token: string) {

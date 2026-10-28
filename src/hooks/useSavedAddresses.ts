@@ -20,7 +20,7 @@ export function SavedAddressSync() {
             return;
         const next = reconcileDeliveryAddress(current, query.data);
         if (next !== current)
-            useOrderStore.getState().setDeliveryAddress(next);
+            useOrderStore.setState({ deliveryAddress: next });
     }, [query.data, query.isSuccess, userId, current, locked]);
     const refetch = query.refetch;
     useEffect(() => { const listener = AppState.addEventListener('change', state => { if (state === 'active')

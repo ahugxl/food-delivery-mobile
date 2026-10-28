@@ -21,6 +21,7 @@ import { AppState, Platform } from 'react-native';
 import { supabase } from '@/src/services/supabase';
 import { useCartStore } from '@/src/store/cartStore';
 import { SavedAddressSync } from '../hooks/useSavedAddresses';
+import { StartupLocationSync } from '../hooks/useStartupLocation';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -122,6 +123,7 @@ export default function RootLayout() {
           <KeyboardProvider statusBarTranslucent navigationBarTranslucent preserveEdgeToEdge>
             <ErrorBoundary>
               <SavedAddressSync />
+              <StartupLocationSync />
               <RootLayoutNav />
               <AppStatusBar />
               <AppToast />

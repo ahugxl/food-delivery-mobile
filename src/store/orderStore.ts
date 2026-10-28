@@ -8,6 +8,7 @@ type OrderState = {
   addOrder: (order: Omit<Order, 'id' | 'date' | 'status'>) => void;
   completeLatestOrder: () => void;
   deliveryAddress: DeliveryAddress;
+  deliverySelectionVersion: number;
   appliedVoucher: Voucher | null;
   checkoutVoucher: VoucherRow | null;
   shippingVoucher: VoucherRow | null;
@@ -60,11 +61,12 @@ export const useOrderStore = create<OrderState>((set) => ({
       };
     }),
   deliveryAddress: { street: '', label: 'Home' },
+  deliverySelectionVersion: 0,
   checkoutVoucher: null,
   shippingVoucher: null,
   setCheckoutVouchers: (checkoutVoucher, shippingVoucher) => set({ checkoutVoucher, shippingVoucher }),
   setCheckoutVoucher: (voucher) => set(voucher && voucherTarget(voucher) === 'shipping' ? { shippingVoucher: voucher } : { checkoutVoucher: voucher }),
   appliedVoucher: null,
-  setDeliveryAddress: (deliveryAddress) => set({ deliveryAddress }),
+  setDeliveryAddress: (deliveryAddress) => set(state => ({ deliveryAddress, deliverySelectionVersion: state.deliverySelectionVersion + 1 })),
   setAppliedVoucher: (appliedVoucher) => set({ appliedVoucher }),
 }));

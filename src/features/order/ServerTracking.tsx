@@ -47,7 +47,6 @@ export default function ServerTracking({ orderId }: { orderId: string }) {
           <Text className="font-bold text-lg text-teal">Tổng cộng: {currency(Number(order.data.total))}</Text>
           <Text className="font-regular text-xs text-muted">Thanh toán khi nhận hàng</Text>
         </FlowCard>
-        <FlowButton title={order.isFetching ? 'Đang cập nhật…' : 'Cập nhật trạng thái'} disabled={order.isFetching} onPress={() => { void order.refetch(); }} />
       </ScrollView>}
   </SafeAreaView>;
 }

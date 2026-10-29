@@ -34,17 +34,19 @@ test('review checks authenticated owner and completed status before posting',asy
   await assert.rejects(f.api.submitReview('order','user',input),/hoàn thành/);
   assert.equal(f.requests.length,1); assert.equal(f.requests[0].url.searchParams.get('user_id'),'eq.user');
 });
-test('completed review inserts real columns and returns the server record',async()=>{
-  const f=fixture([{body:[{id:'order',status:'completed'}]},{body:saved}]);
+test('completed review uses both authenticated stage RPCs and returns the server record',async()=>{
+  const f=fixture([{body:[{id:'order',status:'completed'}]},{body:saved},{body:saved}]);
   assert.equal((await f.api.submitReview('order','user',input)).id,'review');
-  assert.equal(f.requests[1].url.pathname,'/rest/v1/reviews');
-  assert.equal(JSON.parse(f.requests[1].init.body).driver_rating,4);
+  assert.equal(f.requests[1].url.pathname,'/rest/v1/rpc/submit_order_review');
+  assert.equal(JSON.parse(f.requests[1].init.body).p_rating,4);
+  assert.equal(JSON.parse(f.requests[1].init.body).p_stage,'driver');
+  assert.equal(JSON.parse(f.requests[2].init.body).p_stage,'restaurant');
 });
-test('duplicate review retry reads the existing review instead of duplicating or overwriting it',async()=>{
-  const f=fixture([{body:[{id:'order',status:'completed'}]},{status:409,body:{code:'23505',message:'duplicate'}},{body:[saved]}]);
+test('review retry delegates idempotence to the atomic stage RPCs',async()=>{
+  const f=fixture([{body:[{id:'order',status:'completed'}]},{body:saved},{body:saved}]);
   assert.equal((await f.api.submitReview('order','user',input)).id,'review');
-  assert.equal(f.requests[2].url.searchParams.get('order_id'),'eq.order');
-  assert.equal(f.requests[2].url.searchParams.get('user_id'),'eq.user');
+  assert.equal(JSON.parse(f.requests[2].init.body).p_order_id,'order');
+  assert.equal(f.requests.some(r=>r.url.pathname==='/rest/v1/reviews'),false);
 });
 test('review backend error propagates without marking the order completed',async()=>{
   const f=fixture([{body:[{id:'order',status:'completed'}]},{status:403,body:{code:'42501',message:'permission denied'}}]);

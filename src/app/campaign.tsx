@@ -42,7 +42,7 @@ export default function CampaignScreen() {
           const entry = owned.data?.find(row => row.voucher_id === voucher.id);
           const reason = collectionError(voucher);
           const pending = collect.isPending && collect.variables === voucher.id;
-          const action = reason || (entry ? entry.is_used ? 'Đã sử dụng' : 'Đã thu thập' : pending ? 'Đang lấy mã…' : 'Lấy mã');
+          const action = reason ? 'Cháy hàng' : entry ? entry.is_used ? 'Đã sử dụng' : 'Đã lưu' : pending ? 'Đang lưu…' : 'Lưu';
           return <VoucherTicket key={voucher.id} voucher={voucher} reason={reason} action={action} disabled={!!reason || !!entry || collect.isPending || !userId} onPress={() => collect.mutate(voucher.id)} />;
         })}
       </>}

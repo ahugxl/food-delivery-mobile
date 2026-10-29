@@ -1,5 +1,9 @@
 import { AppPressable as Pressable } from '@/src/components/AppPressable';
 import { useState, type PropsWithChildren } from 'react';
+import { useRef } from 'react';
+import { startSocialLogin } from '../../services/socialAuth';
+import { useAuthStore } from '../../store/authStore';
+import { userMessage } from '../../utils/userMessage';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import {
@@ -135,18 +139,20 @@ export function AuthButton({
   onPress,
   secondary = false,
   loading = false,
+  disabled = false,
 }: {
   title: string;
   onPress: () => void;
   secondary?: boolean;
   loading?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={loading ? 'Vui lòng chờ…' : title}
-      accessibilityState={{ disabled: loading, busy: loading }}
-      disabled={loading}
+      accessibilityState={{ disabled: loading || disabled, busy: loading }}
+      disabled={loading || disabled}
       onPress={onPress}
       style={{ flexShrink: 0 }}
       className={`min-h-14 items-center justify-center rounded-2xl border px-5 py-4 active:opacity-80 ${secondary ? 'border-line bg-card' : 'border-teal bg-teal'}`}
@@ -174,37 +180,45 @@ export function AuthMessage({ message }: { message: string }) {
   );
 }
 
-export function SocialLogin() {
+export function SocialLogin({ onBusyChange }: { onBusyChange?: (busy: boolean) => void } = {}) {
   const [message, setMessage] = useState('');
+  const [providerLoading, setProviderLoading] = useState<string | null>(null);
+  const emailLoading = useAuthStore(state => state.isLoading);
+  const pending = useRef(false);
+  const signIn = async (provider: 'google' | 'facebook') => {
+    if (pending.current || emailLoading) return;
+    pending.current = true; setProviderLoading(provider); onBusyChange?.(true); setMessage('');
+    try { await startSocialLogin(provider); }
+    catch (reason) { setMessage(userMessage(reason)); }
+    finally { pending.current = false; setProviderLoading(null); onBusyChange?.(false); }
+  };
 
   return (
-    <View className="mt-8">
-      <View className="mb-6 flex-row items-center gap-4">
+    <View className="mt-6">
+      <View className="mb-5 flex-row items-center gap-4">
         <View className="h-px flex-1 bg-line" />
         <Text className="font-regular text-sm text-muted">
-          Hoặc tiếp tục với
+          Hoặc
         </Text>
         <View className="h-px flex-1 bg-line" />
       </View>
-      <View className="mb-4 flex-row gap-4">
-        {(['Google', 'Apple'] as const).map((provider) => (
+      <View className="mb-4 gap-3">
+        {(['Google', 'Facebook'] as const).map((provider) => (
           <Pressable
             key={provider}
             accessibilityRole="button"
-            accessibilityLabel={`Tiếp tục với ${provider} (bản minh họa)`}
-            onPress={() =>
-              setMessage(
-                `${provider} chưa được hỗ trợ. Vui lòng đăng nhập bằng email.`,
-              )
-            }
-            className="min-h-14 flex-1 flex-row items-center justify-center gap-3 rounded-2xl border border-line bg-card px-3 py-4 active:opacity-70"
+            accessibilityLabel={`Tiếp tục với ${provider}`}
+            accessibilityState={{ disabled: !!providerLoading || emailLoading, busy: providerLoading === provider.toLowerCase() }}
+            disabled={!!providerLoading || emailLoading}
+            onPress={() => { void signIn(provider === 'Google' ? 'google' : 'facebook'); }}
+            style={{ minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, borderRadius: 16, borderWidth: 1, borderColor: '#E3E8E3', backgroundColor: 'white', paddingHorizontal: 16, paddingVertical: 12 }}
           >
             <Ionicons
-              name={provider === 'Google' ? 'logo-google' : 'logo-apple'}
+              name={provider === 'Google' ? 'logo-google' : 'logo-facebook'}
               size={22}
-              color={colors.light.foreground}
+              color={provider === 'Google' ? '#4285F4' : '#1877F2'}
             />
-            <Text className="font-semibold text-sm text-ink">{provider}</Text>
+            <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 15, color: '#17241B', flexShrink: 1, textAlign: 'center' }}>{providerLoading === provider.toLowerCase() ? 'Đang kết nối…' : `Tiếp tục với ${provider}`}</Text>
           </Pressable>
         ))}
       </View>

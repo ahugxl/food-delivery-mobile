@@ -31,6 +31,8 @@ export type SupabaseDatabase = {
     } };
     Views: Record<never, never>;
     Functions: {
+      submit_order_review: { Args: { p_order_id: string; p_stage: string; p_rating: number; p_feedback: string; p_image_path?: string | null; p_food_votes?: Json }; Returns: Tables['reviews']['Row'][] };
+      food_review_stats: { Args: { p_food_ids: string[] }; Returns: { food_id: string; sold_count: number; like_count: number }[] };
       collect_my_voucher: { Args: { p_voucher_id: string }; Returns: Tables['vouchers']['Row'][] };
       update_my_profile: {
         Args: { p_full_name: string; p_phone: string | null; p_avatar_url: string | null };

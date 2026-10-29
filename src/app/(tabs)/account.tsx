@@ -64,6 +64,7 @@ export default function AccountScreen() {
               {user?.email ?? ''}
             </Text>
             {!!profile.data?.phone && <Text style={[styles.phone, { color: colors.mutedForeground }]}>{profile.data.phone}</Text>}
+            <Text style={[styles.phone, { color: colors.primary }]}>SubiFood Xu: {Number(profile.data?.loyalty_points ?? 0).toLocaleString('vi-VN')} xu</Text>
           </View>
           <Pressable
             accessibilityRole="button"

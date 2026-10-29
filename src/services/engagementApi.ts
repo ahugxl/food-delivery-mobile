@@ -19,11 +19,9 @@ export function createEngagementApi(client: SupabaseClient<SupabaseDatabase> | n
       const order = await db().from('orders').select('id,status').eq('id', orderId).eq('user_id', userId).maybeSingle();
       if (order.error) throw order.error;
       if (!order.data || order.data.status !== 'completed') throw new Error('Chỉ được đánh giá đơn hàng của bạn đã hoàn thành.');
-      const { data, error } = await db().from('reviews').insert(payload).select('*').single();
-      if (error?.code === '23505') {
-        const existing = await readReview(orderId, userId);
-        if (existing) return existing;
-      }
+      const driver = await db().rpc('submit_order_review', { p_order_id: orderId, p_stage: 'driver', p_rating: payload.driver_rating!, p_feedback: payload.driver_feedback ?? '' }).single();
+      if (driver.error) throw driver.error;
+      const { data, error } = await db().rpc('submit_order_review', { p_order_id: orderId, p_stage: 'restaurant', p_rating: payload.restaurant_rating!, p_feedback: payload.restaurant_feedback ?? '', p_food_votes: [] }).single();
       if (error) throw error;
       if (!data) throw new Error('Server chưa xác nhận đánh giá. Vui lòng thử lại.');
       return data;

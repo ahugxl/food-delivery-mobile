@@ -44,7 +44,7 @@ export function createPurchaseApi(client: SupabaseClient<SupabaseDatabase> | nul
       return data;
     },
     async order(id: string, userId: string, signal?: AbortSignal) {
-      const query = db().from('orders').select('*, restaurants(id, name, image_url, latitude, longitude), order_items(*)').eq('id', id).eq('user_id', userId);
+      const query = db().from('orders').select('*, restaurants(id, name, address, image_url, latitude, longitude), order_items(*)').eq('id', id).eq('user_id', userId);
       const { data, error } = await (signal ? query.abortSignal(signal) : query).maybeSingle();
       if (error) throw error;
       return data;

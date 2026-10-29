@@ -1,3 +1,5 @@
+import { FoodPrice } from '../../components/FoodPrice';
+import { FoodReviewStats } from '../../components/FoodReviewStats';
 import { AppPressable as Pressable } from '@/src/components/AppPressable';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -5,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Keyboard, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -21,6 +23,7 @@ import { FlowButton, FlowHeader } from '../../components/FlowUI';
 import { useCartStore } from '../../store/cartStore';
 import { currency } from '../../features/order/checkout';
 import { viLabel } from '../../utils/vietnamese';
+import { foodDiscountPercent } from '../../features/catalog/foodPricing';
 
 
 
@@ -46,6 +49,11 @@ function FoodDetailContent({ id }: { id: string }) {
   const [quantity, setQuantity] = useState(1);
   const [note, setNote] = useState('');
   const addedToCart = useRef(false);
+  const scrollRef = useRef<ScrollView>(null);
+  const foodInfoY = useRef(0);
+  const optionsY = useRef(0);
+  const groupPositions = useRef<Record<string, number>>({});
+  const [attemptedAdd, setAttemptedAdd] = useState(false);
 
   const groups = food?.food_option_groups ?? [];
   const options = selectedOptions(groups, selection);
@@ -53,9 +61,16 @@ function FoodDetailContent({ id }: { id: string }) {
   const available = !!food?.is_available && !!food?.restaurants.is_open;
   const unitPrice = food ? optionUnitPrice(food, options) : 0;
   const orderTotal = Math.round(unitPrice * quantity * 100) / 100;
+  const discountPercent = food ? foodDiscountPercent(food) : null;
 
   const handleAddToCart = () => {
-    if (!food || !available || missing.length > 0 || addedToCart.current) return;
+    if (!food || !available || addedToCart.current) return;
+    if (missing.length > 0) {
+      setAttemptedAdd(true);
+      Keyboard.dismiss();
+      scrollRef.current?.scrollTo({ y: Math.max(0, foodInfoY.current + optionsY.current + (groupPositions.current[missing[0].id] ?? 0) - 16), animated: true });
+      return;
+    }
     addedToCart.current = true;
 
     const error = addToCart({
@@ -128,6 +143,8 @@ function FoodDetailContent({ id }: { id: string }) {
     <SafeAreaView className="flex-1 bg-cream" edges={['top', 'left', 'right']}>
       <StatusBar style="light" />
       <ScrollView
+        ref={scrollRef}
+        keyboardShouldPersistTaps="handled"
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -164,7 +181,7 @@ function FoodDetailContent({ id }: { id: string }) {
           </View>
         </View>
 
-        <View style={styles.foodInfo}>
+        <View style={styles.foodInfo} onLayout={event => { foodInfoY.current = event.nativeEvent.layout.y; }}>
           <View style={styles.namePriceRow}>
             <View style={styles.nameCopy}>
               <Text className="text-ink" style={styles.foodName}>
@@ -176,34 +193,31 @@ function FoodDetailContent({ id }: { id: string }) {
                 Được chuẩn bị bởi {food.restaurants.name}.
               </Text>
             </View>
-            <Text className="text-coral" style={styles.basePrice}>
-              {currency(Number(food.price))}
-            </Text>
+            <View style={{ maxWidth: '48%' }}><FoodPrice food={food} detail /></View>
           </View>
 
-          <View
-            style={[
-              styles.basePriceHint,
-              { backgroundColor: colors.secondary },
-            ]}
-          >
+          {discountPercent !== null && <View style={[styles.basePriceHint, { backgroundColor: '#FFF3E8' }]}>
             <Ionicons
               name="pricetag-outline"
               size={14}
-              color={colors.primary}
+              color="#F47721"
             />
             <Text
               style={[
                 styles.basePriceHintText,
-                { color: colors.secondaryForeground },
+                { color: '#BA5418' },
               ]}
             >
-              Giá món {currency(Number(food.price))}
+              Giảm {discountPercent}%
             </Text>
-          </View>
+          </View>}
 
+          <FoodReviewStats foodId={food.id} />
           {!!food.description && <Text className="mb-5 font-regular text-sm leading-6 text-muted">{viLabel(food.description)}</Text>}
           <FoodOptions groups={groups} selection={selection}
+            invalidGroupIds={attemptedAdd ? missing.map(group => group.id) : []}
+            onLayout={event => { optionsY.current = event.nativeEvent.layout.y; }}
+            onGroupLayout={(groupId, y) => { groupPositions.current[groupId] = y; }}
             onToggle={(group, itemId) => setSelection(current => toggleOption(current, group, itemId))} />
           {!available && <Text accessibilityRole="alert" className="mt-4 font-medium text-sm text-coral">{food.is_available ? 'Quán hiện đang đóng cửa.' : 'Món này hiện ngừng bán.'}</Text>}
           {missing.length > 0 && <Text accessibilityLiveRegion="polite" className="mt-4 font-regular text-sm text-muted">Vui lòng chọn: {missing.map(group => viLabel(group.name)).join(', ')}.</Text>}
@@ -255,8 +269,8 @@ function FoodDetailContent({ id }: { id: string }) {
         <Pressable
           testID="add-to-cart"
           accessibilityRole="button"
-          disabled={!available || missing.length > 0}
-          accessibilityState={{ disabled: !available || missing.length > 0 }}
+          disabled={!available}
+          accessibilityState={{ disabled: !available }}
           onPress={handleAddToCart}
           className="bg-teal"
           style={styles.addButton}
@@ -322,6 +336,7 @@ const styles = StyleSheet.create({
     paddingTop: 21,
   },
   namePriceRow: {
+    marginBottom: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -354,12 +369,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 7,
     borderRadius: 10,
-    marginTop: 15,
+    marginTop: 0,
     marginBottom: 23,
   },
   basePriceHintText: {
     fontFamily: 'Inter_500Medium',
-    fontSize: 10,
+    fontSize: 14,
   },
   bottomBar: {
     borderTopWidth: StyleSheet.hairlineWidth,

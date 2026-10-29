@@ -426,8 +426,17 @@ export interface Database {
           created_at?: string;
         };
       };
+      food_reviews: {
+        Row: { review_id: string; food_id: string; is_liked: boolean; created_at: string };
+        Insert: { review_id: string; food_id: string; is_liked: boolean; created_at?: string };
+        Update: { review_id?: string; food_id?: string; is_liked?: boolean; created_at?: string };
+      };
       reviews: {
         Row: {
+          driver_submitted_at: string | null;
+          restaurant_submitted_at: string | null;
+          restaurant_image_path: string | null;
+          reward_points: number;
           id: string;
           order_id: string;
           user_id: string;
@@ -439,6 +448,10 @@ export interface Database {
           created_at: string;
         };
         Insert: {
+          driver_submitted_at?: string | null;
+          restaurant_submitted_at?: string | null;
+          restaurant_image_path?: string | null;
+          reward_points?: number;
           id?: string;
           order_id: string;
           user_id: string;
@@ -450,6 +463,10 @@ export interface Database {
           created_at?: string;
         };
         Update: {
+          driver_submitted_at?: string | null;
+          restaurant_submitted_at?: string | null;
+          restaurant_image_path?: string | null;
+          reward_points?: number;
           id?: string;
           order_id?: string;
           user_id?: string;

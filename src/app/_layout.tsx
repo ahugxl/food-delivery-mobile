@@ -64,11 +64,13 @@ function RootLayoutNav() {
         <Stack.Screen name="voucher-wallet" />
         <Stack.Screen name="tracking" />
         <Stack.Screen name="rating" />
+        <Stack.Screen name="order-detail" />
         <Stack.Screen name="chat" />
         <Stack.Screen name="profile" />
         <Stack.Screen name="addresses" />
         <Stack.Screen name="address-form" />
       </Stack.Protected>
+      <Stack.Screen name="oauth-callback" />
     </Stack>
   );
 }

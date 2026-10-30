@@ -4,7 +4,7 @@
     "slug": "food-delivery",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/subifood-icon-green.png",
     "scheme": "food-delivery",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -23,9 +23,11 @@
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/images/subifood-favicon.png"
+      "favicon": "./assets/images/subifood-favicon-green.png"
     },
     "splash": {
+      "image": "./assets/images/subifood-icon-green.png",
+      "resizeMode": "contain",
       "backgroundColor": "#FFFFFF"
     },
     "plugins": [

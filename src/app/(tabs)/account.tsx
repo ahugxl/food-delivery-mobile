@@ -151,7 +151,7 @@ export default function AccountScreen() {
           </Text>
         </Pressable>
         <Text style={[styles.version, { color: colors.mutedForeground }]}>
-          Giao đồ ăn · Phiên bản 1.0
+          SubiFood · Phiên bản 1.0
         </Text>
       </ScrollView>
     </SafeAreaView>

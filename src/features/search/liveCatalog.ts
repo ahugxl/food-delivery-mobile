@@ -23,7 +23,7 @@ export function searchLiveCatalog(rows: FoodRow[], keyword: string, filters: Sea
     distanceKm: location && row.restaurants.latitude != null && row.restaurants.longitude != null
       ? distanceKm(location, { latitude: row.restaurants.latitude, longitude: row.restaurants.longitude }) : null,
     freeDelivery: Array.isArray(row.restaurants.promo_tags) && row.restaurants.promo_tags.some(tag => typeof tag === 'string' && /freeship|free delivery/i.test(tag)),
-    isOpen: row.restaurants.is_open,
+    isOpen: row.restaurants.is_open === true,
   })).filter(item => words.every(word => `${item.food.name} ${item.restaurant}`.toLowerCase().includes(word))
     && (!filters.freeship || item.freeDelivery)
     && (!filters.favorite || favorites.includes(item.restaurantId))

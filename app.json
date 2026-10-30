@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Giao đồ ăn",
+    "name": "SubiFood",
     "slug": "food-delivery",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -23,7 +23,7 @@
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/subifood-favicon.png"
     },
     "splash": {
       "backgroundColor": "#FFFFFF"
@@ -33,7 +33,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Cho phép Giao đồ ăn dùng vị trí để chọn điểm giao hàng."
+          "locationWhenInUsePermission": "Cho phép SubiFood dùng vị trí để chọn điểm giao hàng."
         }
       ],
       [

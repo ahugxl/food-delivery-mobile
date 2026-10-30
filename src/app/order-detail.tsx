@@ -28,7 +28,7 @@ export default function OrderDetailScreen() {
     <FlowHeader title="Chi tiết đơn hàng" />
     {!orderId ? <Text className="p-5 text-muted">Vui lòng chọn đơn hàng.</Text> : query.isPending ? <Text className="p-5 text-muted">Đang tải đơn hàng…</Text> : query.isError ? <View className="gap-4 p-5"><Text className="text-coral">Không tải được chi tiết đơn hàng.</Text><FlowButton title="Thử lại" onPress={() => { void query.refetch(); }} /></View> : !order ? <Text className="p-5 text-muted">Không tìm thấy đơn hàng của bạn.</Text> : <ScrollView contentContainerStyle={{ padding: 12, paddingBottom: 32 }}>
       <FlowCard><View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text className="font-bold text-lg text-ink">{order.status === 'completed' ? 'Đơn hoàn tất' : ORDER_LABELS[order.status] ?? 'Đang cập nhật'}</Text>
+        <Text className="font-bold text-lg text-ink">{order.status === 'completed' ? 'Đơn hoàn tất' : ORDER_LABELS[order.status ?? ""] ?? 'Đang cập nhật'}</Text>
         <AppPressable accessibilityRole="button" accessibilityLabel="Nhắn tin về đơn hàng" onPress={() => router.push({ pathname: '/chat', params: { orderId } })} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}><Ionicons name="chatbubbles-outline" size={26} color="#008B45" /></AppPressable>
       </View></FlowCard>
       <FlowCard>

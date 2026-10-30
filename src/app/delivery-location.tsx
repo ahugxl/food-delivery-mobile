@@ -4,11 +4,20 @@ import { FlowHeader } from '../components/FlowUI';
 import { LocationEditor } from '../components/LocationEditor';
 import { useOrderStore } from '../store/orderStore';
 import { useCartStore } from '../store/cartStore';
+import { useLocationStore } from '../store/locationStore';
+import { useAuthStore } from '../store/authStore';
+import { deliveryRecipientStorage } from '../services/deliveryRecipient';
 export default function DeliveryLocationScreen() {
     const saved = useOrderStore(state => state.deliveryAddress);
     const locked = useCartStore(state => state.isCheckingOut);
     return <SafeAreaView className="flex-1 bg-cream"><FlowHeader title="Chọn vị trí giao hàng"/>
-    <LocationEditor key={JSON.stringify(saved)} initial={saved} disabled={locked} onSubmit={value => { if (useCartStore.getState().isCheckingOut)
-        return; useOrderStore.getState().setDeliveryAddress(value); router.canGoBack() ? router.back() : router.replace('/checkout'); }}/>
+    <LocationEditor key={JSON.stringify(saved)} initial={saved} disabled={locked} onSubmit={async value => { if (useCartStore.getState().isCheckingOut)
+        return;
+        const userId = useAuthStore.getState().user?.id;
+        await deliveryRecipientStorage.save(userId ?? '', value);
+        if (useAuthStore.getState().user?.id !== userId || useCartStore.getState().isCheckingOut) return;
+        useLocationStore.getState().confirmDetected(saved, value);
+        useOrderStore.getState().setDeliveryAddress(value);
+        router.canGoBack() ? router.back() : router.replace('/checkout'); }}/>
   </SafeAreaView>;
 }

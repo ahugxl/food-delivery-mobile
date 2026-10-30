@@ -13,7 +13,7 @@ import { useChatRealtime } from '../hooks/useChatRealtime';
 import { useAuthStore } from '../store/authStore';
 import { chatApi } from '../services/chat';
 import { purchaseApi } from '../services/purchase';
-import { messageError, type Message } from '../features/chat/messages';
+import { messageError, messageTimeLabel, type Message } from '../features/chat/messages';
 import { imageFromBase64 } from '../features/chat/imageData';
 import { OrderDriverInfo } from '../components/OrderDriverInfo';
 
@@ -85,7 +85,7 @@ function OrderChat({ orderId }: { orderId: string }) {
             <Text className="font-semibold text-xs text-muted">{item.sender_type === 'user' ? 'Bạn' : 'Tài xế'}</Text>
             {item.image_url && <ChatImage path={item.image_url} />}
             {!!item.content && <Text selectable className="font-regular text-base text-ink">{item.content}</Text>}
-            <Text className="text-xs text-muted">{new Date(item.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</Text>
+            <Text className="text-xs text-muted">{messageTimeLabel(item.created_at)}</Text>
           </View>
         </View>} />
       <View className="gap-3 border-t border-line bg-card p-4">

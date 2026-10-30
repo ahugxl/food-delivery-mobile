@@ -6,6 +6,35 @@ const { detectedDelivery, withLocationDeadline, acquireCoordinates, resolveStart
 const { reconcileDeliveryAddress } = require('../src/features/account/validation.ts');
 const { hasRecipient } = require('../src/features/order/recipient.ts');
 const { useOrderStore } = require('../src/store/orderStore.ts');
+const { useLocationStore } = require('../src/store/locationStore.ts');
+const { recipientInput } = require('../src/features/order/recipient.ts');
+
+test('confirmed Google recipient remains complete when the current-location card is selected again', () => {
+  const gps = detectedDelivery({ latitude: 0, longitude: 106 }, '26 Văn Chung', { full_name: 'Nguyễn An', phone: null });
+  assert.equal(hasRecipient(gps), false);
+  useLocationStore.setState({ detected: gps });
+  const confirmed = { ...gps, ...recipientInput({ recipientName: gps.recipientName, recipientPhone: '090 123 4567' }) };
+  useLocationStore.getState().confirmDetected(gps, confirmed);
+  useOrderStore.getState().setDeliveryAddress(confirmed);
+  useOrderStore.getState().setDeliveryAddress(useLocationStore.getState().detected);
+  assert.equal(useOrderStore.getState().deliveryAddress.recipientPhone, '0901234567');
+  assert.equal(hasRecipient(useLocationStore.getState().detected), true);
+  useLocationStore.setState(useLocationStore.getInitialState());
+  useOrderStore.setState(useOrderStore.getInitialState());
+});
+
+test('confirming an unrelated saved address or stale GPS editor preserves the current GPS card', () => {
+  const gps = detectedDelivery({ latitude: 10, longitude: 106 }, '26 Văn Chung', null);
+  const completed = { ...gps, recipientName: 'Nguyễn An', recipientPhone: '0901234567' };
+  useLocationStore.setState({ detected: gps });
+  useLocationStore.getState().confirmDetected({ ...gps, savedAddressId: 'saved-address' }, completed);
+  assert.equal(useLocationStore.getState().detected, gps);
+  const newer = { ...gps, latitude: 11 };
+  useLocationStore.setState({ detected: newer });
+  useLocationStore.getState().confirmDetected(gps, completed);
+  assert.equal(useLocationStore.getState().detected, newer);
+  useLocationStore.setState(useLocationStore.getInitialState());
+});
 
 test('GPS delivery uses coordinates and recipient from profile without a fabricated phone or saved ID', () => {
   const address = detectedDelivery({ latitude: 0, longitude: 106 }, ' 26 Văn Chung ', { full_name: ' Nguyễn An ', phone: '(+84) 901-234-567' });

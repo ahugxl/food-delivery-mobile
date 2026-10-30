@@ -5,7 +5,12 @@ import { useOrderStore } from './orderStore';
 import { useFavoritesStore } from './favoritesStore';
 
 export type { User } from './authState';
-export const useAuthStore = createAuthStore(supabase);
+export const useAuthStore = createAuthStore(supabase, async (phone, email) => {
+  if (!supabase) throw new Error('Chưa cấu hình Supabase.');
+  const { data, error } = await supabase.rpc('signup_account_exists', { p_phone: phone, p_email: email });
+  if (error) throw error;
+  return data === true;
+});
 
 // Initial session restoration keeps the hydrated cart only for its original owner.
 useAuthStore.subscribe((state, previous) => {

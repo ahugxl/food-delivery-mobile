@@ -16,8 +16,8 @@ const itemSchema = z.object({
 const voucherSchema = z.object({
   applies_to: z.enum(['food', 'shipping']).default('food'),
   id: z.string(), restaurant_id: z.string().nullable(), code: z.string(), discount_type: z.string(),
-  discount_value: z.number().finite(), min_order_value: z.number().finite(),
-  expiry_date: z.string().nullable(), is_active: z.boolean(),
+  discount_value: z.number().finite(), min_order_value: z.number().finite().nullable(),
+  expiry_date: z.string().nullable(), is_active: z.boolean().nullable(),
 });
 const savedSchema = z.object({
   ownerId: z.string().min(1).nullable(),

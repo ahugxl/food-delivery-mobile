@@ -28,7 +28,7 @@ export default function ServerTracking({ orderId }: { orderId: string }) {
           <FlowButton title="Nhắn tin về đơn hàng" onPress={() => router.push({ pathname: '/chat', params: { orderId } })} />
           {order.data.status === 'completed' && <FlowButton title="Đánh giá quán và tài xế" onPress={() => router.push({ pathname: '/rating', params: { orderId } })} />}
         </View>
-        <FlowCard><Text className="font-bold text-xl text-ink">{statuses[order.data.status] ?? 'Đang cập nhật'}</Text>
+        <FlowCard><Text className="font-bold text-xl text-ink">{statuses[order.data.status ?? ""] ?? 'Đang cập nhật'}</Text>
           <Text selectable className="font-regular text-xs text-muted">Mã đơn #{order.data.id}</Text>
           <Text className="font-semibold text-base text-ink">{order.data.restaurants?.name ?? 'Quán ăn'}</Text>
           <OrderDriverInfo orderId={orderId} driverId={order.data.driver_id} />

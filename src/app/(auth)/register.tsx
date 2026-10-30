@@ -12,12 +12,15 @@ import {
 } from '@/src/components/auth/AuthUI';
 import { useAuthStore } from '@/src/store/authStore';
 import { userMessage } from '../../utils/userMessage';
+import { isDuplicateAccount, signupPhone } from '../../features/account/signup';
 
 export default function RegisterScreen() {
   const register = useAuthStore((state) => state.register);
   const isLoading = useAuthStore((state) => state.isLoading);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [duplicate, setDuplicate] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -38,12 +41,14 @@ export default function RegisterScreen() {
     }
 
     setMessage('');
+    setDuplicate(false);
     try {
-      const signedIn = await register(name, email, password);
+      const signedIn = await register(name, email, password, signupPhone(phone));
       setPassword('');
       setConfirmPassword('');
       if (!signedIn) setMessage('Vui lòng xác nhận tài khoản qua email, sau đó quay lại đăng nhập.');
     } catch (error) {
+      setDuplicate(isDuplicateAccount(error));
       setMessage(userMessage(error));
     }
   };
@@ -76,6 +81,7 @@ export default function RegisterScreen() {
         autoComplete="email"
         textContentType="emailAddress"
       />
+      <AuthInput label="Số điện thoại" icon="call-outline" placeholder="Ví dụ: 0812345678" value={phone} onChangeText={setPhone} keyboardType="phone-pad" autoComplete="tel" textContentType="telephoneNumber" editable={!isLoading} maxLength={25} />
       <AuthInput
         label="Mật khẩu"
         icon="lock-closed-outline"
@@ -103,6 +109,10 @@ export default function RegisterScreen() {
         onSubmitEditing={handleRegister}
       />
       <AuthMessage message={message} />
+      {duplicate && <View className="mb-4 flex-row flex-wrap gap-5">
+        <Pressable accessibilityRole="link" onPress={() => router.replace({ pathname: '/(auth)/login', params: { email: email.trim() } })} className="min-h-11 justify-center"><Text className="font-semibold text-teal">Đăng nhập</Text></Pressable>
+        <Pressable accessibilityRole="link" onPress={() => router.push({ pathname: '/(auth)/forgot-password', params: { email: email.trim() } })} className="min-h-11 justify-center"><Text className="font-semibold text-teal">Quên mật khẩu</Text></Pressable>
+      </View>}
       <AuthButton title="Đăng ký" onPress={handleRegister} loading={isLoading} />
       <View className="mt-auto flex-row flex-wrap items-center justify-center pt-8">
         <Text className="font-regular text-sm text-muted">

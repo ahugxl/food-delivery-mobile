@@ -74,7 +74,7 @@ export function LocationEditor({ initial, onSubmit, title = 'Xác nhận điểm
     <RecipientFields value={draft} disabled={disabled} onChange={recipient => setDraft(value => ({ ...value, ...recipient, savedAddressId: undefined }))} />
     {!hasRecipient(draft) && <Text className="text-sm text-muted">Nhập tên (2–100 ký tự) và số điện thoại (9–15 chữ số) để xác nhận địa chỉ.</Text>}
     <TextInput accessibilityLabel="Địa chỉ giao hàng" value={draft.street} onChangeText={street => { generation.current++; if (timer.current)
-        clearTimeout(timer.current); setBusy(false); setError(''); setDraft(value => ({ ...value, street, savedAddressId: undefined })); }} editable={!disabled} maxLength={500} multiline placeholder={busy ? 'Đang tìm địa chỉ cho ghim…' : 'Số nhà, tên đường, phường, quận…'} className="min-h-16 rounded-2xl border border-line bg-card px-4 py-3 text-base text-ink"/>
+        clearTimeout(timer.current); setBusy(false); setError(''); setDraft(value => ({ ...value, street, savedAddressId: undefined })); }} editable={!disabled} maxLength={500} multiline placeholderTextColor="#727772" placeholder={busy ? 'Đang tìm địa chỉ cho ghim…' : 'Số nhà, tên đường, phường, quận…'} className="min-h-16 rounded-2xl border border-line bg-card px-4 py-3 text-base text-ink"/>
     <FlowButton title={locating ? 'Đang định vị…' : 'Dùng vị trí hiện tại'} disabled={locating || disabled} onPress={() => { void locate(); }}/>
     <MapPanel coordinate={validCoordinates(draft) ? draft : { latitude: 10.7769, longitude: 106.7009 }} onSelect={disabled ? undefined : choose}/>
     {!validCoordinates(draft) && <Text className="text-sm text-muted">Dùng vị trí hiện tại hoặc chọn tọa độ giao hàng. Vị trí hiển thị ban đầu chưa phải điểm giao đã xác nhận.</Text>}

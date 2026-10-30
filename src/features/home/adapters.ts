@@ -14,7 +14,7 @@ export function toRestaurantCard(row: Row<'restaurants'>): Restaurant {
     image: row.image_url ?? '',
     deliveryTime: viHours(row.opening_hours),
     openingHours: viHours(row.opening_hours),
-    isOpen: row.is_open,
+    isOpen: row.is_open === true,
     tags: restaurantInfoLabels(row.promo_tags),
   };
 }

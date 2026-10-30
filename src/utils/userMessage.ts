@@ -1,5 +1,7 @@
+import { DUPLICATE_ACCOUNT, isDuplicateAccount } from '../features/account/signup';
 /** Only display localized messages; raw SDK/database errors belong in diagnostics. */
 export function userMessage(error: unknown) {
+    if (isDuplicateAccount(error)) return DUPLICATE_ACCOUNT;
     const message = typeof error === 'string' ? error : error && typeof error === 'object' && 'message' in error && typeof error.message === 'string' ? error.message : '';
     const code = error && typeof error === 'object' && 'code' in error && typeof error.code === 'string' ? error.code : '';
     if (code === 'over_email_send_rate_limit' || /email.*rate limit|rate limit.*email/i.test(message))

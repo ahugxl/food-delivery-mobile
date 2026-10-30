@@ -40,6 +40,7 @@ function RootLayoutNav() {
   return (
     <Stack
       screenOptions={{
+        title: 'SubiFood',
         headerShown: false,
         contentStyle: { backgroundColor: '#FFFFFF' },
         statusBarStyle: Platform.OS === 'android' ? 'light' : 'dark',
@@ -71,6 +72,7 @@ function RootLayoutNav() {
         <Stack.Screen name="address-form" />
       </Stack.Protected>
       <Stack.Screen name="oauth-callback" />
+      <Stack.Screen name="reset-password" />
     </Stack>
   );
 }

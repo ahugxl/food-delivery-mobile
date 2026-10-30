@@ -72,7 +72,7 @@ export default function CheckoutScreen() {
         <Text className="font-regular text-sm text-muted">{address.street || 'Vui lòng nhập địa chỉ giao hàng.'}</Text>
         <Text className="font-semibold text-sm text-ink">{[address.recipientName, address.recipientPhone].filter(Boolean).join(' · ')}</Text>
         {!hasRecipient(address) && <Text className="text-sm text-coral">Vui lòng bổ sung tên và số điện thoại người nhận.</Text>}
-        {address.savedAddressId && <Pressable accessibilityRole="button" disabled={locked} onPress={() => router.push({ pathname: '/address-form', params: { id: address.savedAddressId } })} className="min-h-11 justify-center"><Text className="font-semibold text-sm text-teal">Sửa địa chỉ và người nhận</Text></Pressable>}
+        <Pressable accessibilityRole="button" disabled={locked} onPress={() => address.savedAddressId ? router.push({ pathname: '/address-form', params: { id: address.savedAddressId } }) : router.push('/delivery-location')} className="min-h-11 justify-center"><Text className="font-semibold text-sm text-teal">Sửa địa chỉ và người nhận</Text></Pressable>
         {!coordinates && <Text className="text-sm text-coral">Vui lòng chọn điểm giao trên bản đồ trước khi đặt hàng.</Text>}
         <Pressable accessibilityRole="button" disabled={locked} onPress={() => router.push('/select-location')} className="min-h-11 justify-center">
           <Text className="font-semibold text-sm text-teal">Đổi địa chỉ</Text>
@@ -106,7 +106,7 @@ export default function CheckoutScreen() {
       <Text className="mb-3 font-regular text-xs text-muted">Thanh toán khi nhận hàng. Giá và mã ưu đãi được kiểm tra lại khi đặt đơn.</Text>
       {mutation.isError && <Text accessibilityRole="alert" className="mb-4 font-medium text-sm text-coral">{errorMessage(mutation.error)} Giỏ hàng vẫn được giữ. Thử lại để kiểm tra cùng yêu cầu đặt đơn.</Text>}
     </ScrollView>
-    <View className="border-t border-line bg-card p-5"><FlowButton title={locked ? 'Đang đặt hàng…' : !shippingReady ? 'Chọn điểm giao để tính phí' : `Đặt hàng · ${currency(totals.total)}`} onPress={() => { void placeOrder(); }} disabled={!canOrder} /></View>
+    <View className="border-t border-line bg-card p-5"><FlowButton title={locked ? 'Đang đặt hàng…' : !shippingReady ? 'Chọn điểm giao để tính phí' : 'Đặt hàng'} trailing={!locked && shippingReady ? currency(totals.total) : undefined} onPress={() => { void placeOrder(); }} disabled={!canOrder} /></View>
   </SafeAreaView>;
 }
 

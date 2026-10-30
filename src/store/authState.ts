@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { Session, SupabaseClient } from '@supabase/supabase-js';
+import { duplicateAccountError, isDuplicateAccount, signupPhone } from '../features/account/signup';
 
 export type User = {
   id: string;
@@ -16,11 +17,11 @@ type AuthState = {
   error: string | null;
   initialize: () => () => void;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string, phone: string) => Promise<boolean>;
   logout: () => Promise<void>;
 };
 
-export function createAuthStore(client: Pick<SupabaseClient, 'auth'> | null) {
+export function createAuthStore(client: Pick<SupabaseClient, 'auth'> | null, accountExists?: (phone: string, email: string) => Promise<boolean>) {
   return create<AuthState>((set, get) => {
     const applySession = (session: Session | null) => {
       const user = session?.user;
@@ -86,12 +87,23 @@ export function createAuthStore(client: Pick<SupabaseClient, 'auth'> | null) {
         if (error) throw error;
         applySession(data.session);
       }),
-      register: (name, email, password) => perform(async () => {
+      register: (name, email, password, phone) => perform(async () => {
+        const normalizedPhone = signupPhone(phone);
+        if (name.trim().length < 2 || name.trim().length > 100) throw new Error('Họ tên cần từ 2 đến 100 ký tự.');
+        const normalizedEmail = email.trim().toLowerCase();
+        if (accountExists && await accountExists(normalizedPhone, normalizedEmail)) throw duplicateAccountError();
         const { data, error } = await requireClient().auth.signUp({
-          email: email.trim().toLowerCase(), password,
-          options: { data: { full_name: name.trim() } },
+          email: normalizedEmail, password,
+          options: { data: { full_name: name.trim(), phone: normalizedPhone } },
         });
-        if (error) throw error;
+        if (error) {
+          if (isDuplicateAccount(error)) throw duplicateAccountError();
+          // A concurrent registration may have reserved the same phone after preflight.
+          if (error.code === 'unexpected_failure' && accountExists && await accountExists(normalizedPhone, normalizedEmail)) throw duplicateAccountError();
+          throw error;
+        }
+        // With confirmation enabled, Supabase can return an obfuscated existing user.
+        if (data.user?.identities?.length === 0) throw duplicateAccountError();
         applySession(data.session);
         return !!data.session;
       }),

@@ -1,36 +1,16 @@
 import type { Database, Json } from './database.types';
 
 type Tables = Database['public']['Tables'];
-type ForeignKey<Name extends string, Column extends string, Target extends string> = {
-  foreignKeyName: Name;
-  columns: [Column];
-  isOneToOne: false;
-  referencedRelation: Target;
-  referencedColumns: ['id'];
-};
-
-// FK names from the provided CREATE TABLE statements. Keep database.types.ts intact.
-type Relationships = {
-  food_discovery_categories: [ForeignKey<'food_discovery_categories_food_id_fkey', 'food_id', 'foods'>, ForeignKey<'food_discovery_categories_discovery_category_id_fkey', 'discovery_category_id', 'discovery_categories'>];
-  user_vouchers: [ForeignKey<'user_vouchers_voucher_id_fkey', 'voucher_id', 'vouchers'>];
-  favorites: [ForeignKey<'favorites_restaurant_id_fkey', 'restaurant_id', 'restaurants'>];
-  orders: [ForeignKey<'orders_restaurant_id_fkey', 'restaurant_id', 'restaurants'>];
-  order_items: [ForeignKey<'order_items_order_id_fkey', 'order_id', 'orders'>];
-  foods: [
-    ForeignKey<'foods_restaurant_id_fkey', 'restaurant_id', 'restaurants'>,
-    ForeignKey<'foods_category_id_fkey', 'category_id', 'categories'>,
-  ];
-  food_option_groups: [ForeignKey<'food_option_groups_food_id_fkey', 'food_id', 'foods'>];
-  food_option_items: [ForeignKey<'food_option_items_group_id_fkey', 'group_id', 'food_option_groups'>];
-};
-
+// Keep database metadata in one place. The client exposes only current RPCs,
+// and explicitly types nullable arguments accepted by their SQL implementations.
 export type SupabaseDatabase = {
   public: {
-    Tables: { [Name in keyof Tables]: Tables[Name] & {
-      Relationships: Name extends keyof Relationships ? Relationships[Name] : [];
-    } };
-    Views: Record<never, never>;
+    Tables: Tables;
+    Views: Database['public']['Views'];
+    Enums: Database['public']['Enums'];
+    CompositeTypes: Database['public']['CompositeTypes'];
     Functions: {
+      signup_account_exists: { Args: { p_phone: string; p_email: string }; Returns: boolean };
       submit_order_review: { Args: { p_order_id: string; p_stage: string; p_rating: number; p_feedback: string; p_image_path?: string | null; p_food_votes?: Json }; Returns: Tables['reviews']['Row'][] };
       food_review_stats: { Args: { p_food_ids: string[] }; Returns: { food_id: string; sold_count: number; like_count: number }[] };
       collect_my_voucher: { Args: { p_voucher_id: string }; Returns: Tables['vouchers']['Row'][] };
@@ -43,12 +23,8 @@ export type SupabaseDatabase = {
         Returns: Tables['user_addresses']['Row'][];
       };
       delete_my_address: { Args: { p_id: string }; Returns: undefined };
-      create_food_order_at_location: {
-        Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code?: string | null; p_latitude: number; p_longitude: number };
-        Returns: Tables['orders']['Row'][];
-      };
       create_food_order: {
-        Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code: string | null; p_shipping_voucher_code: string | null; p_latitude: number; p_longitude: number; p_delivery_fee: Tables['orders']['Row']['delivery_fee']; p_recipient_name: string; p_recipient_phone: string };
+        Args: { p_order_id: string; p_items: Json; p_address: string; p_voucher_code: string | null; p_shipping_voucher_code: string | null; p_latitude: number; p_longitude: number; p_delivery_fee: number; p_recipient_name: string; p_recipient_phone: string };
         Returns: Tables['orders']['Row'][];
       };
     };

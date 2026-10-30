@@ -15,7 +15,7 @@ export function VoucherTicket({ voucher, reason, action, disabled, selected, onP
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
       <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
         <Text className="font-bold text-base text-ink">Giảm {amount} {shipping ? 'phí giao hàng' : 'tiền món'}</Text>
-        <Text className="text-xs text-muted">Đơn từ {currency(voucher.min_order_value)}</Text>
+        <Text className="text-xs text-muted">Đơn từ {currency(voucher.min_order_value ?? 0)}</Text>
         <AppPressable accessibilityRole="button" accessibilityLabel={`Điều kiện mã ${voucher.code}`} accessibilityState={{ expanded }} onPress={() => setExpanded(value => !value)} style={{ minHeight: 28, justifyContent: 'center' }}>
           <Text className="text-xs text-teal">{voucher.code} · {expanded ? 'Thu gọn' : 'Điều kiện ›'}</Text>
         </AppPressable>

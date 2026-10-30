@@ -16,7 +16,7 @@ export default function InboxScreen() {
     {orders.isPending ? <Text className="p-5 text-muted">Đang tải đơn hàng...</Text> : orders.isError ? <View className="gap-3 p-5"><Text className="text-coral">Không tải được danh sách.</Text><FlowButton title="Thử lại" onPress={() => { void orders.refetch(); }} /></View>
       : <FlatList data={orders.data} keyExtractor={item => item.id} contentContainerStyle={{ padding: 20, gap: 14 }} refreshing={orders.isRefetching} onRefresh={() => { void orders.refetch(); }}
         renderItem={({ item }) => <AppPressable accessibilityRole="button" accessibilityLabel={`Nhắn tin đơn ${item.id.slice(0, 8)}`} onPress={() => router.push({ pathname: '/chat', params: { orderId: item.id } })} className="gap-2 rounded-3xl border border-line bg-card p-5">
-          <Text className="font-semibold text-base text-ink">{item.restaurants?.name ?? 'Nhà hàng'}</Text><Text className="text-xs text-muted">Đơn #{item.id.slice(0, 8)} · {ORDER_LABELS[item.status] ?? 'Đang cập nhật'}</Text><Text className="text-sm text-teal">Mở tin nhắn →</Text>
+          <Text className="font-semibold text-base text-ink">{item.restaurants?.name ?? 'Nhà hàng'}</Text><Text className="text-xs text-muted">Đơn #{item.id.slice(0, 8)} · {ORDER_LABELS[item.status ?? ""] ?? 'Đang cập nhật'}</Text><Text className="text-sm text-teal">Mở tin nhắn →</Text>
         </AppPressable>}
         ListEmptyComponent={<Text className="py-12 text-center text-muted">Bạn chưa có đơn hàng để trò chuyện.</Text>} />}
   </SafeAreaView>;

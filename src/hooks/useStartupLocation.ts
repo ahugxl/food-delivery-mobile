@@ -9,6 +9,7 @@ import { useCartStore } from '../store/cartStore';
 import { useLocationStore } from '../store/locationStore';
 import { userMessage } from '../utils/userMessage';
 import { AppState } from 'react-native';
+import { deliveryRecipientStorage } from '../services/deliveryRecipient';
 
 export function StartupLocationSync() {
   const userId = useAuthStore(state => state.user?.id);
@@ -44,7 +45,9 @@ export function StartupLocationSync() {
       address: point => getAddressFromCoords(point.latitude, point.longitude),
       profile: () => client.fetchQuery({ queryKey: ['profile', userId], queryFn: () => accountApi.profile(userId, controller.signal), staleTime: 0 }),
       onCoordinates: coordinates => { if (active && useAuthStore.getState().user?.id === userId) useLocationStore.setState({ coordinates }); },
-    }).then(address => {
+    }).then(async detected => {
+      const recipient = await deliveryRecipientStorage.read(userId);
+      const address = recipient ? { ...detected, ...recipient } : detected;
       if (!active || useAuthStore.getState().user?.id !== userId) return;
       useLocationStore.setState({ status: 'ready', detected: address, error: '' });
       if (useOrderStore.getState().deliverySelectionVersion === version && !useCartStore.getState().isCheckingOut && !useCartStore.getState().checkoutRequest) {

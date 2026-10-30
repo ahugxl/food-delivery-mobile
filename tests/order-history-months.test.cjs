@@ -19,3 +19,13 @@ test('order history groups and sorts using Vietnam dates across a UTC month boun
   assert.deepEqual(orderHistoryMonths([]), []);
   assert.equal(orderHistoryTime('invalid'), 'Chưa có thời gian');
 });
+
+test('legacy orders without a timestamp stay visible in an unknown-date section', () => {
+  const sections = orderHistoryMonths([
+    { id: 'legacy', created_at: null },
+    { id: 'dated', created_at: '2026-10-29T15:32:00Z' },
+  ], new Date('2026-10-30T00:00:00Z'));
+  assert.equal(orderHistoryTime(null), 'Chưa có thời gian');
+  assert.deepEqual(sections.map(s => s.title), ['Tháng này', 'Đơn hàng khác']);
+  assert.equal(sections[1].data[0].id, 'legacy');
+});

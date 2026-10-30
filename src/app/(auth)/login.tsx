@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import { Text, View, useWindowDimensions } from 'react-native';
 import { AppPressable } from '../../components/AppPressable';
@@ -8,9 +8,10 @@ import { useAuthStore } from '../../store/authStore';
 import { userMessage } from '../../utils/userMessage';
 
 export default function LoginScreen() {
+  const params = useLocalSearchParams<{ email?: string }>();
   const login = useAuthStore(state => state.login);
   const isLoading = useAuthStore(state => state.isLoading);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(typeof params.email === 'string' ? params.email : '');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [socialBusy, setSocialBusy] = useState(false);
@@ -32,6 +33,7 @@ export default function LoginScreen() {
     <AuthInput label="Email" icon="mail-outline" placeholder="Nhập email" value={email} onChangeText={setEmail} editable={!busy} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" textContentType="emailAddress" />
     <AuthInput label="Mật khẩu" icon="lock-closed-outline" placeholder="Nhập mật khẩu" value={password} onChangeText={setPassword} editable={!busy} secureTextEntry autoCapitalize="none" autoCorrect={false} autoComplete="current-password" textContentType="password" returnKeyType="go" onSubmitEditing={() => { void handleLogin(); }} />
     <AuthMessage message={message} />
+    <AppPressable accessibilityRole="link" disabled={busy} onPress={() => router.push({ pathname: '/(auth)/forgot-password', params: { email } })} className="mb-3 min-h-11 justify-center self-end"><Text className="font-semibold text-sm text-teal">Quên mật khẩu?</Text></AppPressable>
     <AuthButton title="Đăng nhập" onPress={() => { void handleLogin(); }} loading={isLoading} disabled={socialBusy} />
     <SocialLogin onBusyChange={setSocialBusy} />
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', marginTop: 8, paddingBottom: 12 }}>

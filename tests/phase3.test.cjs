@@ -5,7 +5,7 @@ const ts = require('typescript');
 const { createClient } = require('@supabase/supabase-js');
 require.extensions['.ts'] = (m, file) => m._compile(ts.transpileModule(fs.readFileSync(file, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, file);
 const { validCoordinates, interpolateTrip, formatAddress } = require('../src/features/location/coordinates.ts');
-const { mergeMessages, parseMessage } = require('../src/features/chat/messages.ts');
+const { mergeMessages, parseMessage, messageTimeLabel } = require('../src/features/chat/messages.ts');
 const { imageFromBase64 } = require('../src/features/chat/imageData.ts');
 const { createChatApi } = require('../src/services/chatApi.ts');
 const { createPurchaseApi } = require('../src/services/purchaseApi.ts');
@@ -30,6 +30,14 @@ test('history and realtime overlap merge once in stable chronological order', ()
   assert.deepEqual(mergeMessages([newer], [message, newer]).map(row => row.id), ['m1', 'm2']);
   assert.equal(parseMessage({ ...message, sender_type: 'admin' }), null);
   assert.deepEqual(parseMessage(message), message);
+});
+
+test('nullable legacy chat timestamps and types do not drop the message or show epoch dates', () => {
+  const legacy = { ...message, id: 'legacy', created_at: null, message_type: null };
+  assert.deepEqual(parseMessage(legacy), legacy);
+  assert.equal(messageTimeLabel(null), 'Chưa có thời gian');
+  assert.equal(messageTimeLabel('invalid'), 'Chưa có thời gian');
+  assert.deepEqual(mergeMessages([message, legacy], [legacy]).map(row => row.id), ['legacy', 'm1']);
 });
 test('image upload data validates real signatures and rejects arbitrary file content', () => {
   assert.equal(imageFromBase64(Buffer.from([0xff, 0xd8, 0xff, 0]).toString('base64')).mime, 'image/jpeg');

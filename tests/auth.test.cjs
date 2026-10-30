@@ -80,15 +80,16 @@ test('login normalizes email, preserves password and exposes server failures', a
 test('registration sends full_name and waits for email confirmation without a session', async () => {
   const f = fixture({ signUp: async (credentials) => {
     assert.equal(credentials.options.data.full_name, 'Alex');
+    assert.equal(credentials.options.data.phone, '+84901234567');
     return result(null);
   } });
-  assert.equal(await f.store.getState().register(' Alex ', 'a@example.com', 'secret'), false);
+  assert.equal(await f.store.getState().register(' Alex ', 'a@example.com', 'secret', '0901234567'), false);
   assert.equal(f.store.getState().user, null);
 });
 
 test('successful registration accepts an immediate session when email confirmation is disabled', async () => {
   const f = fixture({ signUp: async () => result(session) });
-  assert.equal(await f.store.getState().register('Alex', 'a@example.com', 'secret'), true);
+  assert.equal(await f.store.getState().register('Alex', 'a@example.com', 'secret', '0901234567'), true);
   assert.equal(f.store.getState().isAuthenticated, true);
 });
 

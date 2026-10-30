@@ -7,6 +7,7 @@ export default function AuthLayout() {
     <Stack
       initialRouteName="welcome"
       screenOptions={{
+        title: 'SubiFood',
         headerShown: false,
         contentStyle: { backgroundColor: '#FFFBF5' },
       }}
@@ -14,6 +15,7 @@ export default function AuthLayout() {
       <Stack.Screen name="welcome" />
       <Stack.Screen name="login" />
       <Stack.Screen name="register" />
+      <Stack.Screen name="forgot-password" />
     </Stack>
   );
 }

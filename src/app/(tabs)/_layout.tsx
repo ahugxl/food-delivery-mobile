@@ -40,7 +40,8 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Khám phá',
+          title: 'SubiFood',
+          tabBarLabel: 'Khám phá',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
@@ -53,7 +54,8 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="orders"
         options={{
-          title: 'Đơn hàng',
+          title: 'SubiFood',
+          tabBarLabel: 'Đơn hàng',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'receipt' : 'receipt-outline'}
@@ -66,7 +68,8 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="favorites"
         options={{
-          title: 'Yêu thích',
+          title: 'SubiFood',
+          tabBarLabel: 'Yêu thích',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'heart' : 'heart-outline'}
@@ -79,7 +82,8 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="inbox"
         options={{
-          title: 'Tin nhắn',
+          title: 'SubiFood',
+          tabBarLabel: 'Tin nhắn',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
@@ -92,7 +96,8 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="account"
         options={{
-          title: 'Tài khoản',
+          title: 'SubiFood',
+          tabBarLabel: 'Tài khoản',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'person' : 'person-outline'}

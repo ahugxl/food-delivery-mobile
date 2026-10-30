@@ -33,24 +33,26 @@ export function FlowButton({
   title,
   onPress,
   disabled = false,
+  trailing,
 }: {
   title: string;
   onPress: () => void;
   disabled?: boolean;
+  trailing?: string;
 }) {
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={trailing ? `${title} · ${trailing}` : title}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
       className={`min-h-14 items-center justify-center rounded-2xl px-5 py-4 active:opacity-80 ${disabled ? 'bg-line' : 'bg-teal'}`}
     >
-      <Text
-        className={`font-semibold text-base ${disabled ? 'text-muted' : 'text-white'}`}
-      >
-        {title}
-      </Text>
+      {trailing ? <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={{ flex: 1, minWidth: 0, color: disabled ? '#575E58' : 'white' }} className="font-semibold text-base">{title}</Text>
+        <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={{ flex: 1, minWidth: 0, textAlign: 'right', color: disabled ? '#575E58' : 'white' }} className="font-semibold text-base">{trailing}</Text>
+      </View> : <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={{ width: '100%', textAlign: 'center', color: disabled ? '#575E58' : 'white' }} className="font-semibold text-base">{title}</Text>}
     </Pressable>
   );
 }

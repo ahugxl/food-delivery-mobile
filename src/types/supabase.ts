@@ -10,6 +10,10 @@ export type SupabaseDatabase = {
     Enums: Database['public']['Enums'];
     CompositeTypes: Database['public']['CompositeTypes'];
     Functions: {
+      restaurant_review_summary: Database['public']['Functions']['restaurant_review_summary'];
+      restaurant_review_feed: Database['public']['Functions']['restaurant_review_feed'];
+      order_delivery_progress: Database['public']['Functions']['order_delivery_progress'];
+      order_driver_location: Database['public']['Functions']['order_driver_location'];
       signup_account_exists: { Args: { p_phone: string; p_email: string }; Returns: boolean };
       submit_order_review: { Args: { p_order_id: string; p_stage: string; p_rating: number; p_feedback: string; p_image_path?: string | null; p_food_votes?: Json }; Returns: Tables['reviews']['Row'][] };
       food_review_stats: { Args: { p_food_ids: string[] }; Returns: { food_id: string; sold_count: number; like_count: number }[] };

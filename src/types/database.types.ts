@@ -395,72 +395,77 @@ export interface Database {
       };
       orders: {
         Row: {
-          food_discount_amount: number;
-          shipping_discount_amount: number;
-          shipping_voucher_id: string | null;
-          recipient_name: string | null;
-          recipient_phone: string | null;
-          id: string;
-          user_id: string;
-          restaurant_id: string;
-          driver_id: string | null;
-          status: string | null;
-          subtotal: number;
-          delivery_fee: number | null;
-          voucher_id: string | null;
-          discount_amount: number | null;
-          total: number;
-          payment_method: string | null;
-          delivery_address: string;
-          latitude: number | null;
-          longitude: number | null;
-          created_at: string | null;
-        };
+          completed_at: string | null
+          created_at: string | null
+          delivery_address: string
+          delivery_fee: number | null
+          discount_amount: number | null
+          driver_id: string | null
+          food_discount_amount: number
+          id: string
+          latitude: number | null
+          longitude: number | null
+          payment_method: string | null
+          payment_status: string | null
+          recipient_name: string | null
+          recipient_phone: string | null
+          restaurant_id: string
+          shipping_discount_amount: number
+          shipping_voucher_id: string | null
+          status: string | null
+          subtotal: number
+          total: number
+          user_id: string
+          voucher_id: string | null
+        }
         Insert: {
-          food_discount_amount?: number;
-          shipping_discount_amount?: number;
-          shipping_voucher_id?: string | null;
-          recipient_name?: string | null;
-          recipient_phone?: string | null;
-          id?: string;
-          user_id: string;
-          restaurant_id: string;
-          driver_id?: string | null;
-          status?: string | null;
-          subtotal: number;
-          delivery_fee?: number | null;
-          voucher_id?: string | null;
-          discount_amount?: number | null;
-          total: number;
-          payment_method?: string | null;
-          delivery_address: string;
-          latitude?: number | null;
-          longitude?: number | null;
-          created_at?: string | null;
-        };
+          completed_at?: string | null
+          created_at?: string | null
+          delivery_address: string
+          delivery_fee?: number | null
+          discount_amount?: number | null
+          driver_id?: string | null
+          food_discount_amount?: number
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          recipient_name?: string | null
+          recipient_phone?: string | null
+          restaurant_id: string
+          shipping_discount_amount?: number
+          shipping_voucher_id?: string | null
+          status?: string | null
+          subtotal: number
+          total: number
+          user_id: string
+          voucher_id?: string | null
+        }
         Update: {
-          food_discount_amount?: number;
-          shipping_discount_amount?: number;
-          shipping_voucher_id?: string | null;
-          recipient_name?: string | null;
-          recipient_phone?: string | null;
-          id?: string;
-          user_id?: string;
-          restaurant_id?: string;
-          driver_id?: string | null;
-          status?: string | null;
-          subtotal?: number;
-          delivery_fee?: number | null;
-          voucher_id?: string | null;
-          discount_amount?: number | null;
-          total?: number;
-          payment_method?: string | null;
-          delivery_address?: string;
-          latitude?: number | null;
-          longitude?: number | null;
-          created_at?: string | null;
-        };
-      
+          completed_at?: string | null
+          created_at?: string | null
+          delivery_address?: string
+          delivery_fee?: number | null
+          discount_amount?: number | null
+          driver_id?: string | null
+          food_discount_amount?: number
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          recipient_name?: string | null
+          recipient_phone?: string | null
+          restaurant_id?: string
+          shipping_discount_amount?: number
+          shipping_voucher_id?: string | null
+          status?: string | null
+          subtotal?: number
+          total?: number
+          user_id?: string
+          voucher_id?: string | null
+        }
         Relationships: [
           {
             foreignKeyName: "orders_restaurant_id_fkey"
@@ -483,8 +488,8 @@ export interface Database {
             referencedRelation: "vouchers"
             referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       profiles: {
         Row: {
           id: string;
@@ -760,13 +765,324 @@ export interface Database {
           },
         ];
       };
+    
+      driver_settings: {
+        Row: {
+          id: boolean
+          offer_seconds: number
+          payout_base_fee: number | null
+          payout_base_km: number | null
+          payout_extra_km_fee: number | null
+          payout_per_delivery: number | null
+        }
+        Insert: {
+          id?: boolean
+          offer_seconds?: number
+          payout_base_fee?: number | null
+          payout_base_km?: number | null
+          payout_extra_km_fee?: number | null
+          payout_per_delivery?: number | null
+        }
+        Update: {
+          id?: boolean
+          offer_seconds?: number
+          payout_base_fee?: number | null
+          payout_base_km?: number | null
+          payout_extra_km_fee?: number | null
+          payout_per_delivery?: number | null
+        }
+        Relationships: []
+      }
+    
+      driver_profiles: {
+        Row: {
+          approval_status: string
+          plate_number: string | null
+          updated_at: string
+          user_id: string
+          vehicle_type: string
+        }
+        Insert: {
+          approval_status?: string
+          plate_number?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_type?: string
+        }
+        Update: {
+          approval_status?: string
+          plate_number?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    
+      driver_presence: {
+        Row: {
+          driver_id: string
+          is_online: boolean
+          last_seen_at: string
+        }
+        Insert: {
+          driver_id: string
+          is_online?: boolean
+          last_seen_at?: string
+        }
+        Update: {
+          driver_id?: string
+          is_online?: boolean
+          last_seen_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_presence_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: true
+            referencedRelation: "driver_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+    
+      driver_locations: {
+        Row: {
+          accuracy: number | null
+          driver_id: string
+          latitude: number
+          longitude: number
+          received_at: string
+        }
+        Insert: {
+          accuracy?: number | null
+          driver_id: string
+          latitude: number
+          longitude: number
+          received_at?: string
+        }
+        Update: {
+          accuracy?: number | null
+          driver_id?: string
+          latitude?: number
+          longitude?: number
+          received_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_locations_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: true
+            referencedRelation: "driver_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+    
+      driver_ledger_entries: {
+        Row: {
+          amount: number
+          assignment_id: string
+          created_at: string
+          driver_id: string
+          entry_type: string
+          id: string
+          order_id: string
+        }
+        Insert: {
+          amount: number
+          assignment_id: string
+          created_at?: string
+          driver_id: string
+          entry_type: string
+          id?: string
+          order_id: string
+        }
+        Update: {
+          amount?: number
+          assignment_id?: string
+          created_at?: string
+          driver_id?: string
+          entry_type?: string
+          id?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_ledger_entries_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_ledger_entries_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "driver_ledger_entries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    
+      delivery_events: {
+        Row: {
+          actor_id: string | null
+          assignment_id: string
+          created_at: string
+          from_status: string | null
+          id: string
+          note: string | null
+          to_status: string
+        }
+        Insert: {
+          actor_id?: string | null
+          assignment_id: string
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          to_status: string
+        }
+        Update: {
+          actor_id?: string | null
+          assignment_id?: string
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_events_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    
+      delivery_assignments: {
+        Row: {
+          accepted_at: string | null
+          cod_amount: number
+          completed_at: string | null
+          created_at: string
+          distance_km: number | null
+          driver_id: string
+          ended_at: string | null
+          expires_at: string
+          fee: number
+          id: string
+          order_id: string
+          payout_rules: Json | null
+          picked_up_at: string | null
+          reason: string | null
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          cod_amount: number
+          completed_at?: string | null
+          created_at?: string
+          distance_km?: number | null
+          driver_id: string
+          ended_at?: string | null
+          expires_at: string
+          fee: number
+          id?: string
+          order_id: string
+          payout_rules?: Json | null
+          picked_up_at?: string | null
+          reason?: string | null
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          cod_amount?: number
+          completed_at?: string | null
+          created_at?: string
+          distance_km?: number | null
+          driver_id?: string
+          ended_at?: string | null
+          expires_at?: string
+          fee?: number
+          id?: string
+          order_id?: string
+          payout_rules?: Json | null
+          picked_up_at?: string | null
+          reason?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_assignments_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "delivery_assignments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     };
   
     Views: {
       [_ in never]: never
     };
     Functions: {
-      signup_account_exists: { Args: { p_phone: string; p_email: string }; Returns: boolean }
+      restaurant_review_summary: {
+        Args: { p_restaurant_id: string };
+        Returns: { average_rating: number | null; review_count: number; star_5: number; star_4: number; star_3: number; star_2: number; star_1: number }[];
+      };
+      restaurant_review_feed: {
+        Args: { p_restaurant_id: string; p_sort?: string; p_rating?: number | null; p_with_photos?: boolean; p_mine?: boolean; p_offset?: number; p_limit?: number };
+        Returns: { review_id: string; author_name: string; rating: number; feedback: string | null; photo_path: string | null; submitted_at: string; ordered_foods: string[]; is_mine: boolean }[];
+      };
+      order_delivery_progress: {
+        Args: { p_order_id: string }
+        Returns: { order_status: string | null; driver_id: string | null; assignment_id: string | null; delivery_status: string | null; updated_at: string | null }[]
+      }
+      admin_driver_assign: {
+        Args: { p_driver_id: string; p_order_id: string }
+        Returns: string
+      }
+      admin_driver_migrate_order: {
+        Args: { p_confirm_picked_up?: boolean; p_order_id: string }
+        Returns: string
+      }
+      admin_driver_resolve: {
+        Args: {
+          p_assignment_id: string
+          p_goods_returned?: boolean
+          p_outcome: string
+          p_reason: string
+        }
+        Returns: undefined
+      }
       collect_my_voucher: {
         Args: { p_voucher_id: string }
         Returns: {
@@ -796,6 +1112,7 @@ export interface Database {
               p_voucher_code?: string
             }
             Returns: {
+              completed_at: string | null
               created_at: string | null
               delivery_address: string
               delivery_fee: number | null
@@ -806,6 +1123,7 @@ export interface Database {
               latitude: number | null
               longitude: number | null
               payment_method: string | null
+              payment_status: string | null
               recipient_name: string | null
               recipient_phone: string | null
               restaurant_id: string
@@ -835,6 +1153,7 @@ export interface Database {
               p_voucher_code: string
             }
             Returns: {
+              completed_at: string | null
               created_at: string | null
               delivery_address: string
               delivery_fee: number | null
@@ -845,6 +1164,7 @@ export interface Database {
               latitude: number | null
               longitude: number | null
               payment_method: string | null
+              payment_status: string | null
               recipient_name: string | null
               recipient_phone: string | null
               restaurant_id: string
@@ -876,6 +1196,7 @@ export interface Database {
               p_voucher_code: string
             }
             Returns: {
+              completed_at: string | null
               created_at: string | null
               delivery_address: string
               delivery_fee: number | null
@@ -886,6 +1207,7 @@ export interface Database {
               latitude: number | null
               longitude: number | null
               payment_method: string | null
+              payment_status: string | null
               recipient_name: string | null
               recipient_phone: string | null
               restaurant_id: string
@@ -918,6 +1240,7 @@ export interface Database {
               p_voucher_code: string
             }
             Returns: {
+              completed_at: string | null
               created_at: string | null
               delivery_address: string
               delivery_fee: number | null
@@ -928,6 +1251,7 @@ export interface Database {
               latitude: number | null
               longitude: number | null
               payment_method: string | null
+              payment_status: string | null
               recipient_name: string | null
               recipient_phone: string | null
               restaurant_id: string
@@ -956,6 +1280,7 @@ export interface Database {
           p_voucher_code?: string
         }
         Returns: {
+          completed_at: string | null
           created_at: string | null
           delivery_address: string
           delivery_fee: number | null
@@ -966,6 +1291,7 @@ export interface Database {
           latitude: number | null
           longitude: number | null
           payment_method: string | null
+          payment_status: string | null
           recipient_name: string | null
           recipient_phone: string | null
           restaurant_id: string
@@ -985,6 +1311,35 @@ export interface Database {
         }
       }
       delete_my_address: { Args: { p_id: string }; Returns: undefined }
+      driver_dashboard: { Args: never; Returns: Json }
+      driver_messages: { Args: { p_assignment_id: string }; Returns: Json }
+      driver_save_profile: {
+        Args: {
+          p_full_name: string
+          p_phone: string
+          p_plate_number: string
+          p_vehicle_type: string
+        }
+        Returns: undefined
+      }
+      driver_send_message: {
+        Args: { p_assignment_id: string; p_content: string }
+        Returns: undefined
+      }
+      driver_set_online: { Args: { p_online: boolean }; Returns: undefined }
+      driver_step: {
+        Args: {
+          p_action: string
+          p_assignment_id: string
+          p_cod_confirmed?: boolean
+          p_reason?: string
+        }
+        Returns: undefined
+      }
+      driver_update_location: {
+        Args: { p_accuracy?: number; p_latitude: number; p_longitude: number }
+        Returns: undefined
+      }
       food_review_stats: {
         Args: { p_food_ids: string[] }
         Returns: {
@@ -993,6 +1348,7 @@ export interface Database {
           sold_count: number
         }[]
       }
+      order_driver_location: { Args: { p_order_id: string }; Returns: Json }
       save_my_address:
         | {
             Args: {
@@ -1052,6 +1408,10 @@ export interface Database {
               isSetofReturn: true
             }
           }
+      signup_account_exists: {
+        Args: { p_email: string; p_phone: string }
+        Returns: boolean
+      }
       submit_order_review: {
         Args: {
           p_feedback: string
@@ -1101,7 +1461,7 @@ export interface Database {
           isSetofReturn: true
         }
       }
-    };
+    }
     Enums: {
       [_ in never]: never
     };

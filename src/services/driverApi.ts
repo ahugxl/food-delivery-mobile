@@ -1,12 +1,30 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SupabaseDatabase } from '../types/supabase';
 import type { Database } from '../types/database.types';
+import { parseDriverFix } from '../features/location/driverLocation';
 
 export type DriverProfile = Pick<Database['public']['Tables']['profiles']['Row'], 'id' | 'full_name' | 'phone' | 'avatar_url'>;
 export type OrderDriver = { driverId: string | null; profile: DriverProfile | null };
 
 export function createDriverApi(client: SupabaseClient<SupabaseDatabase> | null) {
   return {
+    async progressForOrder(orderId: string, signal?: AbortSignal) {
+      if (!client) throw new Error('Chưa cấu hình kết nối Supabase.');
+      if (!orderId) throw new Error('Vui lòng chọn đơn hàng để theo dõi.');
+      const request = client.rpc('order_delivery_progress', { p_order_id: orderId });
+      const { data, error } = await (signal ? request.abortSignal(signal) : request).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    async locationForOrder(orderId: string, signal?: AbortSignal) {
+      if (!client) throw new Error('Chưa cấu hình kết nối Supabase.');
+      if (!orderId) throw new Error('Vui lòng chọn đơn hàng để theo dõi.');
+      // The RPC enforces order ownership. Never read the private GPS table directly.
+      const request = client.rpc('order_driver_location', { p_order_id: orderId });
+      const { data, error } = await (signal ? request.abortSignal(signal) : request);
+      if (error) throw error;
+      return parseDriverFix(data);
+    },
     async forOrder(orderId: string, userId: string, signal?: AbortSignal): Promise<OrderDriver> {
       if (!client) throw new Error('Chưa cấu hình kết nối Supabase.');
       if (!userId || !orderId) throw new Error('Vui lòng đăng nhập và chọn đơn hàng.');

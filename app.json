@@ -25,13 +25,17 @@
       "bundler": "metro",
       "favicon": "./assets/images/subifood-favicon-green.png"
     },
-    "splash": {
-      "image": "./assets/images/subifood-icon-green.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF"
-    },
     "plugins": [
       "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/subifood-icon-green.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#FFFFFF"
+        }
+      ],
       [
         "expo-location",
         {

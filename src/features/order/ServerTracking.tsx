@@ -9,11 +9,12 @@ import { currency } from './checkout';
 import type { Json } from '../../types/database.types';
 import { viLabel } from '../../utils/vietnamese';
 import { OrderDriverInfo } from '../../components/OrderDriverInfo';
-
-const statuses: Record<string, string> = { pending: 'Chờ quán xác nhận', preparing: 'Quán đang chuẩn bị món', delivering: 'Đang giao hàng', completed: 'Đã giao hàng', cancelled: 'Đã hủy' };
+import { driverFixTime } from '../location/driverLocation';
+import { DeliveryProgressBar } from './DeliveryProgressBar';
 
 export default function ServerTracking({ orderId }: { orderId: string }) {
   const order = useOrderTracking(orderId);
+  const progressStep = order.deliveryProgress?.step;
   return <SafeAreaView className="flex-1 bg-cream">
     <FlowHeader title="Theo dõi đơn hàng" />
     {order.isPending ? <SkeletonGroup label="Đang tải đơn hàng"><View className="gap-4 p-5"><Skeleton height={150} /><Skeleton height={120} /></View></SkeletonGroup>
@@ -21,14 +22,26 @@ export default function ServerTracking({ orderId }: { orderId: string }) {
       : !order.data ? <Text className="p-5 text-ink">Không tìm thấy đơn hàng.</Text>
       : <ScrollView contentContainerStyle={{ padding: 20 }}>
         <View className="mb-5 gap-3">
-          <Text className="text-xs text-muted">{order.connection === 'connected' ? 'Đang đồng bộ trực tiếp' : 'Đang kết nối lại; tự tải lại trạng thái'}</Text>
-          {order.destination && order.origin ? <MapPanel coordinate={order.destination} origin={order.origin} driver={order.driverLocation} simulation />
+          <Text className="text-xs text-muted">{order.connection === 'connected' ? 'Trạng thái đơn đang đồng bộ trực tiếp' : 'Đang kết nối lại; tự tải lại trạng thái'}</Text>
+          {order.destination && order.origin ? <MapPanel coordinate={order.destination} origin={order.origin} driver={order.driverLocation} />
             : <Text className="rounded-2xl bg-tealLight p-4 text-sm text-muted">Đơn hoặc nhà hàng chưa có tọa độ, nên chưa thể vẽ tuyến đường. Các đơn mới sẽ lưu tọa độ đã chọn khi thanh toán.</Text>}
-          {order.data.status === 'delivering' && order.destination && order.origin && <Text className="text-sm text-teal">{order.progress >= 1 ? 'Xe mô phỏng đã tới điểm giao. Trạng thái đơn vẫn do hệ thống quản lý.' : `Xe mô phỏng đang di chuyển · ${Math.round(order.progress * 100)}%`}</Text>}
+          <Text accessibilityLiveRegion="polite" className={`text-sm ${order.locationState === 'live' ? 'text-teal' : 'text-muted'}`}>
+            {order.locationState === 'live' && order.lastDriverFix ? `Vị trí tài xế cập nhật lúc ${driverFixTime(order.lastDriverFix.received_at)}`
+              : order.locationState === 'unassigned' ? 'Đơn hàng chưa được phân công tài xế.'
+              : order.locationState === 'loading' ? 'Đang lấy vị trí tài xế…'
+              : order.locationState === 'error' ? 'Chưa cập nhật được vị trí tài xế. Ứng dụng sẽ tự thử lại.'
+              : order.locationState === 'stale' ? 'Vị trí tài xế chưa được cập nhật gần đây.'
+              : order.locationState === 'inactive' ? 'Đơn đã kết thúc, ngừng theo dõi vị trí tài xế.'
+              : 'Đang chờ tài xế nhận chuyến và gửi vị trí.'}
+          </Text>
+          {order.lastDriverFix && (order.locationState === 'stale' || order.locationState === 'error') && <Text className="text-xs text-muted">Lần cập nhật gần nhất: {driverFixTime(order.lastDriverFix.received_at)}</Text>}
+          {order.destination && order.origin && <Text className="text-xs text-muted">Đường nối các điểm trên bản đồ mang tính minh họa, không phải tuyến đường giao thông.</Text>}
           <FlowButton title="Nhắn tin về đơn hàng" onPress={() => router.push({ pathname: '/chat', params: { orderId } })} />
           {order.data.status === 'completed' && <FlowButton title="Đánh giá quán và tài xế" onPress={() => router.push({ pathname: '/rating', params: { orderId } })} />}
         </View>
-        <FlowCard><Text className="font-bold text-xl text-ink">{statuses[order.data.status ?? ""] ?? 'Đang cập nhật'}</Text>
+        <FlowCard><Text accessibilityLiveRegion="polite" className="font-bold text-xl text-ink">{order.deliveryProgress?.label ?? 'Đang cập nhật'}</Text>
+          <DeliveryProgressBar step={progressStep} />
+          {order.progressError && <Text className="text-xs text-muted">Chưa tải được các bước giao hàng. Đang hiển thị trạng thái tổng quan và sẽ tự thử lại.</Text>}
           <Text selectable className="font-regular text-xs text-muted">Mã đơn #{order.data.id}</Text>
           <Text className="font-semibold text-base text-ink">{order.data.restaurants?.name ?? 'Quán ăn'}</Text>
           <OrderDriverInfo orderId={orderId} driverId={order.data.driver_id} />

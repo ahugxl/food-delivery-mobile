@@ -1,0 +1,44 @@
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const {PGlite}=require('../backups/sql-check/node_modules/@electric-sql/pglite');
+(async()=>{const db=new PGlite();try {
+  await db.exec(`create role anon;create role authenticated;create schema auth;create schema private;create schema storage;
+    create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('app.user_id',true),'')::uuid$$;
+    create table restaurants(id uuid primary key,is_active boolean);
+    create table profiles(id uuid primary key,full_name text,phone text);
+    create table orders(id uuid primary key,user_id uuid,restaurant_id uuid,status text,delivery_address text);
+    create table foods(id uuid primary key,name text);
+    create table order_items(order_id uuid,food_id uuid,options_snapshot jsonb);
+    create table reviews(id uuid primary key,user_id uuid,order_id uuid,restaurant_rating integer,restaurant_feedback text,restaurant_image_path text,restaurant_submitted_at timestamptz,driver_feedback text);
+    create table storage.objects(bucket_id text,name text);alter table storage.objects enable row level security;
+    grant usage on schema storage to authenticated;grant select on storage.objects to authenticated;`);
+  const sql=fs.readFileSync('supabase/migrations/20261030183405_restaurant_review_feed.sql','utf8');await db.exec(sql);await db.exec(sql);
+  const owner='11111111-1111-4111-8111-111111111111', viewer='22222222-2222-4222-8222-222222222222', shop='33333333-3333-4333-8333-333333333333', other='44444444-4444-4444-8444-444444444444';
+  await db.query('insert into restaurants values($1,true),($2,true)',[shop,other]);
+  await db.query("insert into profiles values($1,'Nguyễn Văn A','private-phone')",[owner]);
+  const photo=[];
+  for(let i=1;i<=6;i++){
+    const oid=`aaaaaaaa-aaaa-4aaa-8aaa-${String(i).padStart(12,'0')}`, rid=`bbbbbbbb-bbbb-4bbb-8bbb-${String(i).padStart(12,'0')}`;
+    const path=owner+'/'+oid+'/photo.jpg';photo.push(path);
+    await db.query("insert into orders values($1,$2,$3,$4,'private-address')",[oid,owner,i===6?other:shop,i===5?'cancelled':'completed']);
+    await db.query("insert into reviews values($1,$2,$3,$4,'Public feedback',$5,$6,'private-driver-feedback')",[rid,owner,oid,i===2?2:5,i===1?path:null,i===4?null:'2026-10-01T12:00:00Z']);
+    await db.query('insert into storage.objects values($1,$2)',['review-photos',path]);
+    await db.query('insert into order_items values($1,null,$2::jsonb)',[oid,JSON.stringify({food_name:'Món đã mua',note:'private-note'})]);
+  }
+  await db.query("select set_config('app.user_id',$1,false)",[viewer]);await db.exec('set role authenticated');
+  const summary=(await db.query('select * from restaurant_review_summary($1)',[shop])).rows[0];
+  assert.equal(Number(summary.review_count),3);assert.equal(Number(summary.average_rating),4);assert.equal(Number(summary.star_5),2);assert.equal(Number(summary.star_2),1);
+  const feed=(await db.query("select * from restaurant_review_feed($1,'lowest')",[shop])).rows;
+  assert.equal(feed.length,3);assert.equal(feed[0].rating,2);assert.equal(feed[0].author_name,'N***');
+  const json=JSON.stringify(feed);for(const secret of ['private-phone','private-address','private-driver-feedback','private-note','Nguyễn Văn A'])assert.ok(!json.includes(secret));
+  assert.deepEqual(feed[0].ordered_foods,['Món đã mua']);
+  assert.equal((await db.query("select * from restaurant_review_feed($1,'newest',null,true)",[shop])).rows.length,1);
+  assert.equal((await db.query("select * from restaurant_review_feed($1,'newest',null,false,true)",[shop])).rows.length,0);
+  assert.equal((await db.query("select * from restaurant_review_feed($1,'newest',5,false,false,1,1)",[shop])).rows.length,1);
+  await assert.rejects(db.query('select * from orders'),/permission denied/);await assert.rejects(db.query('select * from profiles'),/permission denied/);await assert.rejects(db.query('select * from reviews'),/permission denied/);
+  const accessible=(await db.query('select name from storage.objects')).rows;assert.deepEqual(accessible.map(r=>r.name),[photo[0]]);
+  await assert.rejects(db.query("select * from restaurant_review_feed($1,'bad')",[shop]),/không hợp lệ/);
+  await db.exec('reset role');await db.query("select set_config('app.user_id',$1,false)",[owner]);await db.exec('set role authenticated');
+  assert.equal((await db.query("select * from restaurant_review_feed($1,'newest',null,false,true)",[shop])).rows[0].author_name,'Bạn');
+  await db.exec('reset role;set role anon');await assert.rejects(db.query('select * from restaurant_review_summary($1)',[shop]),/permission denied/);
+  console.log('Restaurant review SQL passed: stats, filters, pagination, masked authors, no private fields/direct grants, published photos only, anonymous denial, rerun.');
+}finally{await db.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

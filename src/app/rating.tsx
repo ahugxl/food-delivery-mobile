@@ -94,6 +94,7 @@ function OrderReview({ orderId }: { orderId: string }) {
       void client.invalidateQueries({ queryKey: ['orders', userId] });
       if (stage === 'driver') { setStage('restaurant'); }
       else {
+        void client.invalidateQueries({ queryKey: ['restaurant-reviews'] });
         void client.invalidateQueries({ queryKey: ['profile', userId] });
         void client.invalidateQueries({ queryKey: ['food-review-stats'] });
         void client.invalidateQueries({ queryKey: ['review-food-votes', userId] });

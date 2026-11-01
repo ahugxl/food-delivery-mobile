@@ -24,6 +24,8 @@ import { useCartStore } from '../../store/cartStore';
 import { currency } from '../../features/order/checkout';
 import { viLabel } from '../../utils/vietnamese';
 import { foodDiscountPercent } from '../../features/catalog/foodPricing';
+import { useOrderStore } from '../../store/orderStore';
+import { deliveryOrderError } from '../../features/location/deliveryRange';
 
 
 
@@ -45,6 +47,7 @@ function FoodDetailContent({ id }: { id: string }) {
   });
   const insets = useSafeAreaInsets();
   const addToCart = useCartStore((state) => state.addToCart);
+  const address = useOrderStore(state => state.deliveryAddress);
   const [selection, setSelection] = useState<Selection>({});
   const [quantity, setQuantity] = useState(1);
   const [note, setNote] = useState('');
@@ -58,12 +61,18 @@ function FoodDetailContent({ id }: { id: string }) {
   const groups = food?.food_option_groups ?? [];
   const options = selectedOptions(groups, selection);
   const missing = missingRequiredGroups(groups, selection);
-  const available = !!food?.is_available && !!food?.restaurants.is_open;
+  const rangeError = food ? deliveryOrderError(food.restaurants, address) : null;
+  const available = !!food?.is_available && !!food?.restaurants.is_open && !rangeError;
   const unitPrice = food ? optionUnitPrice(food, options) : 0;
   const orderTotal = Math.round(unitPrice * quantity * 100) / 100;
   const discountPercent = food ? foodDiscountPercent(food) : null;
 
   const handleAddToCart = () => {
+    const currentRangeError = food && deliveryOrderError(food.restaurants, useOrderStore.getState().deliveryAddress);
+    if (currentRangeError) {
+      Toast.show({ type: 'error', text1: 'Không thể thêm món', text2: currentRangeError });
+      return;
+    }
     if (!food || !available || addedToCart.current) return;
     if (missing.length > 0) {
       setAttemptedAdd(true);
@@ -227,6 +236,7 @@ function FoodDetailContent({ id }: { id: string }) {
         </View>
       </ScrollView>
 
+      {!!rangeError && <View className="gap-1 bg-red-50 px-5 py-3"><Text accessibilityRole="alert" className="text-sm text-coral">{rangeError}</Text><Pressable accessibilityRole="button" onPress={() => router.push('/select-location')}><Text className="font-semibold text-sm text-teal">Thay đổi địa chỉ</Text></Pressable></View>}
       <View
         style={[
           styles.bottomBar,
@@ -278,7 +288,7 @@ function FoodDetailContent({ id }: { id: string }) {
           <Text
             style={[styles.addButtonText, { color: colors.primaryForeground }]}
           >
-            Thêm vào giỏ · {currency(orderTotal)}
+            {rangeError ? 'Chọn địa chỉ giao phù hợp' : `Thêm vào giỏ · ${currency(orderTotal)}`}
           </Text>
           <Ionicons
             name="arrow-forward"

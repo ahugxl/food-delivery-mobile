@@ -14,6 +14,7 @@ const itemSchema = z.object({
   options: z.array(optionSchema).max(100), note: z.string().max(500),
 });
 const voucherSchema = z.object({
+  reward_owner_id: z.string().nullable().default(null),
   applies_to: z.enum(['food', 'shipping']).default('food'),
   id: z.string(), restaurant_id: z.string().nullable(), code: z.string(), discount_type: z.string(),
   discount_value: z.number().finite(), min_order_value: z.number().finite().nullable(),

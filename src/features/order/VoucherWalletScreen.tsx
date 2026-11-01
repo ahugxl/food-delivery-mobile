@@ -14,9 +14,15 @@ import { useAuthStore } from '../../store/authStore';
 import { cartSubtotal, purchaseSignature, voucherError, voucherTarget, type VoucherTarget } from './purchase';
 import { currency } from './checkout';
 import { userMessage } from '../../utils/userMessage';
+import VoucherWalletOverview from './VoucherWalletOverview';
 
 const groups = [{ target: 'food', title: 'Voucher giảm tiền món' }, { target: 'shipping', title: 'Voucher giảm phí giao hàng' }] as const;
 export default function VoucherWalletScreen({ checkout = false }: { checkout?: boolean }) {
+  return checkout ? <CheckoutVoucherWallet /> : <VoucherWalletOverview />;
+}
+
+function CheckoutVoucherWallet() {
+  const checkout = true;
   const items = useCartStore(state => state.items);
   const locked = useCartStore(state => state.isCheckingOut);
   const food = useOrderStore(state => state.checkoutVoucher);

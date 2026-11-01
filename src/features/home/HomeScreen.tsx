@@ -1,4 +1,5 @@
 import { ActivityIndicator, ScrollView, Text, View, RefreshControl } from 'react-native';
+import { useMemo } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -17,11 +18,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { RestaurantHighlights } from './RestaurantHighlights';
 import { useLocationStore } from '../../store/locationStore';
 import { DeliveryAddressReminder } from '../../components/DeliveryAddressReminder';
+import { nearestRestaurants } from './nearbyRestaurants';
 export default function HomeScreen() {
     const restaurants = useQuery({ queryKey: catalogKeys.restaurants, queryFn: ({ signal }) => catalogApi.restaurants(signal) });
     const banners = useQuery({ queryKey: catalogKeys.banners, queryFn: ({ signal }) => catalogApi.banners(signal) });
     const discovery = useDiscoveryCategories();
-    const address = useOrderStore(state => state.deliveryAddress.street);
+    const deliveryAddress = useOrderStore(state => state.deliveryAddress);
+    const address = deliveryAddress.street;
+    const nearbyRestaurants = useMemo(() => nearestRestaurants(restaurants.data ?? [], deliveryAddress), [restaurants.data, deliveryAddress.latitude, deliveryAddress.longitude]);
     const items = useCartStore(state => state.items);
     const count = items.reduce((sum, item) => sum + item.quantity, 0);
     const locationStatus = useLocationStore(state => state.status);
@@ -55,7 +59,7 @@ export default function HomeScreen() {
         <View style={{ backgroundColor: 'white', borderRadius: 18, paddingVertical: 8, marginBottom: 12, overflow: 'hidden' }}><FoodCollectionStrip refreshKey={restaurants.dataUpdatedAt} onSelect={id => router.push({ pathname: '/search', params: { collection: id } })} /></View>
         <RestaurantHighlights restaurants={restaurants.data ?? []} loading={restaurants.isPending} error={restaurants.isError} onRetry={() => { void restaurants.refetch(); }}/>
         <View className="flex-row items-center justify-between"><Text className="font-bold text-xl text-ink">Quán ngon dành cho bạn</Text><AppPressable accessibilityRole="button" accessibilityLabel="Xem tất cả quán" onPress={() => router.push('/search')} className="h-11 w-11 items-center justify-center rounded-full bg-tealLight"><Ionicons name="arrow-forward" size={22} color="#008B45"/></AppPressable></View>
-        {restaurants.isPending ? <View className="mt-5 gap-4"><Skeleton height={140}/><Skeleton height={140}/></View> : restaurants.isError ? <Message text="Không tải được danh sách quán." retry={() => { void restaurants.refetch(); }}/> : restaurants.data?.length ? restaurants.data.map(restaurant => <RestaurantRow key={restaurant.id} restaurant={restaurant} onPress={() => router.push({ pathname: '/restaurant/[id]', params: { id: restaurant.id } })}/>) : <Message text="Chưa có quán hoạt động."/>}
+        {restaurants.isPending ? <View className="mt-5 gap-4"><Skeleton height={140}/><Skeleton height={140}/></View> : restaurants.isError ? <Message text="Không tải được danh sách quán." retry={() => { void restaurants.refetch(); }}/> : restaurants.data?.length ? nearbyRestaurants.map(restaurant => <RestaurantRow key={restaurant.id} restaurant={restaurant} onPress={() => router.push({ pathname: '/restaurant/[id]', params: { id: restaurant.id } })}/>) : <Message text="Chưa có quán hoạt động."/>}
       </View>
     </ScrollView>{count > 0 && <AppPressable accessibilityRole="button" accessibilityLabel={`Mở giỏ hàng, ${count} món`} onPress={() => router.push('/cart')} className="absolute bottom-5 right-5 flex-row items-center gap-2 rounded-full bg-teal px-5 py-4" style={{ elevation: 5, shadowColor: '#008B45', shadowOpacity: .18, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } }}><Ionicons name="cart-outline" size={22} color="white"/><Text className="font-semibold text-sm text-white">Giỏ hàng{count ? ` · ${count}` : ''}</Text></AppPressable>}
   </SafeAreaView>;

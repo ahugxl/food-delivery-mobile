@@ -80,19 +80,20 @@ export default function MainTabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="inbox"
+        name="offers"
         options={{
           title: 'SubiFood',
-          tabBarLabel: 'Tin nhắn',
+          tabBarLabel: 'Ưu đãi',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
+              name={focused ? 'pricetags' : 'pricetags-outline'}
               size={21}
               color={color}
             />
           ),
         }}
       />
+      <Tabs.Screen name="inbox" options={{ href: null }} />
       <Tabs.Screen
         name="account"
         options={{

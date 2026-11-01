@@ -3,6 +3,7 @@ import type { DeliveryAddress } from '../features/order/checkout';
 import { validCoordinates } from '../features/location/coordinates';
 import { catalogApi, catalogKeys } from '../services/catalog';
 import { haversineDistance, calculateShippingFee } from '../utils/distance';
+import { MAX_DELIVERY_DISTANCE_KM, OUTSIDE_DELIVERY_RANGE } from '../features/location/deliveryRange';
 
 export function useShippingQuote(restaurantId: string | undefined, address: DeliveryAddress) {
   const restaurant = useQuery({
@@ -22,6 +23,8 @@ export function useShippingQuote(restaurantId: string | undefined, address: Deli
     else if (!validCoordinates(address)) error = 'Vui lòng chọn điểm giao để tính phí giao hàng.';
     else distanceKm = haversineDistance(restaurant.data, address);
   }
-  return { distanceKm, deliveryFee: distanceKm === null ? null : calculateShippingFee(distanceKm), error,
+  const outsideRange = distanceKm !== null && distanceKm > MAX_DELIVERY_DISTANCE_KM;
+  if (outsideRange) error = OUTSIDE_DELIVERY_RANGE;
+  return { distanceKm, outsideRange, deliveryFee: distanceKm === null || outsideRange ? null : calculateShippingFee(distanceKm), error,
     isFetching: restaurant.isFetching, refetch: restaurant.refetch };
 }

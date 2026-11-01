@@ -34,6 +34,8 @@ test('pending request/context survives but the in-flight lock never survives res
   assert.equal(reopened.getState().checkoutRequest.context.address.recipientPhone, '0901234567');
   assert.equal(reopened.getState().checkoutRequest.context.voucher.applies_to, 'food');
   assert.equal(reopened.getState().checkoutRequest.context.shippingVoucher.applies_to, 'shipping');
+  assert.equal(reopened.getState().checkoutRequest.context.voucher.reward_owner_id, null);
+  assert.equal(reopened.getState().checkoutRequest.context.shippingVoucher.reward_owner_id, null);
 });
 test('account switch and explicit logout remove the previous owner cart', async () => {
   const disk = memory(); const first = createPersistedCartStore(disk);

@@ -12,14 +12,15 @@ import { AppPressable } from '../components/AppPressable';
 import { useChatRealtime } from '../hooks/useChatRealtime';
 import { useAuthStore } from '../store/authStore';
 import { chatApi } from '../services/chat';
-import { purchaseApi } from '../services/purchase';
+import { useCustomerChatWindow } from '../hooks/useCustomerChatWindow';
+import { canSendCustomerMessage, customerChatClosedReason } from '../features/chat/chatWindow';
 import { messageError, messageTimeLabel, type Message } from '../features/chat/messages';
 import { imageFromBase64 } from '../features/chat/imageData';
 import { OrderDriverInfo } from '../components/OrderDriverInfo';
 
 export default function ChatScreen() {
   const { orderId } = useLocalSearchParams<{ orderId?: string }>();
-  return orderId ? <OrderChat key={orderId} orderId={orderId} /> : <SafeAreaView className="flex-1 bg-cream"><FlowHeader title="Tin nhắn" /><View className="p-5"><FlowButton title="Chọn cuộc trò chuyện" onPress={() => router.replace('/inbox')} /></View></SafeAreaView>;
+  return orderId ? <OrderChat key={orderId} orderId={orderId} /> : <SafeAreaView className="flex-1 bg-cream"><FlowHeader title="Tin nhắn" /><View className="p-5"><FlowButton title="Chọn đơn hàng" onPress={() => router.replace('/(tabs)/orders')} /></View></SafeAreaView>;
 }
 function ChatImage({ path }: { path: string }) {
   const userId = useAuthStore(state => state.user?.id);
@@ -30,7 +31,7 @@ function ChatImage({ path }: { path: string }) {
 function OrderChat({ orderId }: { orderId: string }) {
   const userId = useAuthStore(state => state.user?.id);
   const chat = useChatRealtime(orderId);
-  const order = useQuery({ queryKey: ['order', userId, orderId], queryFn: ({ signal }) => purchaseApi.order(orderId, userId!, signal), enabled: !!userId });
+  const { order, canSend, closedReason } = useCustomerChatWindow(orderId, userId);
   const [draft, setDraft] = useState('');
   const [attachment, setAttachment] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -40,6 +41,7 @@ function OrderChat({ orderId }: { orderId: string }) {
   const sending = useRef(false);
   const mutation = useMutation({ mutationFn: chatApi.send, retry: false });
   const send = async () => {
+    if (!canSend || !canSendCustomerMessage(order.data)) { setError(customerChatClosedReason(order.data)); return; }
     if (!userId || !order.data || sending.current || uploading || (!draft.trim() && !attachment)) return;
     sending.current = true; setError('');
     const signature = JSON.stringify([draft.trim(), attachment]);
@@ -47,10 +49,11 @@ function OrderChat({ orderId }: { orderId: string }) {
     try {
       const message = await mutation.mutateAsync({ id: request.current.id, orderId, senderId: userId, content: draft, imagePath: attachment });
       chat.acceptSent(message); setDraft(''); setAttachment(null); request.current = null;
-    } catch (reason) { setError(messageError(reason)); }
+    } catch (reason) { setError(messageError(reason)); void order.refetch(); }
     finally { sending.current = false; }
   };
   const pickImage = async (camera: boolean) => {
+    if (!canSend || !canSendCustomerMessage(order.data)) return;
     if (!userId || uploading || mutation.isPending || !order.data) return;
     setError(''); setUploading(true);
     try {
@@ -62,6 +65,7 @@ function OrderChat({ orderId }: { orderId: string }) {
       if (!asset.base64 || (asset.fileSize && asset.fileSize > 5 * 1024 * 1024)) throw new Error('Ảnh không hợp lệ hoặc vượt quá 5 MB.');
       const image = imageFromBase64(asset.base64);
       const path = `${orderId}/${userId}/${randomUUID()}.${image.extension}`;
+      if (!canSendCustomerMessage(order.data)) throw new Error(customerChatClosedReason(order.data));
       await chatApi.upload(path, image.buffer, image.mime);
       setAttachment(path);
     } catch (reason) { setError(messageError(reason)); }
@@ -88,14 +92,15 @@ function OrderChat({ orderId }: { orderId: string }) {
             <Text className="text-xs text-muted">{messageTimeLabel(item.created_at)}</Text>
           </View>
         </View>} />
-      <View className="gap-3 border-t border-line bg-card p-4">
+      {!canSend ? <View className="border-t border-line bg-card p-4"><Text accessibilityRole="alert" className="text-sm text-muted">{closedReason}</Text></View> : <View className="gap-3 border-t border-line bg-card p-4">
+        {order.data?.status === 'completed' && <Text className="text-xs text-muted">Bạn có thể tiếp tục nhắn tin trong vòng 5 phút sau khi đơn hoàn thành.</Text>}
         {!!error && <Text accessibilityRole="alert" className="text-sm text-coral">{error}</Text>}
         {attachment && <View className="gap-2"><ChatImage path={attachment} /><FlowButton title="Bỏ ảnh đính kèm" disabled={mutation.isPending} onPress={() => { if (!request.current) void chatApi.removeUpload(attachment).catch(() => {}); setAttachment(null); }} /></View>}
         <View className="flex-row gap-3"><View className="flex-1"><FlowButton title={uploading ? 'Đang tải...' : 'Chọn ảnh'} disabled={uploading || mutation.isPending || !!attachment || !order.data} onPress={() => { void pickImage(false); }} /></View>
           <View className="flex-1"><FlowButton title="Chụp ảnh" disabled={uploading || mutation.isPending || !!attachment || !order.data} onPress={() => { void pickImage(true); }} /></View></View>
         <TextInput accessibilityLabel="Nội dung tin nhắn" placeholder="Nhắn tin về đơn hàng..." value={draft} onChangeText={setDraft} maxLength={2000} editable={!mutation.isPending} multiline className="min-h-12 rounded-2xl border border-line px-4 py-3 text-base text-ink" />
         <FlowButton title={mutation.isPending ? 'Đang gửi...' : 'Gửi tin nhắn'} disabled={mutation.isPending || uploading || !order.data || (!draft.trim() && !attachment)} onPress={() => { void send(); }} />
-      </View>
+      </View>}
     </KeyboardAvoidingView>
   </SafeAreaView>;
 }

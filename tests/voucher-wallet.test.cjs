@@ -37,6 +37,16 @@ test('collection uses authenticated RPC without a caller-controlled owner or use
   await assert.rejects(f.api.collect('other', voucher.id), /đăng nhập đã thay đổi/);
   assert.equal(f.requests.length, 1);
 });
+
+test('voucher history only reads this customer used wallet entries and propagates errors', async () => {
+  const f = fixture(() => ({ body: [{ voucher }, { voucher: null }] }));
+  assert.deepEqual(await f.api.usedWallet('user'), [voucher]);
+  const params = f.requests[0].url.searchParams;
+  assert.equal(params.get('user_id'), 'eq.user');
+  assert.equal(params.get('is_used'), 'eq.true');
+  const failed = fixture(() => ({ status: 403, body: { message: 'Denied' } }));
+  await assert.rejects(failed.api.usedWallet('user'), error => error.message === 'Denied');
+});
 test('manual code validates before collection and normalizes exact code', async () => {
   const f = fixture(r => ({ body: r.url.pathname.endsWith('/vouchers') ? [voucher] : voucher }));
   assert.equal((await f.api.collectForOrder('user', ' save ', [item])).id, voucher.id);

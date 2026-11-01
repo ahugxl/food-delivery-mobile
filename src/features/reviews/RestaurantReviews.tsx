@@ -13,6 +13,7 @@ import { isUuid } from '../../services/catalogApi';
 import { restaurantReviewsApi } from '../../services/restaurantReviews';
 import { REVIEW_PAGE_SIZE, type RestaurantReview, type ReviewFilters } from '../../services/restaurantReviewsApi';
 import { useAuthStore } from '../../store/authStore';
+import { useRestaurantReviewSummary } from '../../hooks/useRestaurantReviewSummary';
 
 function Stars({ rating, size = 16 }: { rating: number; size?: number }) {
   return <View accessible accessibilityLabel={`${rating} trên 5 sao`} style={{ flexDirection: 'row', gap: 2 }}>{[1,2,3,4,5].map(star => <Ionicons key={star} name={rating >= star ? 'star' : rating >= star - 0.5 ? 'star-half' : 'star'} color={rating >= star - 0.5 ? '#FFBD18' : '#E3E5E3'} size={size} />)}</View>;
@@ -41,7 +42,7 @@ export default function RestaurantReviews({ restaurantId }: { restaurantId: stri
   const valid = isUuid(restaurantId);
   const restaurant = useQuery({ queryKey: catalogKeys.restaurant(restaurantId), queryFn: ({ signal }) => catalogApi.restaurant(restaurantId, signal), enabled: valid });
   const enabled = valid && !!userId && !!restaurant.data;
-  const summary = useQuery({ queryKey: ['restaurant-reviews', restaurantId, userId, 'summary'], queryFn: ({ signal }) => restaurantReviewsApi.summary(restaurantId, signal), enabled });
+  const summary = useRestaurantReviewSummary(restaurantId, enabled);
   const feed = useInfiniteQuery({ queryKey: ['restaurant-reviews', restaurantId, userId, 'feed', filters], initialPageParam: 0,
     queryFn: ({ pageParam, signal }) => restaurantReviewsApi.feed(restaurantId, filters, pageParam, signal), enabled,
     getNextPageParam: (last, pages) => last.length === REVIEW_PAGE_SIZE && pages.length * REVIEW_PAGE_SIZE <= 100000 ? pages.length * REVIEW_PAGE_SIZE : undefined,

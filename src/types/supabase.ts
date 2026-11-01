@@ -10,6 +10,7 @@ export type SupabaseDatabase = {
     Enums: Database['public']['Enums'];
     CompositeTypes: Database['public']['CompositeTypes'];
     Functions: {
+      redeem_loyalty_voucher: Database['public']['Functions']['redeem_loyalty_voucher'];
       restaurant_review_summary: Database['public']['Functions']['restaurant_review_summary'];
       restaurant_review_feed: Database['public']['Functions']['restaurant_review_feed'];
       order_delivery_progress: Database['public']['Functions']['order_delivery_progress'];
@@ -37,6 +38,6 @@ export type SupabaseDatabase = {
 
 export type Row<Name extends keyof Tables> = Tables[Name]['Row'];
 export type FoodDetail = Row<'foods'> & {
-  restaurants: Pick<Row<'restaurants'>, 'id' | 'name' | 'rating' | 'is_active' | 'is_open'>;
+  restaurants: Pick<Row<'restaurants'>, 'id' | 'name' | 'rating' | 'is_active' | 'is_open' | 'latitude' | 'longitude'>;
   food_option_groups: (Row<'food_option_groups'> & { food_option_items: Row<'food_option_items'>[] })[];
 };

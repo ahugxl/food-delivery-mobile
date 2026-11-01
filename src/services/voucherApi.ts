@@ -11,6 +11,7 @@ export const voucherKeys = {
   campaign: ['vouchers', 'campaign'] as const,
   owned: (userId?: string) => ['vouchers', 'owned', userId] as const,
   wallet: (userId?: string) => ['vouchers', 'wallet', userId] as const,
+  usedWallet: (userId?: string) => ['vouchers', 'used-wallet', userId] as const,
 };
 
 export function collectionError(voucher: Voucher, now = Date.now()): string | null {
@@ -36,7 +37,7 @@ export function createVoucherApi(client: SupabaseClient<SupabaseDatabase> | null
   }
   return {
     async campaign(signal?: AbortSignal): Promise<Voucher[]> {
-      const query = db().from('vouchers').select('*').order('code');
+      const query = db().from('vouchers').select('*').is('reward_owner_id', null).order('code');
       const { data, error } = await (signal ? query.abortSignal(signal) : query);
       if (error) throw error;
       return data ?? [];
@@ -50,6 +51,13 @@ export function createVoucherApi(client: SupabaseClient<SupabaseDatabase> | null
     async wallet(userId: string, signal?: AbortSignal): Promise<Voucher[]> {
       // Explicit FK column avoids relying on a generated constraint name.
       const query = db().from('user_vouchers').select('voucher:vouchers!voucher_id(*)').eq('user_id', userId).eq('is_used', false);
+      const { data, error } = await (signal ? query.abortSignal(signal) : query);
+      if (error) throw error;
+      return (data ?? []).flatMap(entry => entry.voucher ? [entry.voucher] : []);
+    },
+    async usedWallet(userId: string, signal?: AbortSignal): Promise<Voucher[]> {
+      const query = db().from('user_vouchers').select('voucher:vouchers!voucher_id(*)')
+        .eq('user_id', userId).eq('is_used', true).order('collected_at', { ascending: false });
       const { data, error } = await (signal ? query.abortSignal(signal) : query);
       if (error) throw error;
       return (data ?? []).flatMap(entry => entry.voucher ? [entry.voucher] : []);

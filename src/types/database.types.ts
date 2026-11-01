@@ -722,6 +722,7 @@ export interface Database {
 
       vouchers: {
         Row: {
+          reward_owner_id: string | null;
           applies_to: 'food' | 'shipping';
           id: string;
           restaurant_id: string | null;
@@ -733,6 +734,7 @@ export interface Database {
           is_active: boolean | null;
         };
         Insert: {
+          reward_owner_id?: string | null;
           applies_to?: 'food' | 'shipping';
           id?: string;
           restaurant_id?: string | null;
@@ -744,6 +746,7 @@ export interface Database {
           is_active?: boolean | null;
         };
         Update: {
+          reward_owner_id?: string | null;
           applies_to?: 'food' | 'shipping';
           id?: string;
           restaurant_id?: string | null;
@@ -766,6 +769,12 @@ export interface Database {
         ];
       };
     
+      loyalty_redemptions: {
+        Row: { id: string; user_id: string; voucher_id: string; points_spent: number; discount_amount: number; created_at: string };
+        Insert: { id: string; user_id: string; voucher_id: string; points_spent: number; discount_amount: number; created_at?: string };
+        Update: { id?: string; user_id?: string; voucher_id?: string; points_spent?: number; discount_amount?: number; created_at?: string };
+        Relationships: [{ foreignKeyName: 'loyalty_redemptions_voucher_id_fkey'; columns: ['voucher_id']; isOneToOne: true; referencedRelation: 'vouchers'; referencedColumns: ['id'] }];
+      };
       driver_settings: {
         Row: {
           id: boolean
@@ -1054,6 +1063,10 @@ export interface Database {
       [_ in never]: never
     };
     Functions: {
+      redeem_loyalty_voucher: {
+        Args: { p_request_id: string; p_discount_amount: number; p_expected_user_id: string };
+        Returns: { redemption_id: string; voucher_id: string; points_spent: number; discount_amount: number; balance: number; code: string; expiry_date: string }[];
+      };
       restaurant_review_summary: {
         Args: { p_restaurant_id: string };
         Returns: { average_rating: number | null; review_count: number; star_5: number; star_4: number; star_3: number; star_2: number; star_1: number }[];

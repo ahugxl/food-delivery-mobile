@@ -1,4 +1,4 @@
-﻿import { AppPressable as Pressable } from '@/src/components/AppPressable';
+import { AppPressable as Pressable } from '@/src/components/AppPressable';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useRef } from 'react';
@@ -53,6 +53,7 @@ export default function CheckoutScreen() {
       useOrderStore.getState().setCheckoutVouchers(null, null);
       void client.invalidateQueries({ queryKey: ['orders', userId] });
       void client.invalidateQueries({ queryKey: voucherKeys.wallet(userId) });
+      void client.invalidateQueries({ queryKey: voucherKeys.usedWallet(userId) });
       void client.invalidateQueries({ queryKey: voucherKeys.owned(userId) });
       Toast.show({ type: 'success', text1: 'Đặt hàng thành công!', text2: 'Đơn hàng đang chờ quán xác nhận.' });
       router.replace({ pathname: '/tracking', params: { orderId: order.id } });
@@ -97,7 +98,7 @@ export default function CheckoutScreen() {
         <Text className="font-bold text-base text-ink">Chi tiết thanh toán</Text>
         {shipping.distanceKm !== null && <Text className="font-medium text-sm text-teal">Khoảng cách: {shipping.distanceKm.toFixed(1)} km (đường chim bay)</Text>}
         {!!shipping.error && <Text accessibilityLiveRegion="polite" className="text-sm text-muted">{shipping.error}</Text>}
-        {!shippingReady && items.length > 0 && <FlowButton title="Tính lại phí giao hàng" disabled={shipping.isFetching || locked} onPress={() => { void shipping.refetch(); }} />}
+        {!shippingReady && !shipping.outsideRange && items.length > 0 && <FlowButton title="Tính lại phí giao hàng" disabled={shipping.isFetching || locked} onPress={() => { void shipping.refetch(); }} />}
         {([['Tạm tính', totals.subtotal], ['Phí giao hàng', totals.deliveryFee], ['Giảm tiền món', -totals.foodDiscount], ['Giảm phí giao hàng', -totals.shippingDiscount], ['Tổng cộng', totals.total]] as const).map(([label, amount]) => <View key={label} className="flex-row justify-between">
           <Text className="font-medium text-sm text-muted">{label}</Text><Text className="font-semibold text-base text-ink">{!shippingReady && (label === 'Phí giao hàng' || label === 'Tổng cộng') ? 'Chưa xác định' : amount < 0 ? `-${currency(-amount)}` : currency(amount)}</Text>
         </View>)}
@@ -106,7 +107,7 @@ export default function CheckoutScreen() {
       <Text className="mb-3 font-regular text-xs text-muted">Thanh toán khi nhận hàng. Giá và mã ưu đãi được kiểm tra lại khi đặt đơn.</Text>
       {mutation.isError && <Text accessibilityRole="alert" className="mb-4 font-medium text-sm text-coral">{errorMessage(mutation.error)} Giỏ hàng vẫn được giữ. Thử lại để kiểm tra cùng yêu cầu đặt đơn.</Text>}
     </ScrollView>
-    <View className="border-t border-line bg-card p-5"><FlowButton title={locked ? 'Đang đặt hàng…' : !shippingReady ? 'Chọn điểm giao để tính phí' : 'Đặt hàng'} trailing={!locked && shippingReady ? currency(totals.total) : undefined} onPress={() => { void placeOrder(); }} disabled={!canOrder} /></View>
+    <View className="border-t border-line bg-card p-5"><FlowButton title={locked ? 'Đang đặt hàng…' : shipping.outsideRange ? 'Ngoài phạm vi giao hàng' : !shippingReady ? 'Chọn điểm giao để tính phí' : 'Đặt hàng'} trailing={!locked && shippingReady ? currency(totals.total) : undefined} onPress={() => { void placeOrder(); }} disabled={!canOrder} /></View>
   </SafeAreaView>;
 }
 

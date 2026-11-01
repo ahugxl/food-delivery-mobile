@@ -3,7 +3,7 @@ import type { FoodDetail, SupabaseDatabase } from '../types/supabase';
 
 export const FOOD_DETAIL_SELECT = `
   *,
-  restaurants!inner(id, name, rating, is_active, is_open),
+  restaurants!inner(id, name, rating, is_active, is_open, latitude, longitude),
   food_option_groups(*, food_option_items(*))
 ` as const;
 

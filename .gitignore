@@ -42,3 +42,6 @@ yarn-error.*
 .env
 backups/
 artifacts/
+.tools/
+ai-service/target/
+ai-service/.env.properties

@@ -5,7 +5,7 @@ import { restaurantReviewsApi } from '../services/restaurantReviews';
 import { isUuid } from '../services/catalogApi';
 import { useAuthStore } from '../store/authStore';
 
-// Menu and reviews must share the same published-review aggregate, never the imported rating.
+// Counts and histogram follow the same eligible reviews as restaurants.rating.
 export function useRestaurantReviewSummary(restaurantId: string, enabled = true) {
   const userId = useAuthStore(state => state.user?.id);
   const canFetch = enabled && isUuid(restaurantId) && !!userId;

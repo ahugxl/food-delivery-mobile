@@ -10,7 +10,7 @@ export function restaurantInfoLabels(value: Row<'restaurants'>['promo_tags']): s
 
 export function toRestaurantCard(row: Row<'restaurants'>): Restaurant {
   return {
-    id: row.id, name: row.name, rating: Number(row.rating ?? 0),
+    id: row.id, name: row.name, rating: row.rating == null ? null : Number(row.rating),
     image: row.image_url ?? '',
     deliveryTime: viHours(row.opening_hours),
     openingHours: viHours(row.opening_hours),

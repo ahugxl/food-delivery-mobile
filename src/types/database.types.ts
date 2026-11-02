@@ -229,6 +229,7 @@ export interface Database {
           price: number;
           original_price: number | null;
           image_url: string | null;
+          is_addon: boolean;
           is_available: boolean | null;
           created_at: string | null;
         };
@@ -241,6 +242,7 @@ export interface Database {
           price: number;
           original_price?: number | null;
           image_url?: string | null;
+          is_addon?: boolean;
           is_available?: boolean | null;
           created_at?: string | null;
         };
@@ -253,6 +255,7 @@ export interface Database {
           price?: number;
           original_price?: number | null;
           image_url?: string | null;
+          is_addon?: boolean;
           is_available?: boolean | null;
           created_at?: string | null;
         };
@@ -528,6 +531,9 @@ export interface Database {
           address: string;
           latitude: number | null;
           longitude: number | null;
+          imported_rating: number | null;
+          review_count: number;
+          comment_count: number;
           rating: number | null;
           image_url: string | null;
           is_active: boolean | null;
@@ -543,6 +549,9 @@ export interface Database {
           address: string;
           latitude?: number | null;
           longitude?: number | null;
+          imported_rating?: number | null;
+          review_count?: number;
+          comment_count?: number;
           rating?: number | null;
           image_url?: string | null;
           is_active?: boolean | null;
@@ -558,6 +567,9 @@ export interface Database {
           address?: string;
           latitude?: number | null;
           longitude?: number | null;
+          imported_rating?: number | null;
+          review_count?: number;
+          comment_count?: number;
           rating?: number | null;
           image_url?: string | null;
           is_active?: boolean | null;
@@ -1063,6 +1075,34 @@ export interface Database {
       [_ in never]: never
     };
     Functions: {
+      ai_match_foods_v2: {
+        Args: { p_embedding: string; p_model_key: string; p_latitude: number; p_longitude: number; p_max_price?: number | null; p_sweetness?: string | null; p_groups?: string[]; p_excluded_groups?: string[]; p_min_similarity?: number; p_limit?: number };
+        Returns: (Database['public']['Functions']['ai_match_foods']['Returns'][number] & { similarity: number })[];
+      };
+      ai_recheck_foods_v2: {
+        Args: { p_food_ids: string[]; p_embedding: string; p_model_key: string; p_latitude: number; p_longitude: number; p_max_price?: number | null; p_sweetness?: string | null; p_groups?: string[]; p_excluded_groups?: string[]; p_min_similarity?: number };
+        Returns: Database['public']['Functions']['ai_match_foods_v2']['Returns'];
+      };
+      ai_food_index_batch: {
+        Args: { p_model_key: string; p_limit?: number };
+        Returns: { food_id: string; document: string; content_hash: string }[];
+      };
+      ai_store_food_embedding: {
+        Args: { p_food_id: string; p_content_hash: string; p_model_key: string; p_embedding: string };
+        Returns: boolean;
+      };
+      ai_food_search_status: {
+        Args: { p_model_key: string };
+        Returns: Json;
+      };
+      ai_match_foods: {
+        Args: { p_embedding: string; p_model_key: string; p_latitude: number; p_longitude: number; p_max_price?: number | null; p_sweetness?: string | null; p_limit?: number };
+        Returns: { food_id: string; restaurant_id: string; name: string; description: string | null; price: number; original_price: number | null; image_url: string | null; restaurant_name: string; distance_km: number; option_hint: string | null }[];
+      };
+      ai_recheck_foods: {
+        Args: { p_food_ids: string[]; p_model_key: string; p_latitude: number; p_longitude: number; p_max_price?: number | null; p_sweetness?: string | null };
+        Returns: Database['public']['Functions']['ai_match_foods']['Returns'];
+      };
       redeem_loyalty_voucher: {
         Args: { p_request_id: string; p_discount_amount: number; p_expected_user_id: string };
         Returns: { redemption_id: string; voucher_id: string; points_spent: number; discount_amount: number; balance: number; code: string; expiry_date: string }[];

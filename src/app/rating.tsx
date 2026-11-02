@@ -95,6 +95,8 @@ function OrderReview({ orderId }: { orderId: string }) {
       if (stage === 'driver') { setStage('restaurant'); }
       else {
         void client.invalidateQueries({ queryKey: ['restaurant-reviews'] });
+        void client.invalidateQueries({ queryKey: ['catalog'] });
+        void client.invalidateQueries({ queryKey: ['favorites'] });
         void client.invalidateQueries({ queryKey: ['profile', userId] });
         void client.invalidateQueries({ queryKey: ['food-review-stats'] });
         void client.invalidateQueries({ queryKey: ['review-food-votes', userId] });
@@ -110,7 +112,7 @@ function OrderReview({ orderId }: { orderId: string }) {
     <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, minHeight: 64, gap: 8, borderBottomWidth: 1, borderBottomColor: '#F2F2F2' }}>
       <AppPressable accessibilityRole="button" accessibilityLabel={stage === 'driver' ? 'Bỏ qua đánh giá tài xế' : 'Đóng đánh giá'} disabled={busy} onPress={close} style={{ width: 44, height: 48, alignItems: 'center', justifyContent: 'center' }}><Ionicons name="close" size={30} color="#008B45" /></AppPressable>
       <Text className="font-semibold text-lg text-ink" style={{ flex: 1 }}>{stage === 'driver' ? 'Đánh giá tài xế' : 'Đánh giá quán và món'}</Text>
-      <AppPressable accessibilityRole="button" onPress={() => Alert.alert('Hỗ trợ đánh giá SubiFood', 'Bạn có thể bỏ qua đánh giá tài xế bằng nút X. Đánh giá quán cần chọn 1–5 sao. Bình luận từ 50 ký tự và 1 ảnh hợp lệ được cộng 500 xu một lần cho mỗi đơn.')} style={{ minHeight: 44, justifyContent: 'center' }}><Text className="text-sm text-teal">Hỗ trợ</Text></AppPressable>
+      <AppPressable accessibilityRole="button" onPress={() => Alert.alert('Hỗ trợ đánh giá soopiFood', 'Bạn có thể bỏ qua đánh giá tài xế bằng nút X. Đánh giá quán cần chọn 1–5 sao. Bình luận từ 50 ký tự và 1 ảnh hợp lệ được cộng 500 xu một lần cho mỗi đơn.')} style={{ minHeight: 44, justifyContent: 'center' }}><Text className="text-sm text-teal">Hỗ trợ</Text></AppPressable>
     </View>
     {order.isPending || review.isPending ? <Text className="p-5 text-muted">Đang tải đánh giá…</Text> : order.isError || review.isError ? <View className="gap-4 p-5"><Text className="text-coral">Không tải được đơn hoặc đánh giá.</Text><FlowButton title="Thử lại" onPress={() => { void order.refetch(); void review.refetch(); }} /></View>
       : !order.data ? <Text className="p-5 text-muted">Không tìm thấy đơn hàng của bạn.</Text>
@@ -127,7 +129,7 @@ function OrderReview({ orderId }: { orderId: string }) {
           </View>
           <View style={{ borderTopWidth: 10, borderTopColor: '#F5F5F5', padding: 20 }}>
             <TextInput accessibilityLabel={stage === 'driver' ? 'Nhận xét tài xế' : 'Nhận xét quán'} value={stage === 'driver' ? driverFeedback : restaurantFeedback} onChangeText={stage === 'driver' ? setDriverFeedback : setRestaurantFeedback} editable={!disabled} maxLength={2000} multiline textAlignVertical="top"
-              placeholder={stage === 'driver' ? 'Bạn có điều gì muốn chia sẻ cùng SubiFood? Hãy để lại đánh giá về trải nghiệm giao hàng nhé!' : 'Bạn hãy để lại bình luận tại đây nhé! Chia sẻ trải nghiệm về quán và món ăn cùng SubiFood.'}
+              placeholder={stage === 'driver' ? 'Bạn có điều gì muốn chia sẻ cùng soopiFood? Hãy để lại đánh giá về trải nghiệm giao hàng nhé!' : 'Bạn hãy để lại bình luận tại đây nhé! Chia sẻ trải nghiệm về quán và món ăn cùng soopiFood.'}
               style={{ minHeight: stage === 'driver' ? 180 : 150, fontSize: 15, lineHeight: 23, color: '#17241B', padding: 0 }} placeholderTextColor="#9B9E9B" />
             {stage === 'restaurant' && <>
               {!submitted && <Text style={{ color: earnsReviewReward(restaurantFeedback, !!photo) ? '#008B45' : '#858A85', fontSize: 13, marginBottom: 14 }}>Bình luận từ 50 ký tự & 1 ảnh để nhận 500 xu · {reviewCharacterCount(restaurantFeedback)}/50 ký tự</Text>}

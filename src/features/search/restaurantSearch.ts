@@ -8,25 +8,38 @@ type MenuMatch = {
     restaurant_id: string;
     name: string;
 };
+const tokenize = (value: string) => normalizeSearch(value).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+export function matchesSearchPhrase(value: string, keyword: string) {
+    const words = tokenize(keyword);
+    if (!words.length) return false;
+    const tokens = tokenize(value);
+    return tokens.some((_, start) => words.every((word, offset) => tokens[start + offset] === word));
+}
+export function matchingMenuFoods<T extends MenuMatch>(foods: T[], keyword: string, includeAllWhenEmpty = false) {
+    // Category queries already restrict foods by their database links.
+    if (includeAllWhenEmpty && !tokenize(keyword).length) return foods;
+    return foods.filter(food => matchesSearchPhrase(food.name, keyword) || matchesSearchPhrase(viLabel(food.name), keyword));
+}
 export function searchRestaurants(restaurants: Row<'restaurants'>[], foods: MenuMatch[], keyword: string, filters: {
     favorite: boolean;
     freeship: boolean;
     nearby: boolean;
     sort: string;
 }, saved: string[], location: Coordinates | null, categoryId?: string, collectionId?: string, collection?: FoodCollection) {
-    const words = normalizeSearch(keyword).trim().split(/\s+/).filter(Boolean);
+    const hasKeyword = tokenize(keyword).length > 0;
     if (collectionId && (!collection || collection.id !== collectionId || !collection.is_active)) return [];
     // Food collections receive only dishes linked by food_discovery_categories.
     // No dish-name heuristics or ingredient matching remain.
     const matchingFoods = foods;
     const result = restaurants.filter(restaurant => {
         const menu = matchingFoods.filter(food => food.restaurant_id === restaurant.id);
-        const text = normalizeSearch(`${restaurant.name} ${menu.map(food => `${food.name} ${viLabel(food.name)}`).join(' ')}`);
-        const tokens = text.split(/[^\p{L}\p{N}]+/u);
+        // A phrase must occur in one name, never across unrelated menu items.
+        const matchesKeyword = !hasKeyword || matchesSearchPhrase(restaurant.name, keyword)
+            || matchingMenuFoods(menu, keyword).length > 0;
         const distance = location && restaurant.latitude != null && restaurant.longitude != null ? distanceKm(location, { latitude: restaurant.latitude, longitude: restaurant.longitude }) : Infinity;
         return (!(categoryId || collection?.kind === 'food') || menu.length > 0)
             && (collection?.kind !== 'restaurant_tag' || matchesRestaurantTag(restaurant.promo_tags, collection.restaurant_tag))
-            && words.every(word => tokens.some(token => token.startsWith(word)))
+            && matchesKeyword
             && (!filters.favorite || saved.includes(restaurant.id))
             && (!filters.freeship || (Array.isArray(restaurant.promo_tags) && restaurant.promo_tags.some(tag => typeof tag === 'string' && /freeship|free delivery|miễn phí giao/i.test(viLabel(tag)))))
             && (!filters.nearby || distance <= 2);

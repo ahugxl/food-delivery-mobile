@@ -7,7 +7,7 @@ export default function AuthLayout() {
     <Stack
       initialRouteName="welcome"
       screenOptions={{
-        title: 'SubiFood',
+        title: 'soopiFood',
         headerShown: false,
         contentStyle: { backgroundColor: '#FFFBF5' },
       }}

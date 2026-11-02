@@ -1,3 +1,4 @@
+import { restaurantRatingLabel } from '../../utils/restaurantRating';
 import { AppPressable as Pressable } from '@/src/components/AppPressable';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -105,7 +106,7 @@ export default function FavoritesScreen() {
               <View style={styles.metaRow}>
                 <Ionicons name="star" size={13} color={colors.tabActive} />
                 <Text style={[styles.metaText, { color: colors.foreground }]}>
-                  {item.rating.toFixed(1)}
+                  {restaurantRatingLabel(item.rating)}
                 </Text>
                 <Text style={[styles.dot, { color: colors.mutedForeground }]}>
                   ·

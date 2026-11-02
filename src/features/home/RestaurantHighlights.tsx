@@ -1,3 +1,4 @@
+import { restaurantRatingLabel } from '../../utils/restaurantRating';
 import { ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -41,7 +42,7 @@ export function RestaurantHighlights({ restaurants, loading, error, onRetry }: {
               <RestaurantClosedOverlay closed={restaurant.is_open === false}/>
             </View>
             <Text numberOfLines={2} style={{ minHeight: 40, fontFamily: 'Inter_700Bold', fontSize: 14, lineHeight: 20, color: '#17241B' }}>{restaurant.name}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}><Ionicons name="star" size={14} color="#FFBC23"/><Text style={{ fontSize: 12, color: '#727772' }}>{Number(restaurant.rating ?? 0).toFixed(1)}{distance !== null ? ` · ${distance.toFixed(1)} km` : ''}</Text></View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}><Ionicons name="star" size={14} color="#FFBC23"/><Text style={{ fontSize: 12, color: '#727772' }}>{restaurantRatingLabel(restaurant.rating)}{distance !== null ? ` · ${distance.toFixed(1)} km` : ''}</Text></View>
             {!!tags.length && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>{tags.map(tag => <View key={tag} style={{ maxWidth: '100%', borderWidth: 1, borderColor: '#CCE6D7', borderRadius: 5, paddingHorizontal: 6, paddingVertical: 4 }}><Text style={{ fontSize: 11, color: '#008B45' }}>{tag}</Text></View>)}</View>}
           </AppPressable>;
         })}

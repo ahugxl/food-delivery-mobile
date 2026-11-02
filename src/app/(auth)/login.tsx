@@ -27,8 +27,8 @@ export default function LoginScreen() {
   };
   return <AuthScreen>
     <View style={{ alignItems: 'center', marginTop: 12, marginBottom: 28, gap: 10 }}>
-      <Image source={require('../../../assets/images/subifood-logo.png')} accessibilityLabel="Logo SubiFood" contentFit="contain" style={{ width: logoSize, height: logoSize, borderRadius: 30 }} />
-      <Text accessibilityRole="header" style={{ fontFamily: 'Inter_700Bold', fontSize: 28, color: '#006B3A', letterSpacing: -.5 }}>SubiFood</Text>
+      <Image source={require('../../../assets/images/subifood-logo.png')} accessibilityLabel="Logo soopiFood" contentFit="contain" style={{ width: logoSize, height: logoSize, borderRadius: 30 }} />
+      <Text accessibilityRole="header" style={{ fontFamily: 'Inter_700Bold', fontSize: 28, color: '#006B3A', letterSpacing: -.5 }}>soopiFood</Text>
     </View>
     <AuthInput label="Email" icon="mail-outline" placeholder="Nhập email" value={email} onChangeText={setEmail} editable={!busy} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" textContentType="emailAddress" />
     <AuthInput label="Mật khẩu" icon="lock-closed-outline" placeholder="Nhập mật khẩu" value={password} onChangeText={setPassword} editable={!busy} secureTextEntry autoCapitalize="none" autoCorrect={false} autoComplete="current-password" textContentType="password" returnKeyType="go" onSubmitEditing={() => { void handleLogin(); }} />

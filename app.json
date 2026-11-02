@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SubiFood",
+    "name": "soopiFood",
     "slug": "food-delivery",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -39,7 +39,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Cho phép SubiFood dùng vị trí để chọn điểm giao hàng."
+          "locationWhenInUsePermission": "Cho phép soopiFood dùng vị trí để chọn điểm giao hàng."
         }
       ],
       [

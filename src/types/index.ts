@@ -1,7 +1,7 @@
 export interface Restaurant {
   id: string;
   name: string;
-  rating: number;
+  rating: number | null;
   deliveryTime: string;
   tags: string[];
   image: string;

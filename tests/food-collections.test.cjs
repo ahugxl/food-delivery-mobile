@@ -43,10 +43,10 @@ test('discovery API joins explicit food links, filters availability and active r
   let fail = false;
   const client = createClient('https://example.supabase.co', 'key', { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: async url => {
     requests.push(new URL(url));
-    return new Response(JSON.stringify(fail ? { message: 'Link query failed' } : [{ food_id: 'f', foods: { name: 'Món số 01', restaurant_id: 'r' } }]), { status: fail ? 500 : 200, headers: { 'content-type': 'application/json' } });
+    return new Response(JSON.stringify(fail ? { message: 'Link query failed' } : [{ food_id: 'f', foods: { id: 'f', name: 'Món số 01', restaurant_id: 'r', price: 25000, original_price: 30000, image_url: 'https://example.com/food.jpg' } }]), { status: fail ? 500 : 200, headers: { 'content-type': 'application/json' } });
   } } });
   const api = createCatalogApi(client);
-  assert.deepEqual(await api.discoveryFoods('mon-chay'), [{ name: 'Món số 01', restaurant_id: 'r' }]);
+  assert.deepEqual(await api.discoveryFoods('mon-chay'), [{ id: 'f', name: 'Món số 01', restaurant_id: 'r', price: 25000, original_price: 30000, image_url: 'https://example.com/food.jpg' }]);
   assert.equal(requests[0].searchParams.get('discovery_category_id'), 'eq.mon-chay');
   assert.equal(requests[0].searchParams.get('foods.is_available'), 'eq.true');
   assert.equal(requests[0].searchParams.get('foods.restaurants.is_active'), 'eq.true');

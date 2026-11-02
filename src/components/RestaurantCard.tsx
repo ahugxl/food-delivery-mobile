@@ -1,3 +1,4 @@
+import { restaurantRatingLabel } from '../utils/restaurantRating';
 import { AppPressable as Pressable } from '@/src/components/AppPressable';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -32,7 +33,7 @@ export function RestaurantCard({
     >
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Xem quán ${restaurant.name}, đánh giá ${restaurant.rating.toFixed(1)} sao`}
+        accessibilityLabel={`Xem quán ${restaurant.name}, ${restaurant.rating == null ? 'Chưa có đánh giá' : restaurantRatingLabel(restaurant.rating) + ' sao'}`}
         onPress={onPress}
         style={({ pressed }) => [
           { flex: 1 },
@@ -67,7 +68,7 @@ export function RestaurantCard({
           <View style={styles.metaRow}>
             <Ionicons name="star" size={13} color={colors.primary} />
             <Text style={[styles.rating, { color: colors.foreground }]}>
-              {restaurant.rating.toFixed(1)}
+              {restaurantRatingLabel(restaurant.rating)}
             </Text>
             <View
               style={[

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { FoodDetail, SupabaseDatabase } from '../types/supabase';
+import type { FoodDetail, Row, SupabaseDatabase } from '../types/supabase';
 
 export const FOOD_DETAIL_SELECT = `
   *,
@@ -21,14 +21,14 @@ export function createCatalogApi(client: SupabaseClient<SupabaseDatabase> | null
     },
     async discoveryFoods(categoryId: string, signal?: AbortSignal) {
       const query = db().from('food_discovery_categories')
-        .select('food_id, foods!inner(name,restaurant_id,is_available,restaurants!inner(is_active))')
+        .select('food_id, foods!inner(id,name,restaurant_id,price,original_price,image_url,is_available,restaurants!inner(is_active))')
         .eq('discovery_category_id', categoryId).eq('foods.is_available', true).eq('foods.restaurants.is_active', true).order('food_id');
-      const rows: { name: string; restaurant_id: string }[] = [];
+      const rows: Pick<Row<'foods'>, 'id' | 'name' | 'restaurant_id' | 'price' | 'original_price' | 'image_url'>[] = [];
       for (let offset = 0; ; offset += 500) {
         const page = query.range(offset, offset + 499);
         const { data, error } = await (signal ? page.abortSignal(signal) : page);
         if (error) throw error;
-        for (const item of data ?? []) rows.push({ name: item.foods.name, restaurant_id: item.foods.restaurant_id });
+        for (const item of data ?? []) rows.push(item.foods);
         if (!data || data.length < 500) return rows;
       }
     },
@@ -52,7 +52,7 @@ export function createCatalogApi(client: SupabaseClient<SupabaseDatabase> | null
       return data ?? [];
     },
     async restaurants(signal?: AbortSignal) {
-      const query = db().from('restaurants').select('*').eq('is_active', true).order('rating', { ascending: false }).order('id');
+      const query = db().from('restaurants').select('*').eq('is_active', true).order('rating', { ascending: false, nullsFirst: false }).order('id');
       const { data, error } = await (signal ? query.abortSignal(signal) : query);
       if (error) throw error;
       return data ?? [];

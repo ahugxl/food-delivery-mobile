@@ -15,10 +15,11 @@ import { catalogApi, catalogKeys } from '../../services/catalog';
 import { useFavorites } from '../../hooks/useFavorites';
 import { defaultFilters } from './catalog';
 import type { Coordinates } from './liveCatalog';
-import { searchRestaurants } from './restaurantSearch';
+import { searchRestaurants, matchingMenuFoods } from './restaurantSearch';
 import { viLabel } from '../../utils/vietnamese';
 import { findFoodCollection } from './foodCollections';
 import { FoodCollectionStrip } from '../../components/FoodCollectionStrip';
+import { SearchFoodStrip } from './SearchFoodStrip';
 import { useDiscoveryCategories } from '../../hooks/useDiscoveryCategories';
 export default function SearchScreen({ categoryId }: {
     categoryId?: string;
@@ -40,6 +41,15 @@ export default function SearchScreen({ categoryId }: {
     const categories = useQuery({ queryKey: catalogKeys.categories, queryFn: ({ signal }) => catalogApi.categories(signal) });
     const favorites = useFavorites();
     const results = useMemo(() => searchRestaurants(restaurants.data ?? [], foods.data ?? [], keyword, filters, favorites.favorites.map(r => r.id), location, categoryId, collectionId, collection), [restaurants.data, foods.data, keyword, filters, favorites.favorites, location, categoryId, collectionId, collection]);
+    const matchedMenus = useMemo(() => {
+        const grouped = new Map<string, NonNullable<typeof foods.data>[number][]>();
+        for (const food of matchingMenuFoods(foods.data ?? [], keyword, !!categoryId || collection?.kind === 'food')) {
+            const items = grouped.get(food.restaurant_id) ?? [];
+            items.push(food);
+            grouped.set(food.restaurant_id, items);
+        }
+        return grouped;
+    }, [foods.data, keyword, categoryId, collection?.kind]);
     useEffect(() => { setKeyword(''); }, [collectionId]);
     const chooseCollection = (id: string) => { setKeyword(''); router.setParams({ collection: id === collectionId ? '' : id }); };
     const locate = async () => {
@@ -76,6 +86,6 @@ export default function SearchScreen({ categoryId }: {
         return; setFilters(f => ({ ...f, [item.key]: !f[item.key] })); }} className={`min-h-11 justify-center rounded-full border px-4 ${filters[item.key] ? 'border-teal bg-tealLight' : 'border-line'}`}><Text className="text-sm text-ink">{item.label}</Text></AppPressable>)}
     </ScrollView></View>
     <Text accessibilityLiveRegion="polite" className="px-5 pb-2 text-sm text-muted">{locating ? 'Đang xác định vị trí…' : `${results.length} quán${filters.nearby ? ' trong phạm vi 2 km' : ''} · Chọn quán để xem thực đơn`}</Text>
-    {loading ? <View className="gap-4 p-5"><Skeleton height={145}/><Skeleton height={145}/></View> : failed ? <View className="gap-4 p-5"><Text className="text-muted">Không tải được danh sách quán hoặc thực đơn.</Text><FlowButton title="Thử lại" onPress={refresh}/></View> : <FlashList data={results} keyExtractor={item => item.id} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 30 }} refreshing={restaurants.isRefetching || foods.isRefetching} onRefresh={refresh} keyboardShouldPersistTaps="handled" renderItem={({ item }) => <RestaurantRow restaurant={item} onPress={() => router.push({ pathname: '/restaurant/[id]', params: { id: item.id } })}/>} ListEmptyComponent={<View className="gap-4 py-12"><Text className="text-center font-bold text-xl text-ink">Chưa tìm thấy quán phù hợp</Text><Text className="text-center text-sm text-muted">Thử từ khóa khác hoặc bỏ bớt bộ lọc.</Text><FlowButton title="Xóa tìm kiếm và bộ lọc" onPress={() => { setKeyword(''); setFilters(defaultFilters); if (!categoryId) router.setParams({ collection: '' }); }}/></View>}/>}
+    {loading ? <View className="gap-4 p-5"><Skeleton height={145}/><Skeleton height={145}/></View> : failed ? <View className="gap-4 p-5"><Text className="text-muted">Không tải được danh sách quán hoặc thực đơn.</Text><FlowButton title="Thử lại" onPress={refresh}/></View> : <FlashList data={results} keyExtractor={item => item.id} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 30 }} refreshing={restaurants.isRefetching || foods.isRefetching} onRefresh={refresh} keyboardShouldPersistTaps="handled" renderItem={({ item }) => <RestaurantRow restaurant={item} onPress={() => router.push({ pathname: '/restaurant/[id]', params: { id: item.id } })}><SearchFoodStrip foods={matchedMenus.get(item.id) ?? []}/></RestaurantRow>} ListEmptyComponent={<View className="gap-4 py-12"><Text className="text-center font-bold text-xl text-ink">Chưa tìm thấy quán phù hợp</Text><Text className="text-center text-sm text-muted">Thử từ khóa khác hoặc bỏ bớt bộ lọc.</Text><FlowButton title="Xóa tìm kiếm và bộ lọc" onPress={() => { setKeyword(''); setFilters(defaultFilters); if (!categoryId) router.setParams({ collection: '' }); }}/></View>}/>}
   </SafeAreaView>;
 }

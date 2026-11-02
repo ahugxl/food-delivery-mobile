@@ -36,20 +36,50 @@ test('missing/invalid phone and a failed availability check never call signup', 
   assert.equal(calls, 0);
 });
 
-test('password recovery normalizes email, exchanges the link code, validates passwords and propagates errors', async () => {
+test('password recovery sends email without a redirect and verifies a recovery OTP before updating the same user', async () => {
   const calls = [];
   const recovery = createPasswordRecovery({ auth: {
     resetPasswordForEmail: async (...args) => { calls.push(args); return { error: null }; },
-    exchangeCodeForSession: async code => { calls.push(code); return { data: { session: {} }, error: null }; },
+    verifyOtp: async value => { calls.push(value); return { data: { session: {}, user: { id: 'user-a' } }, error: null }; },
+    getUser: async () => ({ data: { user: { id: 'user-a' } }, error: null }),
     updateUser: async value => { calls.push(value); return { error: null }; },
   } });
-  await recovery.request(' An@Example.com ', 'fooddelivery://reset-password');
-  assert.deepEqual(calls[0], ['an@example.com', { redirectTo: 'fooddelivery://reset-password' }]);
-  await assert.rejects(recovery.verify(''), /không hợp lệ/);
-  await recovery.verify('recovery-code');
-  await assert.rejects(recovery.update('123', '123'), /6 ký tự/);
-  await assert.rejects(recovery.update('secret1', 'secret2'), /không khớp/);
-  await recovery.update(' secret ', ' secret ');
+  await recovery.request(' An@Example.com ');
+  assert.deepEqual(calls[0], ['an@example.com']);
+  assert.equal(await recovery.verify(' An@Example.com ', '12 345678'), 'user-a');
+  assert.deepEqual(calls[1], { email: 'an@example.com', token: '12345678', type: 'recovery' });
+  await assert.rejects(recovery.update('123', '123', 'user-a'), /6 ký tự/);
+  await assert.rejects(recovery.update('secret1', 'secret2', 'user-a'), /không khớp/);
+  await assert.rejects(recovery.update('secret1', 'secret1', ''), /xác nhận mã/);
+  await recovery.update(' secret ', ' secret ', 'user-a');
   assert.deepEqual(calls.at(-1), { password: ' secret ' });
-  await assert.rejects(createPasswordRecovery({ auth: { resetPasswordForEmail: async () => ({ error: Error('rate limit') }) } }).request('an@example.com', 'url'), /rate limit/);
+});
+
+test('recovery rejects invalid input, expired OTPs and missing sessions without changing a password', async () => {
+  let verifies=0,updates=0;
+  const auth={
+    resetPasswordForEmail: async () => ({ error: Error('rate limit') }),
+    verifyOtp: async () => { verifies++;return { data: {}, error: { code:'otp_expired' } }; },
+    updateUser: async () => { updates++;return { error:null }; },
+  };
+  const recovery=createPasswordRecovery({auth});
+  await assert.rejects(recovery.request('invalid'),/email hợp lệ/);
+  await assert.rejects(recovery.request('an@example.com'),/rate limit/);
+  for(const code of ['', '123', 'abcdef', '12345678901'])await assert.rejects(recovery.verify('an@example.com',code),/6–10/);
+  assert.equal(verifies,0);
+  await assert.rejects(recovery.verify('an@example.com','123456'),/không đúng hoặc đã hết hạn/);
+  auth.verifyOtp=async()=>({data:{user:{id:'user-a'},session:null},error:null});
+  await assert.rejects(recovery.verify('an@example.com','123456'),/Chưa xác minh/);
+  assert.equal(updates,0);
+});
+
+test('a changed recovery session never updates another account password and provider errors remain visible', async () => {
+  let updates=0;
+  const auth={getUser:async()=>({data:{user:{id:'other'}},error:null}),updateUser:async()=>{updates++;return {error:Error('weak password')};}};
+  const recovery=createPasswordRecovery({auth});
+  await assert.rejects(recovery.update('secret1','secret1','user-a'),/Phiên khôi phục/);
+  assert.equal(updates,0);
+  auth.getUser=async()=>({data:{user:{id:'user-a'}},error:null});
+  await assert.rejects(recovery.update('secret1','secret1','user-a'),/weak password/);
+  assert.equal(updates,1);
 });

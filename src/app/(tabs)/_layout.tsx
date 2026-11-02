@@ -40,7 +40,7 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'SubiFood',
+          title: 'soopiFood',
           tabBarLabel: 'Khám phá',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
@@ -54,7 +54,7 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="orders"
         options={{
-          title: 'SubiFood',
+          title: 'soopiFood',
           tabBarLabel: 'Đơn hàng',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
@@ -68,7 +68,7 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="favorites"
         options={{
-          title: 'SubiFood',
+          title: 'soopiFood',
           tabBarLabel: 'Yêu thích',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
@@ -82,7 +82,7 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="offers"
         options={{
-          title: 'SubiFood',
+          title: 'soopiFood',
           tabBarLabel: 'Ưu đãi',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
@@ -97,7 +97,7 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="account"
         options={{
-          title: 'SubiFood',
+          title: 'soopiFood',
           tabBarLabel: 'Tài khoản',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons

@@ -40,7 +40,7 @@ function RootLayoutNav() {
   return (
     <Stack
       screenOptions={{
-        title: 'SubiFood',
+        title: 'soopiFood',
         headerShown: false,
         contentStyle: { backgroundColor: '#FFFFFF' },
         statusBarStyle: Platform.OS === 'android' ? 'light' : 'dark',
@@ -59,6 +59,7 @@ function RootLayoutNav() {
         <Stack.Screen name="cart" />
         <Stack.Screen name="checkout" />
         <Stack.Screen name="search" />
+        <Stack.Screen name="ai-assistant" />
         <Stack.Screen name="category/[id]" />
         <Stack.Screen name="select-location" />
         <Stack.Screen name="select-offer" />

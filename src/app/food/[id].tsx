@@ -1,3 +1,4 @@
+import { restaurantRatingLabel } from '../../utils/restaurantRating';
 import { FoodPrice } from '../../components/FoodPrice';
 import { FoodReviewStats } from '../../components/FoodReviewStats';
 import { AppPressable as Pressable } from '@/src/components/AppPressable';
@@ -185,7 +186,7 @@ function FoodDetailContent({ id }: { id: string }) {
                 { color: colors.primaryForeground },
               ]}
             >
-              {Number(food.restaurants.rating ?? 0).toFixed(1)} · {food.restaurants.name}
+              {restaurantRatingLabel(food.restaurants.rating)} · {food.restaurants.name}
             </Text>
           </View>
         </View>

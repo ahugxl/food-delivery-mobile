@@ -8,11 +8,12 @@ import static vn.subifood.ai.ApiTypes.*;
 
 // One instance per HTTP request. Never put session or location into a shared tool bean.
 public class FoodTools {
+    public enum SearchMode { SPECIFIC, EXPLORE }
     private final SupabaseGateway db;private final MenuEmbeddings embeddings;private final Session session;private final Question question;
     private final String sweetness;private final BigDecimal hardBudget;
     private FoodIntent.Groups groups;private final List<DiscoveryGroup> catalog;private float[] queryVector;
     private final List<String> namedDishes;
-    private List<Food> candidates=List.of();private BigDecimal budget;private int calls=0;
+    private List<Food> candidates=List.of();private BigDecimal budget;private boolean exploratory;private int calls=0;
     private RuntimeException failure;
     public FoodTools(SupabaseGateway db,MenuEmbeddings embeddings,Session session,Question question,List<DiscoveryGroup> catalog){
         this.db=db;this.embeddings=embeddings;this.session=session;this.question=question;
@@ -20,20 +21,24 @@ public class FoodTools {
         this.catalog=List.copyOf(catalog);
         this.namedDishes=FoodIntent.namedDishes(question.message());
     }
-    @Tool(returnDirect=true, description="Tìm món thực sự bán trong soopiFood bằng vector ngữ nghĩa rồi lọc giá, quán mở cửa, còn món và phạm vi 20 km. Chỉ dùng cho nhu cầu ăn uống. Không có quyền tìm Internet, đặt hàng hay sửa dữ liệu.")
+    @Tool(description="Tìm món thực sự bán trong soopiFood bằng vector ngữ nghĩa rồi lọc giá, quán mở cửa, còn món và phạm vi 20 km. Chỉ dùng cho nhu cầu ăn uống. Không có quyền tìm Internet, đặt hàng hay sửa dữ liệu.")
     public List<Food> searchFoods(
-        @ToolParam(description="Nhu cầu món ăn bằng tiếng Việt; giữ nguyên loại món và khẩu vị khách yêu cầu") String query,
+        @ToolParam(description="Câu tìm món ngắn gọn bằng tiếng Việt, bỏ lời chào và câu nhờ vả; giữ loại món, khẩu vị và yêu cầu kiêng. Ví dụ: cơm phần ăn no. Không đưa ngân sách vào câu vì đã có maxPrice.") String query,
         @ToolParam(description="Giá tối đa của một món bằng VND nếu khách có yêu cầu",required=false) BigDecimal maxPrice,
         @ToolParam(description="ID nhóm món bắt buộc từ danh sách database; [] nếu chưa xác định. Không dùng nhóm khách phủ định.") List<String> requiredGroupIds,
-        @ToolParam(description="ID nhóm món khách muốn tránh từ danh sách database; [] nếu không có.") List<String> excludedGroupIds){
+        @ToolParam(description="ID nhóm món khách muốn tránh từ danh sách database; [] nếu không có.") List<String> excludedGroupIds,
+        @ToolParam(description="SPECIFIC khi khách chỉ rõ món/khẩu vị. EXPLORE chỉ khi khách muốn gợi ý chung như đang đói, ăn gì, chưa biết ăn gì, chỉ giới hạn ngân sách/khoảng cách. EXPLORE phải chọn đúng một nhóm món ăn phù hợp từ database.") SearchMode mode){
         try {
         if(++calls>2)throw new ApiFailure(429,"TOOL_LIMIT","Vui lòng mô tả nhu cầu ngắn gọn hơn.");
         if(query==null || query.isBlank() || query.length()>600)throw new IllegalArgumentException("Invalid food search");
         if(maxPrice!=null && (maxPrice.signum()<0 || maxPrice.compareTo(BigDecimal.valueOf(10000000))>0))throw new IllegalArgumentException("Invalid budget");
         groups=FoodIntent.groups(requiredGroupIds,excludedGroupIds,catalog);
+        // Broad requests have no named dish to match semantically. Rank eligible foods
+        // within one real catalog group instead of rejecting them by similarity.
+        exploratory=mode==SearchMode.EXPLORE && namedDishes.isEmpty() && sweetness==null && groups.required().size()==1;
         budget=FoodIntent.lowerBudget(hardBudget,maxPrice);
-        queryVector=embeddings.query(question.message());
-        candidates=db.match(session,question,queryVector,budget,sweetness,groups).stream()
+        queryVector=embeddings.query(query.trim());
+        candidates=db.match(session,question,queryVector,budget,sweetness,groups,exploratory).stream()
             .filter(food->FoodIntent.matchesNamedDish(food.name(),namedDishes) && FoodIntent.withinBudget(food.price(),question.message(),budget)).limit(5).toList();
         return candidates;
         } catch(RuntimeException error) {
@@ -47,7 +52,7 @@ public class FoodTools {
     public List<Food> verifiedFoods(){
         throwIfFailed();
         if(!used() || candidates.isEmpty())return List.of();
-        return db.recheck(session,question,candidates.stream().map(Food::food_id).distinct().limit(10).toList(),queryVector,budget,sweetness,groups).stream()
+        return db.recheck(session,question,candidates.stream().map(Food::food_id).distinct().limit(10).toList(),queryVector,budget,sweetness,groups,exploratory).stream()
             .filter(food->FoodIntent.matchesNamedDish(food.name(),namedDishes) && FoodIntent.withinBudget(food.price(),question.message(),budget)).toList();
     }
 }

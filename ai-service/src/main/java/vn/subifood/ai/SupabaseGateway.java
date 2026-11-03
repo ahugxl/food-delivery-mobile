@@ -44,18 +44,18 @@ public class SupabaseGateway {
         args.put("p_latitude",q.latitude());args.put("p_longitude",q.longitude());
         args.put("p_max_price",max);args.put("p_sweetness",sweetness);return args;
     }
-    private void relevance(Map<String,Object> args,float[] vector,FoodIntent.Groups groups){
+    private void relevance(Map<String,Object> args,float[] vector,FoodIntent.Groups groups,boolean exploratory){
         if(!Double.isFinite(minSimilarity)||minSimilarity<0||minSimilarity>1)throw new IllegalStateException("Invalid similarity configuration");
-        args.put("p_embedding",vector);args.put("p_groups",groups.required());args.put("p_excluded_groups",groups.excluded());args.put("p_min_similarity",minSimilarity);
+        args.put("p_embedding",vector);args.put("p_groups",groups.required());args.put("p_excluded_groups",groups.excluded());args.put("p_min_similarity",exploratory?0d:minSimilarity);
     }
-    public List<Food> match(Session session,Question q,float[] vector,BigDecimal max,String sweetness,FoodIntent.Groups groups) {
-        var args=filters(q,max,sweetness);relevance(args,vector,groups);args.put("p_limit",10);
+    public List<Food> match(Session session,Question q,float[] vector,BigDecimal max,String sweetness,FoodIntent.Groups groups,boolean exploratory) {
+        var args=filters(q,max,sweetness);relevance(args,vector,groups,exploratory);args.put("p_limit",10);
         var result=rpc("ai_match_foods_v2",args,settings.publicKey(),session.token(),Food[].class);
         return result==null?List.of():List.of(result);
     }
-    public List<Food> recheck(Session session,Question q,List<UUID> ids,float[] vector,BigDecimal max,String sweetness,FoodIntent.Groups groups) {
+    public List<Food> recheck(Session session,Question q,List<UUID> ids,float[] vector,BigDecimal max,String sweetness,FoodIntent.Groups groups,boolean exploratory) {
         if(ids.isEmpty()) return List.of();
-        var args=filters(q,max,sweetness);relevance(args,vector,groups);args.put("p_food_ids",ids);
+        var args=filters(q,max,sweetness);relevance(args,vector,groups,exploratory);args.put("p_food_ids",ids);
         var result=rpc("ai_recheck_foods_v2",args,settings.publicKey(),session.token(),Food[].class);
         return result==null?List.of():List.of(result);
     }

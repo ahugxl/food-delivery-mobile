@@ -10,6 +10,35 @@ import static vn.subifood.ai.ApiTypes.*;
 
 class FoodToolsTest {
     private final List<DiscoveryGroup> catalog=List.of(new DiscoveryGroup("tra-sua","Trà sữa"));
+    @Test void hungryRequestUsesRewrittenMealQueryAndStrictBudgetThenRechecks() {
+        var db=mock(SupabaseGateway.class);var embeddings=mock(MenuEmbeddings.class);
+        var session=new Session(UUID.randomUUID(),"token");
+        var question=new Question("Tôi đang đói bạn hãy tìm món gì ăn dưới 40k",10.8,106.6,null);
+        var meals=List.of(new DiscoveryGroup("nhom-bua-an","Bữa ăn"));
+        var groups=FoodIntent.groups(List.of("nhom-bua-an"),List.of(),meals);
+        float[] vector=new float[1536];vector[0]=1;
+        var food=new Food(UUID.randomUUID(),UUID.randomUUID(),"Cơm phần","",new BigDecimal("35000"),null,null,"Quán thật",2,null,.4);
+        var boundary=new Food(UUID.randomUUID(),food.restaurant_id(),"Cơm phần lớn","",new BigDecimal("40000"),null,null,"Quán thật",2,null,.5);
+        when(embeddings.query("bữa ăn no")).thenReturn(vector);
+        when(db.match(session,question,vector,new BigDecimal("40000"),null,groups,true)).thenReturn(List.of(boundary,food));
+        var tool=new FoodTools(db,embeddings,session,question,meals);
+        assertEquals(List.of(food),tool.searchFoods(" bữa ăn no ",new BigDecimal("50000"),groups.required(),List.of(),FoodTools.SearchMode.EXPLORE));
+        when(db.recheck(session,question,List.of(food.food_id()),vector,new BigDecimal("40000"),null,groups,true)).thenReturn(List.of(food));
+        assertEquals(List.of(food),tool.verifiedFoods());
+        verify(embeddings,never()).query(question.message());
+    }
+    @Test void explorationCannotRelaxSpecificDishOrSweetnessOrSearchWithoutAGroup() {
+        for(String request:List.of("Cơm gà dưới 40k","Trà sữa ít ngọt dưới 40k","Ăn gì dưới 40k")) {
+            var db=mock(SupabaseGateway.class);var embeddings=mock(MenuEmbeddings.class);
+            var session=new Session(UUID.randomUUID(),"token");
+            var question=new Question(request,10.8,106.6,null);
+            var required=request.startsWith("Ăn")?List.<String>of():List.of("tra-sua");
+            var groups=FoodIntent.groups(required,List.of(),catalog);
+            var tool=new FoodTools(db,embeddings,session,question,catalog);
+            tool.searchFoods("món ăn",null,required,List.of(),FoodTools.SearchMode.EXPLORE);
+            verify(db).match(eq(session),eq(question),isNull(),eq(new BigDecimal("40000")),eq(FoodIntent.sweetness(request)),eq(groups),eq(false));
+        }
+    }
     @Test void preservesCustomerConstraintsAndRechecksCurrentDatabaseBeforeReturning() {
         var db=mock(SupabaseGateway.class);var embeddings=mock(MenuEmbeddings.class);
         var session=new Session(UUID.randomUUID(),"test-user-token");
@@ -17,15 +46,15 @@ class FoodToolsTest {
         float[] vector=new float[1536];vector[0]=1;
         var food=new Food(UUID.randomUUID(),UUID.randomUUID(),"Trà sữa","Món thật",new BigDecimal("30000"),null,null,"Quán thật",2,"Mức đường: 30%",.8);
         var groups=FoodIntent.groups(List.of("tra-sua"),List.of(),catalog);
-        when(embeddings.query(question.message())).thenReturn(vector);
-        when(db.match(session,question,vector,new BigDecimal("40000"),"light",groups)).thenReturn(List.of(food));
+        when(embeddings.query("trà sữa")).thenReturn(vector);
+        when(db.match(session,question,vector,new BigDecimal("40000"),"light",groups,false)).thenReturn(List.of(food));
         var tool=new FoodTools(db,embeddings,session,question,catalog);
-        assertEquals(List.of(food),tool.searchFoods("trà sữa",new BigDecimal("80000"),List.of("tra-sua"),List.of()));
+        assertEquals(List.of(food),tool.searchFoods("trà sữa",new BigDecimal("80000"),List.of("tra-sua"),List.of(),FoodTools.SearchMode.SPECIFIC));
         // The dish becomes unavailable after retrieval. Never show the stale result.
-        when(db.recheck(session,question,List.of(food.food_id()),vector,new BigDecimal("40000"),"light",groups)).thenReturn(List.of());
+        when(db.recheck(session,question,List.of(food.food_id()),vector,new BigDecimal("40000"),"light",groups,false)).thenReturn(List.of());
         assertTrue(tool.verifiedFoods().isEmpty());
-        verify(db).recheck(session,question,List.of(food.food_id()),vector,new BigDecimal("40000"),"light",groups);
-        verify(embeddings).query(question.message());
+        verify(db).recheck(session,question,List.of(food.food_id()),vector,new BigDecimal("40000"),"light",groups,false);
+        verify(embeddings).query("trà sữa");
     }
     @Test void doesNotQueryOrInventFoodsWhenModelDidNotCallTool() {
         var db=mock(SupabaseGateway.class);var embeddings=mock(MenuEmbeddings.class);
@@ -72,9 +101,9 @@ class FoodToolsTest {
         var db=mock(SupabaseGateway.class);var embeddings=mock(MenuEmbeddings.class);
         var question=new Question("Trà sữa ngọt nhẹ dưới 40k",10.8,106.6,null);
         var quota=new ApiFailure(429,"AI_QUOTA_EXCEEDED","Hết hạn mức Gemini");
-        when(embeddings.query(question.message())).thenThrow(quota);
+        when(embeddings.query("trà sữa")).thenThrow(quota);
         var tool=new FoodTools(db,embeddings,new Session(UUID.randomUUID(),"token"),question,catalog);
-        assertSame(quota,assertThrows(ApiFailure.class,()->tool.searchFoods("trà sữa",null,List.of("tra-sua"),List.of())));
+        assertSame(quota,assertThrows(ApiFailure.class,()->tool.searchFoods("trà sữa",null,List.of("tra-sua"),List.of(),FoodTools.SearchMode.SPECIFIC)));
         // Simulate the framework swallowing the exception and returning control to the service.
         assertSame(quota,assertThrows(ApiFailure.class,tool::throwIfFailed));
         assertSame(quota,assertThrows(ApiFailure.class,tool::verifiedFoods));

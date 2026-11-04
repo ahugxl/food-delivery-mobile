@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript');
 require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,f);
-const {createAiApi,conversationHistory}=require('../src/services/aiApi.ts');
+const {createAiApi,conversationHistory,readAiStream}=require('../src/services/aiApi.ts');
 const coords={latitude:10.8,longitude:106.6},user='customer';
 const session=async()=>({accessToken:'session-token',userId:user});
 const food={food_id:'aaaaaaaa-aaaa-4aaa-8aaa-000000000001',restaurant_id:'aaaaaaaa-aaaa-4aaa-8aaa-000000000002',name:'Trà sữa',description:null,price:30000,original_price:null,image_url:null,restaurant_name:'Quán thật',distance_km:2,option_hint:'Mức đường: 30%'};
@@ -51,4 +51,37 @@ test('AI rejects privileged history roles and oversized history before making re
     await assert.rejects(api.recommend('ăn gì',coords,user,undefined,history),/Lịch sử/);
   }
   assert.equal(calls,0);
+});
+
+
+test('AI streaming decodes split UTF-8 and delivers text before final result is available',async()=>{
+  let controller, sent;
+  const encoder=new TextEncoder();
+  const stream=new ReadableStream({start(c){controller=c;}});
+  const api=createAiApi('http://localhost:3002',session,async(url,options)=>{
+    sent={url,...options};
+    const bytes=encoder.encode('event: delta\r\ndata: '+JSON.stringify({text:'Chào bạn, món Việt nhé!'})+'\r\n\r\n');
+    for(const byte of bytes)controller.enqueue(Uint8Array.of(byte));
+    return new Response(stream,{headers:{'Content-Type':'text/event-stream;charset=UTF-8'}});
+  });
+  const chunks=[];
+  const result=await api.recommend('ăn gì',coords,user,undefined,[],text=>{
+    chunks.push(text);
+    controller.enqueue(encoder.encode('event: result\ndata: '+JSON.stringify({message:text,foods:[food]})+'\n\n'));
+    controller.close();
+  });
+  assert.equal(sent.url,'http://localhost:3002/api/ai/chat/stream');
+  assert.equal(sent.headers.Accept,'text/event-stream');
+  assert.deepEqual(chunks,['Chào bạn, món Việt nhé!']);
+  assert.deepEqual(result.foods,[food]);
+});
+
+test('AI streaming rejects interrupted answers, provider errors and unverified final cards',async()=>{
+  for(const frame of [
+    'event: delta\ndata: '+JSON.stringify({text:'Xin chào'})+'\n\n',
+    'event: error\ndata: '+JSON.stringify({message:'Gemini đang bận, vui lòng thử lại.'})+'\n\n',
+    'event: result\ndata: '+JSON.stringify({message:'test',foods:[{...food,food_id:'invented'}]})+'\n\n',
+  ]){
+    await assert.rejects(readAiStream(new Response(frame,{headers:{'Content-Type':'text/event-stream'}}),()=>{}));
+  }
 });

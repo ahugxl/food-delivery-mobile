@@ -32,5 +32,8 @@ class ConversationTest {
         assertEquals("fallback",Conversation.reply(null,"fallback"));
         assertEquals("fallback",Conversation.reply("a".repeat(2001),"fallback"));
         assertEquals("Chào bạn!",Conversation.reply(" Chào bạn! ","fallback"));
+        assertEquals("fallback",Conversation.reply("My Thought Process in Addressing the User's Request","fallback"));
+        var q=new Question("ăn gì",10d,106d,null,List.of(new ChatTurn("assistant","My Thought Process in Addressing the User's Request")));
+        assertEquals(1,Conversation.messages(q).size());
     }
 }

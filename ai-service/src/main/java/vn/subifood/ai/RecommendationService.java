@@ -3,6 +3,8 @@ package vn.subifood.ai;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
+import org.springframework.ai.google.genai.GoogleGenAiChatOptions;
 import java.util.concurrent.*;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
@@ -18,7 +20,7 @@ public class RecommendationService {
     private record Window(long expires,int count){}
     private final ThreadPoolExecutor workers=new ThreadPoolExecutor(2,2,0,TimeUnit.SECONDS,new ArrayBlockingQueue<>(2),r->{var t=new Thread(r,"ai-request");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
     public RecommendationService(AiSettings settings,SupabaseGateway db,MenuEmbeddings embeddings,ChatModel model){this.settings=settings;this.db=db;this.embeddings=embeddings;this.model=model;}
-    public Recommendation recommend(String authorization,Question question){
+    private Session authorize(String authorization){
         if(!settings.configured())throw new ApiFailure(503,"AI_NOT_CONFIGURED","Trợ lý AI chưa được cấu hình. Vui lòng chọn món bằng tìm kiếm thông thường.");
         var session=db.authenticate(authorization);
         long now=Instant.now().getEpochSecond();
@@ -28,8 +30,12 @@ public class RecommendationService {
             if(window.count>=20)throw new ApiFailure(429,"RATE_LIMIT","Bạn đã hỏi nhiều lần. Vui lòng chờ vài phút rồi thử lại.");
             return new Window(window.expires,window.count+1);
         });
+        return session;
+    }
+    public Recommendation recommend(String authorization,Question question){
+        var session=authorize(authorization);
         Future<Recommendation> future;
-        try {future=workers.submit(()->generate(session,question));}
+        try {future=workers.submit(()->generate(session,question,null));}
         catch(RejectedExecutionException e){throw new ApiFailure(503,"AI_BUSY","Trợ lý đang bận. Vui lòng thử lại sau.");}
         try{return future.get(45,TimeUnit.SECONDS);}
         catch(InterruptedException e){Thread.currentThread().interrupt();future.cancel(true);throw new ApiFailure(503,"AI_TIMEOUT","Đã dừng yêu cầu gợi ý món.");}
@@ -42,7 +48,18 @@ public class RecommendationService {
             }
             throw new ApiFailure(503,"AI_UNAVAILABLE","Chưa kết nối được trợ lý hoặc dữ liệu menu. Vui lòng thử lại sau.");}
     }
-    private Recommendation generate(Session session,Question question){
+    public Future<?> stream(String authorization,Question question,Consumer<String> onText,Consumer<Recommendation> onResult,Consumer<ApiFailure> onError){
+        var session=authorize(authorization);
+        try {return workers.submit(()->{
+            try {onResult.accept(generate(session,question,onText));}
+            catch(RuntimeException error){
+                log.warn("AI stream failed: {}",error.getClass().getName());
+                var known=ProviderErrors.find(error);
+                if(!Thread.currentThread().isInterrupted())onError.accept(known!=null?known:new ApiFailure(503,"AI_UNAVAILABLE","Trợ lý bị gián đoạn. Bạn vui lòng thử lại nhé."));
+            }
+        });} catch(RejectedExecutionException error){throw new ApiFailure(503,"AI_BUSY","Trợ lý đang bận. Vui lòng thử lại sau.");}
+    }
+    private Recommendation generate(Session session,Question question,Consumer<String> onText){
         embeddings.checkAvailability();
         var status=db.indexStatus(session);
         if(status.indexed()==0)throw new ApiFailure(503,"MENU_NOT_INDEXED","Menu chưa được lập vector. Vui lòng chờ máy chủ đồng bộ dữ liệu món ăn.");
@@ -88,9 +105,11 @@ public class RecommendationService {
         String data;
         try { data=new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(foods); }
         catch(com.fasterxml.jackson.core.JsonProcessingException error){throw new IllegalStateException(error);}
-        String generated=ChatClient.create(model).prompt().system("""
+        var writer=ChatClient.create(model).prompt().options(GoogleGenAiChatOptions.builder().includeThoughts(false)).system("""
             Bạn là trợ lý chọn món của soopiFood. Trả lời tiếng Việt tự nhiên, thân thiện, ngắn gọn
-            2-4 câu như đang nhắn tin. Có thể hỏi một câu để hiểu khẩu vị hoặc giúp khách chọn tiếp.
+            2-4 câu như đang nhắn tin. BẮT BUỘC chỉ trả lời bằng tiếng Việt, kể cả khi lịch sử
+            có văn bản tiếng Anh. Chỉ viết câu trả lời dành cho khách, không xuất quá trình suy nghĩ,
+            phân tích yêu cầu, kế hoạch xử lý hay các đoạn "My Thought Process", "Okay, here is how". Có thể hỏi một câu để hiểu khẩu vị hoặc giúp khách chọn tiếp.
             Chỉ đề cập tên món, quán, giá và tùy chọn có trong DANH SÁCH ĐÃ KIỂM TRA bên dưới.
             Không gợi ý món/quán từ kiến thức bên ngoài hoặc từ lịch sử. Không tự suy đoán hương vị,
             dinh dưỡng, độ ngon, số lượng bán hay ưu đãi nếu dữ liệu không thể hiện.
@@ -101,7 +120,24 @@ public class RecommendationService {
             Không đặt hàng, không tự thêm giỏ, không tạo link. Các thẻ món thật hiển thị riêng bên dưới.
             Không dùng bảng, JSON hoặc tiêu đề. Tối đa 1500 ký tự.
             DANH SÁCH ĐÃ KIỂM TRA (JSON):
-            """+data).messages(Conversation.messages(question)).call().content();
+            """+data).messages(Conversation.messages(question));
+        String generated;
+        if(onText==null)generated=writer.call().content();
+        else {
+            var text=new StringBuilder();
+            int sent=0;
+            // Forward model tokens as they arrive; do not wait for the full answer.
+            for(String chunk:writer.stream().content().timeout(java.time.Duration.ofSeconds(25)).toIterable()) {
+                if(Thread.currentThread().isInterrupted())throw new java.util.concurrent.CancellationException();
+                if(text.length()+chunk.length()>1800)throw new ApiFailure(503,"AI_REPLY_TOO_LONG","Câu trả lời quá dài. Bạn vui lòng thử lại nhé.");
+                text.append(chunk);
+                if(Conversation.internalText(text.toString()))throw new ApiFailure(503,"AI_REPLY_INVALID","Trợ lý chưa tạo được câu trả lời phù hợp. Bạn vui lòng thử lại nhé.");
+                // Hold a short prefix so known internal-analysis headings never reach the UI.
+                if(text.length()>=80){onText.accept(text.substring(sent));sent=text.length();}
+            }
+            if(sent<text.length())onText.accept(text.substring(sent));
+            generated=text.toString();
+        }
         String message=Conversation.reply(generated,fallback);
         if(status.indexed()<status.total())message+=" Menu AI đang được cập nhật, nên kết quả hiện chưa bao gồm toàn bộ món.";
         return new Recommendation(message,foods);

@@ -13,15 +13,19 @@ final class Conversation {
         var result=new ArrayList<Message>();
         for(var turn:question.history()) {
             if("user".equals(turn.role()))result.add(new UserMessage(turn.content()));
-            else if("assistant".equals(turn.role()))result.add(new AssistantMessage(turn.content()));
+            else if("assistant".equals(turn.role())) {if(!internalText(turn.content()))result.add(new AssistantMessage(turn.content()));}
             else throw new ApiFailure(400,"INVALID_HISTORY","Lịch sử trò chuyện không hợp lệ.");
         }
         result.add(new UserMessage(question.message()));
         return List.copyOf(result);
     }
     static String reply(String generated,String fallback) {
-        if(generated==null || generated.isBlank())return fallback;
+        if(generated==null || generated.isBlank() || internalText(generated))return fallback;
         String text=generated.strip();
         return text.length()<=2000?text:fallback;
+    }
+    static boolean internalText(String text){
+        String value=text.toLowerCase(java.util.Locale.ROOT);
+        return value.contains("my thought process") || value.contains("here's how i'm going to approach") || value.contains("my reasoning process");
     }
 }

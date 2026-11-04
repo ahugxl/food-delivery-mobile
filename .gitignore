@@ -45,3 +45,4 @@ artifacts/
 .tools/
 ai-service/target/
 ai-service/.env.properties
+.env.properties

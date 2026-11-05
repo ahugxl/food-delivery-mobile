@@ -29,6 +29,25 @@ test('wallet joins vouchers and filters both owner and unused flag; missing rela
   assert.equal(params.get('is_used'), 'eq.false');
   assert.equal(params.get('select'), 'voucher:vouchers!voucher_id(*)');
 });
+
+test('banner campaign only returns assigned public vouchers and preserves their ordering', async () => {
+  const bannerId='aaaaaaaa-aaaa-4aaa-8aaa-000000000001';
+  const f=fixture(()=>({body:[{voucher},{voucher:null},{voucher:{...voucher,reward_owner_id:'another-user'}}]}));
+  assert.deepEqual(await f.api.campaign(undefined,bannerId),[voucher]);
+  const request=f.requests[0];
+  assert.equal(request.url.pathname,'/rest/v1/banner_vouchers');
+  assert.equal(request.url.searchParams.get('banner_id'),`eq.${bannerId}`);
+  assert.equal(request.url.searchParams.get('order'),'position.asc');
+  assert.equal(request.url.searchParams.get('select'),'voucher:vouchers!voucher_id(*)');
+});
+
+test('invalid or unavailable banner never falls back to the full voucher catalog', async () => {
+  const f=fixture(()=>({status:403,body:{message:'Denied'}}));
+  await assert.rejects(f.api.campaign(undefined,'invalid'),/không hợp lệ/);
+  assert.equal(f.requests.length,0);
+  await assert.rejects(f.api.campaign(undefined,'aaaaaaaa-aaaa-4aaa-8aaa-000000000001'),error=>error.message==='Denied');
+  assert.equal(f.requests.length,1);
+});
 test('collection uses authenticated RPC without a caller-controlled owner or used flag', async () => {
   const f = fixture(() => ({ body: voucher }));
   assert.equal((await f.api.collect('user', voucher.id)).code, 'SAVE');

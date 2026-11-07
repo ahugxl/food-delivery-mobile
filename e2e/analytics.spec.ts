@@ -1,206 +1,159 @@
-import { test, expect } from "@playwright/test";
+import { expect, test, type Request } from '@playwright/test';
 
-test.describe("Luồng E2E Khách hàng & Xác minh PostHog Analytics", () => {
-  // Biến lưu trữ toàn bộ event bóc tách từ network requests
-  const capturedPosthogEvents: any[] = [];
+type CapturedEvent = {
+  event: string;
+  properties?: Record<string, unknown>;
+};
 
-  test.beforeEach(async ({ page }) => {
-    // Lắng nghe và giải mã các request gửi đến PostHog
-    page.on("request", (request) => {
-      const url = request.url();
-      if (
-        url.includes("posthog.com/e/") ||
-        url.includes("posthog.com/batch/") ||
-        url.includes("posthog.com/capture/")
-      ) {
-        const postData = request.postData();
-        if (!postData) return;
+function eventsFromPayload(payload: unknown): CapturedEvent[] {
+  if (Array.isArray(payload)) return payload.flatMap(eventsFromPayload);
+  if (!payload || typeof payload !== 'object') return [];
 
-        try {
-          let payload;
-          if (postData.startsWith("data=")) {
-            // Xử lý Base64 URL-encoded (phổ biến ở PostHog Web SDK)
-            const base64Data = decodeURIComponent(
-              postData
-                .split("&")
-                .find((p) => p.startsWith("data="))
-                ?.substring(5) || "",
-            );
-            const decoded = Buffer.from(base64Data, "base64").toString("utf-8");
-            payload = JSON.parse(decoded);
-          } else {
-            // Xử lý chuẩn JSON
-            payload = request.postDataJSON();
-          }
+  const value = payload as Record<string, unknown>;
+  if (Array.isArray(value.batch)) return value.batch.flatMap(eventsFromPayload);
+  if (typeof value.event === 'string') {
+    return [{
+      event: value.event,
+      properties:
+        value.properties && typeof value.properties === 'object'
+          ? (value.properties as Record<string, unknown>)
+          : undefined,
+    }];
+  }
+  if (value.data !== undefined) return eventsFromPayload(value.data);
+  return [];
+}
 
-          if (payload) {
-            const batch = payload.batch || [payload];
-            capturedPosthogEvents.push(...batch);
-          }
-        } catch (e) {
-          console.error("Không thể parse payload từ PostHog:", e);
-        }
-      }
-    });
-  });
+function decodePostHogRequest(request: Request): CapturedEvent[] {
+  const postData = request.postData();
+  if (!postData) return [];
 
-  test("Chạy luồng tìm kiếm, thêm vào giỏ, thanh toán và xác minh sự kiện", async ({
-    page,
-  }) => {
-    const email = process.env.TEST_USER_EMAIL;
+  try {
+    return eventsFromPayload(JSON.parse(postData));
+  } catch {
+    // Some PostHog endpoints send a URL-encoded `data` field, often base64 encoded.
+  }
+
+  try {
+    const encoded = new URLSearchParams(postData).get('data');
+    if (!encoded) return [];
+
+    try {
+      return eventsFromPayload(JSON.parse(encoded));
+    } catch {
+      const base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+      return eventsFromPayload(JSON.parse(Buffer.from(base64, 'base64').toString('utf8')));
+    }
+  } catch {
+    return [];
+  }
+}
+
+test.describe('PostHog analytics qua luồng khách hàng', () => {
+  test('ghi nhận tìm món, thêm giỏ và mở thanh toán mà không đặt đơn', async ({ page }) => {
+    test.setTimeout(180_000);
+
+    const email = process.env.TEST_USER_EMAIL?.trim();
     const password = process.env.TEST_USER_PASSWORD;
+    test.skip(!email || !password, 'Cần TEST_USER_EMAIL và TEST_USER_PASSWORD để đăng nhập tài khoản kiểm thử.');
 
-    if (!email || !password) {
-      test.skip(
-        true,
-        "BLOCKED: Thiếu TEST_USER_EMAIL hoặc TEST_USER_PASSWORD trong biến môi trường.",
-      );
-      return;
-    }
-
-    // 1. Mở app và đăng nhập
-    await page.goto("/");
-    // Tùy thuộc vào giao diện, tìm nút Đăng nhập hoặc form
-    const emailInput = page.getByPlaceholder(/email|tài khoản/i).first();
-    await emailInput.waitFor({ state: "visible", timeout: 15000 });
-    await emailInput.fill(email);
-
-    const passwordInput = page.getByPlaceholder(/mật khẩu|password/i).first();
-    await passwordInput.fill(password);
-
-    await page.getByRole("button", { name: /đăng nhập|login/i }).click();
-
-    // 2. Chờ chuyển tới trang chủ và xác minh UI
-    // 2. Chờ chuyển tới trang chủ và xác minh UI
-    // Sử dụng getByPlaceholder thay vì getByLabel để tương thích tốt nhất với React Native Web
-    const searchInput = page.getByPlaceholder(/bạn đang thèm gì/i).first();
-
-    // Tăng timeout lên 30 giây để đảm bảo API đăng nhập và Expo Router có đủ thời gian chuyển trang
-    await searchInput.waitFor({ state: "visible", timeout: 30000 });
-
-    // 3. Nhập từ khóa và chờ kết quả (kiểm tra tính năng debounce 1s)
-    const testKeyword = "Cơm tấm";
-    await searchInput.fill(testKeyword);
-    // Chờ 1.5s để debounce UseSearchUsage kích hoạt analytics.searchSubmitted[cite: 2]
-    await page.waitForTimeout(1500);
-
-    // 4. Mở một quán đang mở cửa
-    // Tránh click vào nhãn "Đóng cửa", ưu tiên các card có chứa thông tin món
-    const restaurantCard = page
-      .locator('[data-testid="restaurant-card"]')
-      .filter({ hasNotText: /đóng cửa/i })
-      .first();
-    if ((await restaurantCard.count()) === 0) {
-      test.fail(
-        true,
-        "FAIL: Không tìm thấy quán ăn nào đang mở cửa để tiếp tục luồng test.",
-      );
-    }
-    await restaurantCard.click();
-
-    // 5. Mở một món ăn và chọn
-    const foodItem = page.locator('[data-testid="food-item"]').first();
-    await foodItem.waitFor({ state: "visible" });
-    await foodItem.click();
-
-    // Chọn option nếu có (radio buttons, checkboxes)
-    const radioOptions = page.getByRole("radio");
-    if ((await radioOptions.count()) > 0) {
-      await radioOptions.first().check();
-    }
-
-    // 6. Thêm vào giỏ
-    const addToCartBtn = page.getByRole("button", {
-      name: /thêm vào giỏ|add to cart/i,
-    });
-    await addToCartBtn.click();
-
-    // Xác minh giỏ hàng cập nhật số lượng
-    const cartBadge = page.locator('[data-testid="cart-badge"]');
-    await expect(cartBadge).toBeVisible();
-    await expect(cartBadge).not.toHaveText("0");
-
-    // 7. Mở màn hình thanh toán
-    const cartButton = page.getByRole("button", { name: /giỏ hàng|cart/i });
-    await cartButton.click();
-
-    const checkoutTitle = page.getByText(/thanh toán|checkout/i).first();
-    await expect(checkoutTitle).toBeVisible();
-
-    // 8. Kích hoạt flush PostHog Event
-    // PostHog SDK có maxQueueSize 100 và flushInterval 30s.[cite: 1]
-    // Sự kiện pagehide sẽ kích hoạt analytics.background() và ép SDK flush() ngay lập tức
-    await page.evaluate(() => {
-      window.dispatchEvent(new Event("pagehide"));
+    const captured: CapturedEvent[] = [];
+    page.on('request', request => {
+      const url = request.url();
+      if (!/posthog\.(com|eu)\//i.test(url) || !/\/(e|batch|capture)\//i.test(new URL(url).pathname)) return;
+      captured.push(...decodePostHogRequest(request));
     });
 
-    // Chờ một chút để network requests hoàn tất việc gửi
-    await page.waitForTimeout(3000);
+    await page.goto('/');
+    const homeSearch = page.getByPlaceholder(/bạn đang thèm gì/i).first();
+    if (!(await homeSearch.isVisible().catch(() => false))) {
+      await page.goto('/login');
+      await page.getByPlaceholder(/email/i).first().fill(email!);
+      await page.getByPlaceholder(/mật khẩu|password/i).first().fill(password!);
+      await page.getByRole('button', { name: /đăng nhập/i }).click();
+    }
+    await expect(homeSearch).toBeVisible({ timeout: 45_000 });
 
-    // XÁC MINH ANALYTICS PASS/FAIL
-    const events = capturedPosthogEvents.map((e) => e.event);
+    const keyword = process.env.ANALYTICS_TEST_QUERY?.trim() || 'cơm';
+    await homeSearch.fill(keyword);
 
-    // Yêu cầu phải có các sự kiện cốt lõi[cite: 3, 4]
-    expect(events, "FAIL: Thiếu sự kiện app_opened").toContain("app_opened");
-    expect(events, "FAIL: Thiếu sự kiện screen_viewed").toContain(
-      "screen_viewed",
-    );
-    expect(events, "FAIL: Thiếu sự kiện search_submitted").toContain(
-      "search_submitted",
-    );
-    expect(events, "FAIL: Thiếu sự kiện food_added_to_cart").toContain(
-      "food_added_to_cart",
-    );
-    expect(events, "FAIL: Thiếu sự kiện checkout_started").toContain(
-      "checkout_started",
-    );
+    // Chọn món từ kết quả tìm kiếm, tránh phụ thuộc vào tên quán hoặc ID cố định.
+    const foodResult = page.getByRole('button', { name: /^xem món /i }).first();
+    await expect(foodResult).toBeVisible({ timeout: 30_000 });
+    await foodResult.click();
 
-    // Yêu cầu KHÔNG chứa các sự kiện tạo đơn (bài test dừng ở Checkout)
-    expect(
-      events,
-      "FAIL: Phát hiện event order_created (Bài test không được phép tạo đơn)",
-    ).not.toContain("order_created");
+    // Chọn lựa chọn đầu tiên ở mỗi nhóm để thỏa các nhóm bắt buộc trước khi thêm giỏ.
+    const optionRules = page.getByText(/^(Chọn 1|Chọn ít nhất 1|Chọn nhiều)$/);
+    for (let index = 0; index < await optionRules.count(); index += 1) {
+      const group = optionRules.nth(index).locator('xpath=../../..');
+      const options = group.locator('[data-testid^="option-"]');
+      if (await options.count() === 0) {
+        throw new Error('Món kiểm thử có nhóm tùy chọn nhưng không có lựa chọn để hoàn tất. Hãy đổi ANALYTICS_TEST_QUERY.');
+      }
+      await options.first().click();
+    }
 
-    // Kiểm tra Properties chi tiết
-    const screenViewEvents = capturedPosthogEvents.filter(
-      (e) => e.event === "screen_viewed",
-    );
-    expect(
-      screenViewEvents.some((e) => e.properties?.screen_name === "home"),
-      "FAIL: Không ghi nhận được screen_name: home",
-    ).toBeTruthy();
-    expect(
-      screenViewEvents.some((e) => e.properties?.screen_name === "checkout"),
-      "FAIL: Không ghi nhận được screen_name: checkout",
-    ).toBeTruthy();
+    const addToCart = page.getByTestId('add-to-cart');
+    await expect(addToCart).toBeEnabled({ timeout: 15_000 });
+    await addToCart.click();
 
-    const searchEvents = capturedPosthogEvents.filter(
-      (e) => e.event === "search_submitted",
-    );
-    expect(searchEvents.length).toBeGreaterThan(0);
+    const openCart = page.getByRole('button', { name: /mở giỏ hàng/i });
+    await expect(openCart).toBeVisible({ timeout: 15_000 });
+    await openCart.click();
 
-    // Xác minh chuẩn cấu hình chung[cite: 1]
-    for (const event of capturedPosthogEvents) {
-      expect(event.properties?.app, "FAIL: app property không đúng chuẩn").toBe(
-        "soopifood-customer",
-      );
-      expect(
-        event.properties?.environment,
-        "FAIL: environment không đúng chuẩn",
-      ).toBe("development");
+    // Nút này chỉ mở bước checkout; tuyệt đối không nhấn nút xác nhận đặt hàng.
+    const continueToCheckout = page.getByTestId('order-now');
+    await expect(continueToCheckout).toBeEnabled({ timeout: 20_000 });
+    await continueToCheckout.click();
+    await expect(page).toHaveURL(/\/checkout(?:\?|$)/, { timeout: 20_000 });
 
-      // Đảm bảo Payload KHÔNG chứa dữ liệu nhạy cảm (PII)
-      const stringifiedProps = JSON.stringify(event.properties || {});
-      expect(stringifiedProps, "FAIL: Payload bị lộ Password").not.toContain(
-        password,
-      );
-      expect(stringifiedProps, "FAIL: Payload bị lộ Email").not.toContain(
-        email,
-      );
-      expect(
-        stringifiedProps,
-        "FAIL: Phát hiện nội dung từ khóa tìm kiếm trong Payload",
-      ).not.toContain(testKeyword.toLowerCase());
+    // PostHog flush theo lô/chu kỳ; chờ các sự kiện cần thiết được gửi qua network.
+    await expect.poll(
+      () => [...new Set(captured.map(item => item.event))],
+      {
+        timeout: 60_000,
+        intervals: [1_000, 2_000, 3_000, 5_000],
+        message: 'Không nhận đủ sự kiện PostHog. Kiểm tra project token, host và cấu hình analytics của Expo Web.',
+      },
+    ).toEqual(expect.arrayContaining([
+      'app_opened',
+      'screen_viewed',
+      'search_submitted',
+      'food_added_to_cart',
+      'checkout_started',
+    ]));
+
+    const eventNames = captured.map(item => item.event);
+    expect(eventNames).not.toContain('order_created');
+
+    const screenViews = captured.filter(item => item.event === 'screen_viewed');
+    expect(screenViews.some(item => item.properties?.screen_name === 'home')).toBe(true);
+    expect(screenViews.some(item => item.properties?.screen_name === 'checkout')).toBe(true);
+
+    const searchEvent = captured.find(item => item.event === 'search_submitted');
+    expect(searchEvent?.properties?.source).toBe('home');
+    expect(searchEvent?.properties?.query_length).toEqual(expect.any(Number));
+    expect(searchEvent?.properties?.result_count).toEqual(expect.any(Number));
+    expect(Number(searchEvent?.properties?.result_count)).toBeGreaterThan(0);
+
+    const addedEvent = captured.find(item => item.event === 'food_added_to_cart');
+    expect(addedEvent?.properties?.food_id).toEqual(expect.any(String));
+    expect(addedEvent?.properties?.restaurant_id).toEqual(expect.any(String));
+    expect(Number(addedEvent?.properties?.quantity)).toBeGreaterThan(0);
+    expect(addedEvent?.properties?.currency).toBe('VND');
+
+    const checkoutEvent = captured.find(item => item.event === 'checkout_started');
+    expect(Number(checkoutEvent?.properties?.item_count)).toBeGreaterThan(0);
+    expect(checkoutEvent?.properties?.currency).toBe('VND');
+
+    // Chỉ kiểm tra properties thu thập được; không in request body hoặc thông tin đăng nhập ra log.
+    for (const item of captured) {
+      expect(item.properties?.app).toBe('soopifood-customer');
+      expect(item.properties?.event_version).toBe(1);
+      const properties = JSON.stringify(item.properties ?? {});
+      expect(properties).not.toContain(email!);
+      expect(properties).not.toContain(password!);
+      expect(properties.toLocaleLowerCase('vi')).not.toContain(keyword.toLocaleLowerCase('vi'));
     }
   });
 });

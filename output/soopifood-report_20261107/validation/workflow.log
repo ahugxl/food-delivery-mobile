@@ -399,3 +399,8 @@ stdout:
     [PPTX] output\soopifood-report_20261107\exports\soopifood-report_20261107_213340.pptx
     [REPORT] output\soopifood-report_20261107\validation\soopifood-report_20261107_213340.report.json
 === 2026-11-07T14:33:42.426Z END run=33f2f9f0415e elapsed_ms=5328 output_lines=47 retained=5 omitted=42 ===
+
+=== 2026-11-07T17:07:12.127Z PYTHON run=5ea469cabbf5 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\pptx_to_svg.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107\\exports\\soopiFood-bao-cao-v4.pptx", "-o", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-monitor_20261108", "--inheritance-mode", "both", "--roundtrip"]
+=== 2026-11-07T17:07:14.828Z END run=5ea469cabbf5 elapsed_ms=2701 output_lines=11 retained=0 omitted=11 ===

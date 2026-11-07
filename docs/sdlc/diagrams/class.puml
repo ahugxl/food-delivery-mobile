@@ -1,0 +1,74 @@
+@startuml
+!pragma layout smetana
+skinparam shadowing false
+title soopiFood - Domain model and implementation services
+class Food <<TypeScript interface>> {
+  id: string
+  name: string
+  price: number
+}
+class CartItem <<TypeScript interface>> {
+  lineId: string
+  foodId: string
+  restaurantId: string
+  quantity: number
+  unitPrice: number
+  note: string
+}
+class SelectedOption <<TypeScript type>> {
+  id: string
+  groupId: string
+  label: string
+  price: number
+}
+class Restaurant <<domain>> {
+  id: UUID
+  is_open: boolean
+  latitude: number
+  longitude: number
+}
+class Order <<database row>> {
+  id: UUID
+  user_id: UUID
+  status: string
+  total: numeric
+}
+class OrderItem <<database row>> {
+  order_id: UUID
+  food_id: UUID
+  quantity: integer
+  options_snapshot: JSON
+}
+class PurchaseApi <<factory object>> {
+  checkVoucher(code, items)
+  createOrder(input)
+  order(id, userId)
+  orders(userId)
+}
+class AiController <<Java>> {
+  status()
+  recommend(authorization, question)
+  stream(authorization, question, response)
+}
+class RecommendationService <<Java>> {
+  recommend(authorization, question)
+  stream(authorization, question, callbacks)
+}
+class SupabaseGateway <<Java>>
+class MenuEmbeddings <<Java>>
+CartItem --|> Food
+CartItem "1" *-- "0..*" SelectedOption
+Restaurant "1" -- "0..*" Food
+Restaurant "1" -- "0..*" Order
+Order "1" *-- "1..*" OrderItem
+OrderItem "0..*" --> "1" Food
+PurchaseApi ..> CartItem
+PurchaseApi ..> Order : RPC result
+AiController --> RecommendationService
+RecommendationService --> SupabaseGateway
+RecommendationService --> MenuEmbeddings
+note bottom of Order
+Composition expresses business ownership.
+Database constraints are documented in ERD/migrations.
+end note
+@enduml

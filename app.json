@@ -49,7 +49,8 @@
           "cameraPermission": "Cho phép chụp ảnh để gửi trong cuộc trò chuyện đơn hàng.",
           "microphonePermission": false
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

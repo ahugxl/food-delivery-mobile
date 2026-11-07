@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, Arial" font-size="24" data-pptx-page-role="content">
+<rect id="bg" data-pptx-role="background" width="1280" height="720" fill="#FFFFFF" />
+<g id="heading" data-pptx-bounds="48 32 1184 100">
+<text x="48" y="51" font-size="16" fill="#006B42">06 / VẬN HÀNH KHI NGƯỜI DÙNG TĂNG</text>
+<text x="48" y="104" font-size="40" font-weight="bold" fill="#153F32">GIÁM SÁT &amp; MỞ RỘNG HỆ THỐNG</text>
+</g>
+<g id="monitoring" data-pptx-bounds="48 150 1184 142">
+<rect x="48" y="150" width="1184" height="142" rx="20" fill="#EFF7F1" />
+<line x1="640" y1="174" x2="640" y2="268" stroke="#D4E4D9" />
+<text x="72" y="182" font-size="20" font-weight="bold" fill="#006B42">ĐÃ CÓ TRONG CODE</text>
+<text x="72" y="223" fill="#153F32">Log lỗi AI và tiến trình tạo vector</text>
+<text x="72" y="258" font-size="16" fill="#61766B">/api/ai/status chỉ kiểm tra cấu hình, chưa phải health check đầy đủ.</text>
+<text x="664" y="182" font-size="20" font-weight="bold" fill="#006B42">GIÁM SÁT CẦN BỔ SUNG</text>
+<text x="664" y="223" fill="#153F32">Độ trễ p95 · lỗi · CPU/RAM · quota</text>
+<text x="664" y="258" font-size="16" fill="#61766B">Dashboard và cảnh báo tập trung là phương án đề xuất.</text>
+</g>
+<g id="vertical-scaling" data-pptx-bounds="48 318 568 204">
+<rect x="48" y="324" width="4" height="32" fill="#00A65A" />
+<text x="72" y="351" font-size="28" font-weight="bold" fill="#006B42">DỌC · tăng tài nguyên</text>
+<text x="72" y="384" font-size="16" fill="#61766B">Khi CPU/RAM là điểm nghẽn</text>
+<text x="72" y="428" fill="#153F32"><tspan x="72" dy="0">Supabase: nâng compute CPU/RAM</tspan><tspan x="72" dy="36">Backend: tăng cấu hình máy chạy</tspan></text>
+<text x="72" y="506" font-size="20" fill="#61766B">Nâng gói ≠ tự chia nhỏ database.</text>
+</g>
+<g id="horizontal-scaling" data-pptx-bounds="664 318 568 204">
+<rect x="664" y="324" width="4" height="32" fill="#00A65A" />
+<text x="688" y="351" font-size="28" font-weight="bold" fill="#006B42">NGANG · tăng số bản chạy</text>
+<text x="688" y="384" font-size="16" fill="#61766B">Khi cần chia tải xử lý hoặc tải đọc</text>
+<text x="688" y="428" fill="#153F32"><tspan x="688" dy="0">AI/Admin: nhiều instance, cân bằng tải</tspan><tspan x="688" dy="36">Read replica: chia tải đọc database</tspan></text>
+<text x="688" y="506" font-size="20" fill="#61766B">Ghi vẫn về primary; bản sao có thể trễ.</text>
+</g>
+<g id="scaling-roadmap" data-pptx-bounds="48 546 1184 94">
+<rect x="48" y="546" width="1184" height="94" rx="16" fill="#006B42" />
+<text x="72" y="581" font-weight="bold" fill="#FFFFFF">Đo tải → tối ưu query/cache → nâng compute → thêm replica khi cần</text>
+<text x="72" y="615" font-size="20" fill="#FFFFFF">Trước khi nhân bản AI: 1 worker tạo vector + bộ giới hạn/quota dùng chung.</text>
+</g>
+<g id="footer" data-pptx-bounds="48 672 1184 32">
+<line x1="48" y1="672" x2="1232" y2="672" stroke="#D4E4D9" />
+<text x="48" y="697" font-size="16" fill="#61766B">Scale là đề xuất, chưa load test · Render Free chưa hỗ trợ nhiều instance · Nguồn trong ghi chú</text>
+<text x="1232" y="697" text-anchor="end" font-size="16" fill="#61766B">07 / 09</text>
+</g>
+</svg>

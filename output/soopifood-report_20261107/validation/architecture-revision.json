@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-07",
+  "source": "user architecture reference screenshot",
+  "changed_slides": [
+    2
+  ],
+  "html_self_check": "pass",
+  "ppt_master_quality_gate": "pass, zero errors",
+  "powerpoint_render_review": "pass",
+  "native_editable": true,
+  "scope": "architecture only; no application logic changes",
+  "media": "S3 upload from admin; Cloudflare CDN links to apps",
+  "custom_connector_reason": "The two outer routes require rounded multi-bend arrowheads and a crossing hop. Unconnected stock connector presets cannot preserve the arrowhead/hop contract; native editable SVG paths implement these route semantics. Tabler pictograms are inline local symbols, not data-icon placeholders."
+}

@@ -1,0 +1,5 @@
+Sơ đồ này thể hiện ba tầng của hệ thống. Phía trên là app khách hàng, app tài xế và web quản trị. App khách dùng Expo và React Native. App khách cùng app tài xế truy cập Supabase qua HTTPS và Realtime để đăng nhập, đặt hàng, cập nhật trạng thái và nhắn tin.
+
+Khối lớn ở giữa là backend Supabase được quản lý, gồm Auth, Data API và các hàm RPC, Realtime, cùng Storage cho ảnh người dùng. RLS và quyền gọi hàm kiểm soát truy cập. Dữ liệu nghiệp vụ và vector menu được lưu trong PostgreSQL với pgvector.
+
+Bên phải là hai dịch vụ riêng. API quản trị dùng Node.js và Express để kiểm tra phiên đăng nhập, quyền admin, quản lý dữ liệu và phân công tài xế. Backend AI dùng Spring Boot và Spring AI, nhận câu hỏi từ app khách, gọi Gemini, tìm vector rồi kiểm tra kết quả bằng RPC trước khi trả lời theo luồng SSE. API quản trị upload ảnh món và quán lên Backblaze B2 qua S3; app nhận ảnh qua Cloudflare CDN. Các khóa đặc quyền và khóa AI được giữ ở backend, không nhúng vào app khách.

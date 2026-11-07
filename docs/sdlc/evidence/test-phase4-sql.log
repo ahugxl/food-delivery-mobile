@@ -1,0 +1,8 @@
+Error: ENOENT: no such file or directory, open 'D:\TBDD\btl\food-delivery\supabase\migrations\20261026_phase2_checkout.sql'
+    at Object.readFileSync (node:fs:441:20)
+    at main (D:\TBDD\btl\food-delivery\scripts\test-phase4-sql.cjs:10:22) {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'D:\\TBDD\\btl\\food-delivery\\supabase\\migrations\\20261026_phase2_checkout.sql'
+}

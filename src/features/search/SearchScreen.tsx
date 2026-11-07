@@ -21,6 +21,7 @@ import { findFoodCollection } from './foodCollections';
 import { FoodCollectionStrip } from '../../components/FoodCollectionStrip';
 import { SearchFoodStrip } from './SearchFoodStrip';
 import { useDiscoveryCategories } from '../../hooks/useDiscoveryCategories';
+import { useSearchUsage } from '../../hooks/useUsageAnalytics';
 export default function SearchScreen({ categoryId }: {
     categoryId?: string;
 }) {
@@ -74,6 +75,7 @@ export default function SearchScreen({ categoryId }: {
     const category = categories.data?.find(item => item.id === categoryId);
     const loading = restaurants.isPending || (!!collectionId && discovery.isPending) || ((!collectionId || !!collection) && foods.isPending);
     const failed = restaurants.isError || foods.isError || (!!collectionId && discovery.isError);
+    useSearchUsage(keyword, results.length, !loading && !failed, categoryId || collectionId ? 'category' : 'search');
     const refresh = () => { void restaurants.refetch(); void foods.refetch(); void discovery.refetch(); };
     const collectionTitle = collection?.kind === 'restaurant_tag' ? collection.name : collection ? `Quán bán ${collection.name.toLowerCase()}` : 'Khám phá quán ngon';
     return <SafeAreaView className="flex-1 bg-white"><FlowHeader title={category ? viLabel(category.name) : collectionTitle}/>

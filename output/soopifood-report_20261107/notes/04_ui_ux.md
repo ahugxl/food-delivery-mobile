@@ -1,0 +1,3 @@
+Về giao diện, nhóm tổ chức theo hành trình đặt món thay vì đưa tất cả chức năng lên một màn hình. Người dùng bắt đầu bằng email và mật khẩu hoặc đăng nhập xã hội. Sau đó, họ tìm quán, xem những món phù hợp rồi chuyển sang xác nhận đơn.
+
+Ba hình trên slide là màn hình thật của ứng dụng. Ở bước thanh toán, app hiển thị địa chỉ, người nhận và hai lựa chọn voucher độc lập: giảm tiền món và giảm phí giao hàng. Toàn bộ nhãn hướng đến người dùng được trình bày bằng tiếng Việt. Những trạng thái đang tải, gặp lỗi hoặc chưa có dữ liệu đều có phản hồi. Nếu món có lựa chọn bắt buộc, người dùng phải chọn đủ trước khi thêm vào giỏ. Ứng dụng cũng kiểm tra phạm vi giao hàng hai mươi ki lô mét. Mục tiêu của nhóm là giúp khách biết mình cần làm gì và tránh sai thông tin trước khi đặt.

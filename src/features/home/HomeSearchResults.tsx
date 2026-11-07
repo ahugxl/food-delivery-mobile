@@ -13,6 +13,7 @@ import { SearchFoodStrip } from '../search/SearchFoodStrip';
 import { nearestRestaurants } from './nearbyRestaurants';
 import { useOrderStore } from '../../store/orderStore';
 import { validCoordinates } from '../location/coordinates';
+import { useSearchUsage } from '../../hooks/useUsageAnalytics';
 
 export function HomeSearchResults({ keyword, restaurants, loading, error, retry }: {
   keyword: string; restaurants: Row<'restaurants'>[]; loading: boolean; error: boolean; retry: () => void;
@@ -30,6 +31,7 @@ export function HomeSearchResults({ keyword, restaurants, loading, error, retry 
     }
     return grouped;
   }, [foods.data, keyword]);
+  useSearchUsage(keyword, results.length, !loading && !error && foods.isSuccess, 'home');
   return <View className="px-4 pt-4">
     {!hasKeyword ? <Text className="py-6 text-center text-sm text-muted">Nhập tên quán hoặc món bạn muốn tìm.</Text>
       : loading || foods.isPending ? <View className="gap-4"><Skeleton height={140}/><Skeleton height={140}/></View>

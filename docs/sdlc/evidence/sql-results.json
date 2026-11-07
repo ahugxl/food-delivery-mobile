@@ -1,0 +1,102 @@
+[
+  {
+    "script": "test-ai-vector-sql.cjs",
+    "exitCode": 0,
+    "log": "docs/sdlc/evidence/test-ai-vector-sql.log"
+  },
+  {
+    "script": "test-chat-window-sql.cjs",
+    "exitCode": 0,
+    "log": "docs/sdlc/evidence/test-chat-window-sql.log"
+  },
+  {
+    "script": "test-checkout-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-checkout-sql.log"
+  },
+  {
+    "script": "test-customer-delivery-progress-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-customer-delivery-progress-sql.log"
+  },
+  {
+    "script": "test-delivery-range-sql.cjs",
+    "exitCode": 0,
+    "log": "docs/sdlc/evidence/test-delivery-range-sql.log"
+  },
+  {
+    "script": "test-discovery-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-discovery-sql.log"
+  },
+  {
+    "script": "test-driver-foundation-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-driver-foundation-sql.log"
+  },
+  {
+    "script": "test-driver-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-driver-sql.log"
+  },
+  {
+    "script": "test-driver-workflow-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-driver-workflow-sql.log"
+  },
+  {
+    "script": "test-dual-vouchers-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-dual-vouchers-sql.log"
+  },
+  {
+    "script": "test-loyalty-redemption-sql.cjs",
+    "exitCode": 0,
+    "log": "docs/sdlc/evidence/test-loyalty-redemption-sql.log"
+  },
+  {
+    "script": "test-phase3-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-phase3-sql.log"
+  },
+  {
+    "script": "test-phase4-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-phase4-sql.log"
+  },
+  {
+    "script": "test-profile-addresses-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-profile-addresses-sql.log"
+  },
+  {
+    "script": "test-recipient-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-recipient-sql.log"
+  },
+  {
+    "script": "test-restaurant-rating-sql.cjs",
+    "exitCode": 0,
+    "log": "docs/sdlc/evidence/test-restaurant-rating-sql.log"
+  },
+  {
+    "script": "test-restaurant-review-feed-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-restaurant-review-feed-sql.log"
+  },
+  {
+    "script": "test-shipping-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-shipping-sql.log"
+  },
+  {
+    "script": "test-signup-phone-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-signup-phone-sql.log"
+  },
+  {
+    "script": "test-voucher-wallet-sql.cjs",
+    "exitCode": 1,
+    "log": "docs/sdlc/evidence/test-voucher-wallet-sql.log"
+  }
+]

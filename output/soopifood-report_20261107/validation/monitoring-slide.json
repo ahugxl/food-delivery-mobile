@@ -1,0 +1,14 @@
+{
+  "soopiFood-giam-sat-mo-rong.pptx": {
+    "slides": 1,
+    "expected": 1,
+    "passed": true
+  },
+  "soopiFood-bao-cao-v4.pptx": {
+    "slides": 9,
+    "expected": 9,
+    "passed": true
+  },
+  "visual_review": "PowerPoint-rendered preview: checked separately by the author",
+  "scope": "Slide artifacts only; no infrastructure changes or load testing"
+}

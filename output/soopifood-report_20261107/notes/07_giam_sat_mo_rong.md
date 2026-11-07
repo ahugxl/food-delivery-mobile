@@ -1,0 +1,6 @@
+Về giám sát, code hiện có log lỗi AI, log đồng bộ vector và endpoint kiểm tra cấu hình. Endpoint này chưa chứng minh Supabase và Gemini đều hoạt động. Dashboard và cảnh báo tập trung là đề xuất, cần đo độ trễ, tỷ lệ lỗi, CPU, RAM và quota.
+
+Khi tải tăng, nhóm đo và tối ưu query, cache trước. Nếu database thiếu tài nguyên, nâng compute Supabase là mở rộng theo chiều dọc. Nếu API quá tải, có thể chạy nhiều instance sau cân bằng tải, tức chiều ngang. Read replica chỉ chia tải đọc phù hợp, không tăng khả năng ghi và có thể trễ dữ liệu. Nâng gói không tự động chia nhỏ database. Với backend AI, cần tách một worker tạo vector và chuyển giới hạn gọi sang nơi dùng chung; thêm instance không giải quyết quota Gemini. Các phương án này chưa được triển khai và kiểm thử tải trong lần báo cáo.
+
+
+Nguồn tham khảo cho người trình bày, không đọc thành lời: Supabase Compute and Disk (https://supabase.com/docs/guides/platform/compute-and-disk), Read Replicas (https://supabase.com/docs/guides/platform/read-replicas), Metrics API (https://supabase.com/docs/guides/observability/metrics), Render Scaling (https://render.com/docs/scaling). Đối chiếu ngày 07/11/2026. Cơ chế hiện có được xác minh từ AiController, RecommendationService, MenuIndexer và MenuEmbeddings; không xác nhận dashboard hoặc scale thực tế.

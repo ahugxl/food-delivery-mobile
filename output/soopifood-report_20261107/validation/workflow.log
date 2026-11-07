@@ -1,0 +1,401 @@
+
+=== 2026-11-07T13:31:28.420Z NOTE id=b7ea9c308d69 ===
+Project initialized: profile=default; path=D:\TBDD\btl\food-delivery\output\soopifood-report_20261107
+
+=== 2026-11-07T13:31:44.139Z PYTHON run=a67f0d372b57 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\analyze_images.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107\\images"]
+stdout:
+  [REPORT] Image analysis CSV: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\analysis\image_analysis.csv
+=== 2026-11-07T13:31:44.259Z END run=a67f0d372b57 elapsed_ms=119 output_lines=23 retained=1 omitted=22 ===
+
+=== 2026-11-07T13:34:22.080Z PYTHON run=792707e2603c ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\project_manager.py", "validate", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107"]
+stdout:
+  [WARN]
+  [OK] Project structure is valid, with warnings.
+=== 2026-11-07T13:34:22.866Z END run=792707e2603c elapsed_ms=786 output_lines=5 retained=2 omitted=3 ===
+
+=== 2026-11-07T13:34:35.764Z PYTHON run=659aa7d8bf2d ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\text_measure.py", "calibrate", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--outline"]
+=== 2026-11-07T13:34:36.291Z END run=659aa7d8bf2d elapsed_ms=526 output_lines=16 retained=0 omitted=16 ===
+
+=== 2026-11-07T13:34:38.047Z PYTHON run=4ed4c420c5db ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\analyze_images.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107\\images"]
+stdout:
+  [REPORT] Image analysis CSV: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\analysis\image_analysis.csv
+=== 2026-11-07T13:34:38.208Z END run=4ed4c420c5db elapsed_ms=160 output_lines=25 retained=1 omitted=24 ===
+
+=== 2026-11-07T13:37:35.094Z PYTHON run=6aa09bfc157c ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_quality_checker.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--canonical-authoring", "--stage", "early", "--json"]
+stdout:
+  [WARN] 01_soopifood.svg - Passed (with warnings)
+     [WARN] Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (7 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[13]:font-size '24' -> None; text[18]:font-size '24' -> None; text[20]:font-size '24' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)
+     [WARN] <text> (x=48, y=634; text='Đào Thế Vinh — 23702…') exceeds <g id="team"> data-pptx-bounds on the vertical axis: content (48.0, 613.6)-(351.2, 642.4), container (48.0, 504.0)-(768.0, 638.0), overflow horizontal 0.0%, vertical 3.3% (error above 5%); expand the root module bounds into available non-overlapping space; otherwise reflow the text
+     [WARN] Image ../images/logo.png is 1024x1024 and renders at 0.07x scale in a 72x72 meet frame; the source is 1.4 MiB — file-size advisory only, not an aspect-ratio warning; consider a smaller source asset, or export with svg_to_pptx.py --image-sizing display to downsize at export time
+  [ERROR] 02_kien_truc.svg - Failed
+     viewBox: 0 0 1280 720
+     [ERROR] <g id="architecture-links"> data-pptx-bounds overlaps <g id="customer-app"> data-pptx-bounds by 304.0px x 83.0px; keep ordinary direct-root module zones disjoint beyond the 1px tolerance
+     [ERROR] <g id="architecture-links"> data-pptx-bounds overlaps <g id="supabase-platform"> data-pptx-bounds by 378.0px x 167.0px; keep ordinary direct-root module zones disjoint beyond the 1px tolerance
+     [ERROR] <g id="architecture-links"> data-pptx-bounds overlaps <g id="ai-backend"> data-pptx-bounds by 304.0px x 86.0px; keep ordinary direct-root module zones disjoint beyond the 1px tolerance
+     [ERROR] <g id="architecture-links"> data-pptx-bounds overlaps <g id="gemini"> data-pptx-bounds by 378.0px x 86.0px; keep ordinary direct-root module zones disjoint beyond the 1px tolerance
+     [WARN] Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (17 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[13]:font-size '24' -> None; text[15]:font-size '24' -> None; text[17]:font-size '24' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)
+     [WARN] Detected 1 paragraph-like line run(s) split across sibling <text> elements (<g id="supabase-platform"> x=852.0, y=254.0..292.0, 2 lines). If each run is one prose paragraph, combine it into one <text>: keep its first line as direct text and use direct <tspan> children with the parent x and positive relative dy values for later lines. An all-<tspan> form may start with dy="0". Keep semantically independent text frames separate.
+  [WARN] 03_ui_ux.svg - Passed (with warnings)
+     viewBox: 0 0 1280 720
+  [ERROR] 04_backend_database.svg - Failed
+     viewBox: 0 0 1280 720
+     [ERROR] <text> (x=1232, y=699; text='04 / 07') exceeds <g id="footer"> data-pptx-bounds on the vertical axis: content (1179.5, 685.4)-(1232.0, 704.6), container (48.0, 650.0)-(1232.0, 700.0), overflow horizontal 0.0%, vertical 9.2% (error above 5%); expand the root module bounds into available non-overlapping space; otherwise reflow the text
+     [WARN] Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (11 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): g[26]:font-size '24' -> None; g[26]:text-anchor None -> 'middle'; text[27]:text-anchor 'middle' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)
+  [ERROR] 05_cache_ai.svg - Failed
+     viewBox: 0 0 1280 720
+     [ERROR] <text> (x=1232, y=699; text='05 / 07') exceeds <g id="footer"> data-pptx-bounds on the vertical axis: content (1179.5, 685.4)-(1232.0, 704.6), container (48.0, 650.0)-(1232.0, 700.0), overflow horizontal 0.0%, vertical 9.2% (error above 5%); expand the root module bounds into available non-overlapping space; otherwise reflow the text
+     [WARN] Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (10 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[10]:font-size '24' -> None; text[11]:font-size '24' -> None; text[16]:font-size '24' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)
+  [SUMMARY] Check Summary
+  Total files: 5
+    [OK] Fully passed: 0 (0%)
+    [WARN] With warnings: 2 (40%)
+    [ERROR] With errors: 3 (60%)
+  Provenance categories:
+    blocking: 6          hard findings; gate also requires exit 0
+    introduced: 11       advisory; new or changed
+    inherited: 0         informational; prototype-identical
+    source-import: 0     informational; source-conversion loss
+  [CARRIERS] Actual-use receipt (informational; not a quota)
+    Pages: 5 | text: 105 | images: 5 | icons: 0
+    Geometry: SVG elements 46 | native presets 0 | page-frame elements 6 | marker uses 4
+    Effects: inline emphasis 4 (pages 2) | gradients 0 (pages 0) | filters 0 (pages 0) | text effects 0 (pages 0)
+    Native objects: charts 0 | tables 0 | formulas 0
+    Presets: (none)
+  [OK] spec_lock anchor comparison: no additional contextual colors/fonts or out-of-band font sizes
+  [REPORT] JSON quality report exported: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\validation\svg_quality_early_report.json
+=== 2026-11-07T13:37:37.050Z END run=6aa09bfc157c elapsed_ms=1956 output_lines=58 retained=40 omitted=18 ===
+
+=== 2026-11-07T13:38:03.500Z PYTHON run=7ee454bb228b ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_quality_checker.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--canonical-authoring", "--stage", "early", "--json"]
+stdout:
+  [WARN] 01_soopifood.svg - Passed (with warnings)
+     [WARN] Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (7 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[13]:font-size '24' -> None; text[18]:font-size '24' -> None; text[20]:font-size '24' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)
+     [WARN] Image ../images/logo.png is 1024x1024 and renders at 0.07x scale in a 72x72 meet frame; the source is 1.4 MiB — file-size advisory only, not an aspect-ratio warning; consider a smaller source asset, or export with svg_to_pptx.py --image-sizing display to downsize at export time
+  [WARN] 02_kien_truc.svg - Passed (with warnings)
+  [SUMMARY] Check Summary
+  Total files: 5
+    [OK] Fully passed: 0 (0%)
+    [WARN] With warnings: 5 (100%)
+    [ERROR] With errors: 0 (0%)
+  Provenance categories:
+    blocking: 0          hard findings; gate also requires exit 0
+    introduced: 6        advisory; new or changed
+    inherited: 0         informational; prototype-identical
+    source-import: 0     informational; source-conversion loss
+  [CARRIERS] Actual-use receipt (informational; not a quota)
+    Pages: 5 | text: 105 | images: 5 | icons: 0
+    Geometry: SVG elements 46 | native presets 0 | page-frame elements 6 | marker uses 4
+  [OK] spec_lock anchor comparison: no additional contextual colors/fonts or out-of-band font sizes
+  [REPORT] JSON quality report exported: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\validation\svg_quality_early_report.json
+=== 2026-11-07T13:38:05.306Z END run=7ee454bb228b elapsed_ms=1805 output_lines=45 retained=19 omitted=26 ===
+
+=== 2026-11-07T13:39:24.802Z PYTHON run=feb531142e7f ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\compact_svg_styles.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107\\svg_output", "--inplace"]
+=== 2026-11-07T13:39:24.828Z END run=feb531142e7f elapsed_ms=26 output_lines=1 retained=0 omitted=1 ===
+
+=== 2026-11-07T13:39:32.561Z PYTHON run=a48f3fc267bb ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_quality_checker.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--canonical-authoring", "--stage", "final", "--json"]
+stdout:
+  [WARN] 01_soopifood.svg - Passed (with warnings)
+     [WARN] Image ../images/logo.png is 1024x1024 and renders at 0.07x scale in a 72x72 meet frame; the source is 1.4 MiB — file-size advisory only, not an aspect-ratio warning; consider a smaller source asset, or export with svg_to_pptx.py --image-sizing display to downsize at export time
+  [OK] 02_kien_truc.svg - Passed
+  [SUMMARY] Check Summary
+  Total files: 7
+    [OK] Fully passed: 6 (85%)
+    [WARN] With warnings: 1 (14%)
+    [ERROR] With errors: 0 (0%)
+  Provenance categories:
+    blocking: 0          hard findings; gate also requires exit 0
+    introduced: 1        advisory; new or changed
+    inherited: 0         informational; prototype-identical
+    source-import: 0     informational; source-conversion loss
+  [CARRIERS] Actual-use receipt (informational; not a quota)
+    Pages: 7 | text: 150 | images: 6 | icons: 0
+    Geometry: SVG elements 63 | native presets 0 | page-frame elements 8 | marker uses 4
+  [REPORT] JSON quality report exported: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\validation\svg_quality_report.json
+=== 2026-11-07T13:39:34.982Z END run=a48f3fc267bb elapsed_ms=2420 output_lines=44 retained=17 omitted=27 ===
+
+=== 2026-11-07T13:40:56.321Z PYTHON run=9fa3dc6b6aed ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\total_md_split.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107"]
+stdout:
+  [OK] SVG files and notes have one-to-one correspondence
+  [Done] Successfully generated 7/7 file(s)
+  [Done] Notes splitting complete
+=== 2026-11-07T13:40:56.380Z END run=9fa3dc6b6aed elapsed_ms=59 output_lines=16 retained=3 omitted=13 ===
+
+=== 2026-11-07T13:41:03.489Z PYTHON run=9305064ca356 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\finalize_svg.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107"]
+stdout:
+  [OK] Done!
+=== 2026-11-07T13:41:05.068Z END run=9305064ca356 elapsed_ms=1579 output_lines=12 retained=1 omitted=11 ===
+
+=== 2026-11-07T13:41:15.273Z PYTHON run=bde21e848960 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_to_pptx.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--image-sizing", "display", "--no-animations"]
+stdout:
+  [Done] Saved: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\exports\soopifood-report_20261107_204122.pptx
+    [POSTFLIGHT] status=passed-with-warnings quality_gate=passed slides=7 warning_categories=1
+    [POSTFLIGHT][WARNING] quality_introduced_warnings=1
+    [PPTX] D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\exports\soopifood-report_20261107_204122.pptx
+    [REPORT] D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\validation\soopifood-report_20261107_204122.report.json
+=== 2026-11-07T13:41:23.632Z END run=bde21e848960 elapsed_ms=8359 output_lines=40 retained=5 omitted=35 ===
+
+=== 2026-11-07T13:55:55.065Z PYTHON run=5e6b889612be ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\icon_sync.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "tabler-outline/device-mobile", "tabler-outline/truck", "tabler-outline/browser", "tabler-outline/database", "tabler-outline/sparkles", "tabler-outline/shield-lock"]
+stderr:
+  [OK] 6 icon(s) in D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\icons:
+       + tabler-outline/device-mobile
+       + tabler-outline/truck
+       + tabler-outline/browser
+       + tabler-outline/database
+       + tabler-outline/sparkles
+       + tabler-outline/shield-lock
+=== 2026-11-07T13:55:55.105Z END run=5e6b889612be elapsed_ms=39 output_lines=7 retained=7 omitted=0 ===
+
+=== 2026-11-07T14:00:19.462Z PYTHON run=61fb5838f078 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\project_manager.py", "validate", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107"]
+stdout:
+  [OK] Project structure is complete.
+=== 2026-11-07T14:00:20.341Z END run=61fb5838f078 elapsed_ms=879 output_lines=3 retained=1 omitted=2 ===
+
+=== 2026-11-07T14:00:20.808Z PYTHON run=96538467273b ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\compact_svg_styles.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107\\svg_output\\02_kien_truc.svg", "--inplace"]
+=== 2026-11-07T14:00:20.822Z END run=96538467273b elapsed_ms=14 output_lines=1 retained=0 omitted=1 ===
+
+=== 2026-11-07T14:00:29.081Z PYTHON run=8a0bc04f7862 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_quality_checker.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--canonical-authoring", "--stage", "final", "--json"]
+stdout:
+  [WARN] 01_soopifood.svg - Passed (with warnings)
+     [WARN] Image ../images/logo.png is 1024x1024 and renders at 0.07x scale in a 72x72 meet frame; the source is 1.4 MiB — file-size advisory only, not an aspect-ratio warning; consider a smaller source asset, or export with svg_to_pptx.py --image-sizing display to downsize at export time
+  [OK] 02_kien_truc.svg - Passed
+  [SUMMARY] Check Summary
+  Total files: 7
+    [OK] Fully passed: 6 (85%)
+    [WARN] With warnings: 1 (14%)
+    [ERROR] With errors: 0 (0%)
+  Provenance categories:
+    blocking: 0          hard findings; gate also requires exit 0
+    introduced: 1        advisory; new or changed
+    inherited: 0         informational; prototype-identical
+    source-import: 0     informational; source-conversion loss
+  [CARRIERS] Actual-use receipt (informational; not a quota)
+    Pages: 7 | text: 164 | images: 6 | icons: 0
+    Geometry: SVG elements 83 | native presets 0 | page-frame elements 8 | marker uses 9
+  [REPORT] JSON quality report exported: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\validation\svg_quality_report.json
+=== 2026-11-07T14:00:31.100Z END run=8a0bc04f7862 elapsed_ms=2018 output_lines=44 retained=17 omitted=27 ===
+
+=== 2026-11-07T14:00:40.000Z PYTHON run=412d03b331c2 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\total_md_split.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107"]
+stdout:
+  [OK] SVG files and notes have one-to-one correspondence
+  [Done] Successfully generated 7/7 file(s)
+  [Done] Notes splitting complete
+=== 2026-11-07T14:00:40.050Z END run=412d03b331c2 elapsed_ms=49 output_lines=16 retained=3 omitted=13 ===
+
+=== 2026-11-07T14:00:48.028Z PYTHON run=75119f982956 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\finalize_svg.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107"]
+stdout:
+  [OK] Done!
+=== 2026-11-07T14:00:49.376Z END run=75119f982956 elapsed_ms=1348 output_lines=12 retained=1 omitted=11 ===
+
+=== 2026-11-07T14:00:57.979Z PYTHON run=451622816787 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_to_pptx.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--image-sizing", "display", "--no-animations"]
+stdout:
+  [Done] Saved: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\exports\soopifood-report_20261107_210101.pptx
+    [POSTFLIGHT] status=passed-with-warnings quality_gate=passed slides=7 warning_categories=1
+    [POSTFLIGHT][WARNING] quality_introduced_warnings=1
+    [PPTX] D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\exports\soopifood-report_20261107_210101.pptx
+    [REPORT] D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\validation\soopifood-report_20261107_210101.report.json
+=== 2026-11-07T14:01:02.394Z END run=451622816787 elapsed_ms=4405 output_lines=41 retained=5 omitted=36 ===
+
+=== 2026-11-07T14:02:10.739Z PYTHON run=8b2e66634565 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\compact_svg_styles.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107\\svg_output\\02_kien_truc.svg", "--inplace"]
+=== 2026-11-07T14:02:10.757Z END run=8b2e66634565 elapsed_ms=18 output_lines=1 retained=0 omitted=1 ===
+
+=== 2026-11-07T14:02:27.841Z PYTHON run=9616ea324455 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_quality_checker.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--canonical-authoring", "--stage", "final", "--json"]
+stdout:
+  [WARN] 01_soopifood.svg - Passed (with warnings)
+     [WARN] Image ../images/logo.png is 1024x1024 and renders at 0.07x scale in a 72x72 meet frame; the source is 1.4 MiB — file-size advisory only, not an aspect-ratio warning; consider a smaller source asset, or export with svg_to_pptx.py --image-sizing display to downsize at export time
+  [OK] 02_kien_truc.svg - Passed
+  [SUMMARY] Check Summary
+  Total files: 7
+    [OK] Fully passed: 6 (85%)
+    [WARN] With warnings: 1 (14%)
+    [ERROR] With errors: 0 (0%)
+  Provenance categories:
+    blocking: 0          hard findings; gate also requires exit 0
+    introduced: 1        advisory; new or changed
+    inherited: 0         informational; prototype-identical
+    source-import: 0     informational; source-conversion loss
+  [CARRIERS] Actual-use receipt (informational; not a quota)
+    Pages: 7 | text: 163 | images: 6 | icons: 0
+    Geometry: SVG elements 82 | native presets 0 | page-frame elements 8 | marker uses 9
+  [REPORT] JSON quality report exported: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\validation\svg_quality_report.json
+=== 2026-11-07T14:02:29.909Z END run=9616ea324455 elapsed_ms=2068 output_lines=44 retained=17 omitted=27 ===
+
+=== 2026-11-07T14:02:39.196Z PYTHON run=82df539e7696 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\finalize_svg.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107"]
+stdout:
+  [OK] Done!
+=== 2026-11-07T14:02:40.577Z END run=82df539e7696 elapsed_ms=1381 output_lines=12 retained=1 omitted=11 ===
+
+=== 2026-11-07T14:02:49.867Z PYTHON run=893be8ad5e78 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_to_pptx.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--image-sizing", "display", "--no-animations"]
+stdout:
+  [Done] Saved: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\exports\soopifood-report_20261107_210252.pptx
+    [POSTFLIGHT] status=passed-with-warnings quality_gate=passed slides=7 warning_categories=1
+    [POSTFLIGHT][WARNING] quality_introduced_warnings=1
+    [PPTX] D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\exports\soopifood-report_20261107_210252.pptx
+    [REPORT] D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\validation\soopifood-report_20261107_210252.report.json
+=== 2026-11-07T14:02:54.246Z END run=893be8ad5e78 elapsed_ms=4375 output_lines=41 retained=5 omitted=36 ===
+
+=== 2026-11-07T14:13:46.735Z PYTHON run=ffb919f5b75f ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\project_manager.py", "validate", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107"]
+stdout:
+  [OK] Project structure is complete.
+=== 2026-11-07T14:13:47.572Z END run=ffb919f5b75f elapsed_ms=837 output_lines=3 retained=1 omitted=2 ===
+
+=== 2026-11-07T14:13:48.043Z PYTHON run=35a0a97bf018 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\compact_svg_styles.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107\\svg_output\\03_cong_nghe.svg", "--inplace"]
+=== 2026-11-07T14:13:48.054Z END run=35a0a97bf018 elapsed_ms=11 output_lines=1 retained=0 omitted=1 ===
+
+=== 2026-11-07T14:13:48.262Z PYTHON run=fcd40bbc1ba1 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_quality_checker.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--canonical-authoring", "--stage", "final", "--json"]
+stdout:
+  [WARN] 01_soopifood.svg - Passed (with warnings)
+     [WARN] Image ../images/logo.png is 1024x1024 and renders at 0.07x scale in a 72x72 meet frame; the source is 1.4 MiB — file-size advisory only, not an aspect-ratio warning; consider a smaller source asset, or export with svg_to_pptx.py --image-sizing display to downsize at export time
+  [OK] 02_kien_truc.svg - Passed
+  [SUMMARY] Check Summary
+  Total files: 8
+    [OK] Fully passed: 7 (87%)
+    [WARN] With warnings: 1 (12%)
+    [ERROR] With errors: 0 (0%)
+  Provenance categories:
+    blocking: 0          hard findings; gate also requires exit 0
+    introduced: 1        advisory; new or changed
+    inherited: 0         informational; prototype-identical
+    source-import: 0     informational; source-conversion loss
+  [CARRIERS] Actual-use receipt (informational; not a quota)
+    Pages: 8 | text: 183 | images: 6 | icons: 0
+    Geometry: SVG elements 90 | native presets 0 | page-frame elements 9 | marker uses 9
+  [REPORT] JSON quality report exported: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\validation\svg_quality_report.json
+=== 2026-11-07T14:13:50.532Z END run=fcd40bbc1ba1 elapsed_ms=2269 output_lines=46 retained=17 omitted=29 ===
+
+=== 2026-11-07T14:13:58.891Z PYTHON run=c0a211986348 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\total_md_split.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107"]
+stdout:
+  [OK] SVG files and notes have one-to-one correspondence
+  [Done] Successfully generated 8/8 file(s)
+  [Done] Notes splitting complete
+=== 2026-11-07T14:13:58.959Z END run=c0a211986348 elapsed_ms=68 output_lines=17 retained=3 omitted=14 ===
+
+=== 2026-11-07T14:14:09.495Z PYTHON run=6866abbcc470 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\finalize_svg.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107"]
+stdout:
+  [OK] Done!
+=== 2026-11-07T14:14:11.156Z END run=6866abbcc470 elapsed_ms=1661 output_lines=12 retained=1 omitted=11 ===
+
+=== 2026-11-07T14:14:20.521Z PYTHON run=16c7b9728400 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_to_pptx.py", "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107", "--image-sizing", "display", "--no-animations"]
+stdout:
+  [Done] Saved: D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\exports\soopifood-report_20261107_211423.pptx
+    [POSTFLIGHT] status=passed-with-warnings quality_gate=passed slides=8 warning_categories=1
+    [POSTFLIGHT][WARNING] quality_introduced_warnings=1
+    [PPTX] D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\exports\soopifood-report_20261107_211423.pptx
+    [REPORT] D:\TBDD\btl\food-delivery\output\soopifood-report_20261107\validation\soopifood-report_20261107_211423.report.json
+=== 2026-11-07T14:14:24.986Z END run=16c7b9728400 elapsed_ms=4452 output_lines=44 retained=5 omitted=39 ===
+
+=== 2026-11-07T14:32:54.048Z PYTHON run=d486b1a2202f ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\compact_svg_styles.py", "output\\soopifood-report_20261107\\svg_output\\07_giam_sat_mo_rong.svg", "--inplace"]
+=== 2026-11-07T14:32:54.068Z END run=d486b1a2202f elapsed_ms=20 output_lines=1 retained=0 omitted=1 ===
+
+=== 2026-11-07T14:33:03.356Z PYTHON run=56401049f443 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\project_manager.py", "validate", "output\\soopifood-report_20261107"]
+stdout:
+  [OK] Project structure is complete.
+=== 2026-11-07T14:33:04.185Z END run=56401049f443 elapsed_ms=829 output_lines=3 retained=1 omitted=2 ===
+
+=== 2026-11-07T14:33:06.438Z PYTHON run=1883dc3101a8 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_quality_checker.py", "output\\soopifood-report_20261107", "--canonical-authoring", "--stage", "final", "--json"]
+stdout:
+  [WARN] 01_soopifood.svg - Passed (with warnings)
+     [WARN] Image ../images/logo.png is 1024x1024 and renders at 0.07x scale in a 72x72 meet frame; the source is 1.4 MiB — file-size advisory only, not an aspect-ratio warning; consider a smaller source asset, or export with svg_to_pptx.py --image-sizing display to downsize at export time
+  [OK] 02_kien_truc.svg - Passed
+  [SUMMARY] Check Summary
+  Total files: 9
+    [OK] Fully passed: 8 (88%)
+    [WARN] With warnings: 1 (11%)
+    [ERROR] With errors: 0 (0%)
+  Provenance categories:
+    blocking: 0          hard findings; gate also requires exit 0
+    introduced: 1        advisory; new or changed
+    inherited: 0         informational; prototype-identical
+    source-import: 0     informational; source-conversion loss
+  [CARRIERS] Actual-use receipt (informational; not a quota)
+    Pages: 9 | text: 203 | images: 6 | icons: 0
+    Geometry: SVG elements 97 | native presets 0 | page-frame elements 10 | marker uses 9
+  [REPORT] JSON quality report exported: output\soopifood-report_20261107\validation\svg_quality_report.json
+=== 2026-11-07T14:33:08.695Z END run=1883dc3101a8 elapsed_ms=2257 output_lines=48 retained=17 omitted=31 ===
+
+=== 2026-11-07T14:33:17.830Z PYTHON run=93ae0dced2cf ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\total_md_split.py", "output\\soopifood-report_20261107"]
+stdout:
+  [OK] SVG files and notes have one-to-one correspondence
+  [Done] Successfully generated 9/9 file(s)
+  [Done] Notes splitting complete
+=== 2026-11-07T14:33:17.930Z END run=93ae0dced2cf elapsed_ms=100 output_lines=18 retained=3 omitted=15 ===
+
+=== 2026-11-07T14:33:25.193Z PYTHON run=c579360a59d3 ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Users\\Thinh\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\finalize_svg.py", "output\\soopifood-report_20261107"]
+stdout:
+  [OK] Done!
+=== 2026-11-07T14:33:27.218Z END run=c579360a59d3 elapsed_ms=2025 output_lines=12 retained=1 omitted=11 ===
+
+=== 2026-11-07T14:33:37.091Z PYTHON run=33f2f9f0415e ===
+cwd: D:\TBDD\btl\food-delivery
+argv: ["C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe", "C:\\Users\\Thinh\\.codex\\skills\\ppt-master\\scripts\\svg_to_pptx.py", "output\\soopifood-report_20261107", "--image-sizing", "display", "--no-animations"]
+stdout:
+  [Done] Saved: output\soopifood-report_20261107\exports\soopifood-report_20261107_213340.pptx
+    [POSTFLIGHT] status=passed-with-warnings quality_gate=passed slides=9 warning_categories=1
+    [POSTFLIGHT][WARNING] quality_introduced_warnings=1
+    [PPTX] output\soopifood-report_20261107\exports\soopifood-report_20261107_213340.pptx
+    [REPORT] output\soopifood-report_20261107\validation\soopifood-report_20261107_213340.report.json
+=== 2026-11-07T14:33:42.426Z END run=33f2f9f0415e elapsed_ms=5328 output_lines=47 retained=5 omitted=42 ===

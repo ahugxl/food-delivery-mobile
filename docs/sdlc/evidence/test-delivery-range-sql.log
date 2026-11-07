@@ -1,0 +1,1 @@
+Delivery range SQL passed: 0/20 km allowed, >20 blocked, invalid pins blocked, checkout rolls back voucher/order, old trip status unaffected, rerun and grants verified.

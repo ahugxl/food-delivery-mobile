@@ -1,0 +1,44 @@
+@startuml
+title UC-03 - Checkout COD with idempotency
+skinparam shadowing false
+actor Customer
+participant "Checkout UI" as UI
+participant "Cart / PurchaseApi" as APP
+participant "Supabase RPC\ncreate_food_order" as RPC
+database PostgreSQL as DB
+Customer -> UI : Confirm address, recipient, vouchers
+UI -> APP : Validate and reuse/create request UUID
+APP -> RPC : JWT + UUID + items + location + recipient
+RPC -> RPC : Check session and request owner
+RPC -> DB : Acquire transaction lock / find request
+alt Same request already completed
+  DB --> RPC : Existing order
+  RPC --> APP : Existing order
+else New request
+  RPC -> DB : Read catalog, options, vouchers
+  RPC -> RPC : Recalculate prices, shipping, range
+  alt Invalid input or changed price
+    RPC --> APP : Business error
+    APP --> UI : Keep cart, show correction
+  else Valid
+    RPC -> DB : Insert order, items, snapshots\nand related voucher changes in transaction
+    alt Any database operation fails
+      DB --> RPC : Rollback
+      RPC --> APP : Error
+      APP --> UI : Keep cart / same retry UUID
+    else Commit succeeds
+      DB --> RPC : Order
+      RPC --> APP : Confirmed order
+    end
+  end
+end
+opt Confirmed successful result received
+  APP -> APP : Clear cart after confirmation
+  APP --> UI : Navigate to tracking(orderId)
+  UI --> Customer : Show server invoice
+end
+note over APP,RPC
+If the response is lost, retry the same request UUID.
+Do not assume failure means no order was created.
+end note
+@enduml

@@ -1,0 +1,1 @@
+Restaurant rating SQL passed: backfill, insert/update/delete, driver-only/draft exclusion, order status/moves/cascade, owner match, counts, rerun and private permissions.

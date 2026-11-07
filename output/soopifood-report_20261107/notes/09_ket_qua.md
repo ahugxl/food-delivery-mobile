@@ -1,0 +1,3 @@
+Tổng kết lại, soopiFood đã kết nối hành trình đặt món với hai loại voucher, theo dõi và chat theo đơn, đánh giá sau giao hàng, tích xu và đổi mã. Phần hội thoại AI gợi ý các món có trong menu, như màn hình thực tế bên phải.
+
+Hướng phát triển tiếp theo của nhóm là đo độ trễ và tải bằng benchmark, kiểm thử xuyên suốt ba ứng dụng khách hàng, quản trị và tài xế với GPS thật, đồng thời giám sát lỗi cùng quota AI. Đây là những bước giúp đánh giá chất lượng vận hành rõ ràng hơn. Nhóm chúng em cảm ơn thầy và các bạn đã lắng nghe và xin tiếp nhận câu hỏi.

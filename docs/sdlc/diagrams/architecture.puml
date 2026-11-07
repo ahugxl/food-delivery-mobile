@@ -1,0 +1,40 @@
+@startuml
+!pragma layout smetana
+title soopiFood - System architecture (04/11/2026)
+skinparam componentStyle rectangle
+skinparam shadowing false
+actor Customer
+rectangle "Expo / React Native / Web" {
+  component "Expo Router UI" as UI
+  component "Feature rules + API adapters" as APP
+  component "Zustand / React Query" as STATE
+  UI --> APP
+  UI --> STATE
+}
+rectangle "Supabase" {
+  component Auth
+  component "Data API + RPC" as API
+  database "PostgreSQL\nRLS + transactions" as DB
+  component "Storage / Realtime" as RT
+  API --> DB
+}
+rectangle "Java AI service" {
+  component "AiController" as CTRL
+  component "RecommendationService\nFoodTools / Gateway" as AI
+  component "MenuIndexer" as INDEX
+  CTRL --> AI
+}
+cloud Gemini
+actor "Driver / Admin\nExternal clients" as EXT
+Customer --> UI
+APP --> Auth : session
+APP --> API : JWT + public key
+APP --> RT : files / subscriptions
+APP --> CTRL : HTTP / SSE + JWT
+AI --> Auth : validate user
+AI --> API : user-scoped search / recheck
+AI --> Gemini : chat / embedding
+INDEX --> Gemini : document embedding
+INDEX --> DB : restricted server indexing
+EXT --> API : authorized RPC
+@enduml

@@ -1,0 +1,13 @@
+{
+  "new_slide": 3,
+  "full_deck_count": 8,
+  "standalone_slide_count": 1,
+  "source_check": [
+    "customer package.json",
+    "ai-service/pom.xml",
+    "admin package.json",
+    "LeafletMapNative.tsx"
+  ],
+  "quality_errors": 0,
+  "powerpoint_png_review": "pass"
+}

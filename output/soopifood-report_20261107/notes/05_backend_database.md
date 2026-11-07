@@ -1,0 +1,5 @@
+Đằng sau giao diện là dữ liệu thật trên Supabase. File định nghĩa kiểu hiện tại khai báo hai mươi chín bảng public, đã mở rộng so với thiết kế ban đầu. Con số này được kiểm tra từ mã nguồn, không phải kết quả truy vấn trực tiếp database trong lần dựng báo cáo.
+
+Sơ đồ bên trái chỉ giữ các quan hệ lõi: nhà hàng có nhiều món, khách có nhiều đơn, mỗi đơn có các dòng chi tiết tham chiếu món và có đánh giá sau giao hàng. Những nhóm bảng khác phục vụ danh mục, ưu đãi, người dùng và vận hành tài xế.
+
+Khi đặt hàng, client gọi hàm create_food_order. Phía database kiểm tra các điều kiện về giá, khoảng cách, phí giao hàng và voucher, sau đó ghi đơn cùng chi tiết. Cấu hình món được lưu dưới dạng snapshot để giữ lại lựa chọn tại thời điểm đặt. Khoản giảm tiền món và khoản giảm phí giao hàng được lưu riêng. RLS và quyền gọi RPC được dùng để kiểm soát truy cập. Chức năng đánh giá, yêu thích và ví voucher đều có lớp API làm việc với dữ liệu thật. Nhóm không coi kiểm tra kiểu TypeScript là bằng chứng thay thế cho việc kiểm tra quyền trên database đang chạy.

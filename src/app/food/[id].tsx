@@ -27,6 +27,7 @@ import { viLabel } from '../../utils/vietnamese';
 import { foodDiscountPercent } from '../../features/catalog/foodPricing';
 import { useOrderStore } from '../../store/orderStore';
 import { deliveryOrderError } from '../../features/location/deliveryRange';
+import { analytics } from '../../services/analytics';
 
 
 
@@ -98,6 +99,7 @@ function FoodDetailContent({ id }: { id: string }) {
       Toast.show({ type: 'error', text1: 'Không thêm được món', text2: error });
       return;
     }
+    analytics.foodAdded(food.id, food.restaurant_id, quantity, unitPrice);
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Toast.show({
       type: 'success',

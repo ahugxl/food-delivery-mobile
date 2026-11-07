@@ -1,0 +1,929 @@
+
+> food-delivery@1.0.0 test
+> node --test tests/*.test.cjs
+
+TAP version 13
+# Subtest: profile validation trims names, normalizes phone, and never accepts role/points fields
+ok 1 - profile validation trims names, normalizes phone, and never accepts role/points fields
+  ---
+  duration_ms: 5.2262
+  ...
+# Subtest: address validation requires a real pin including zero coordinates and a usable street
+ok 2 - address validation requires a real pin including zero coordinates and a usable street
+  ---
+  duration_ms: 1.0098
+  ...
+# Subtest: saved addresses load default after restart without overwriting a manually chosen point
+ok 3 - saved addresses load default after restart without overwriting a manually chosen point
+  ---
+  duration_ms: 0.5263
+  ...
+# Subtest: address edits update checkout, deleted selections fall back, and legacy missing coordinates are not usable
+ok 4 - address edits update checkout, deleted selections fall back, and legacy missing coordinates are not usable
+  ---
+  duration_ms: 0.3509
+  ...
+# Subtest: profile and address list queries are explicitly scoped and accept cancellation
+ok 5 - profile and address list queries are explicitly scoped and accept cancellation
+  ---
+  duration_ms: 62.2472
+  ...
+# Subtest: profile save sends only whitelisted RPC fields and reports server denial
+ok 6 - profile save sends only whitelisted RPC fields and reports server denial
+  ---
+  duration_ms: 4.7865
+  ...
+# Subtest: address creation retries reuse the same ID; deletion uses transactional RPC
+ok 7 - address creation retries reuse the same ID; deletion uses transactional RPC
+  ---
+  duration_ms: 5.111
+  ...
+# Subtest: invalid profile/address and oversized avatars never issue a backend request
+ok 8 - invalid profile/address and oversized avatars never issue a backend request
+  ---
+  duration_ms: 1.7217
+  ...
+# Subtest: address reminder ignores GPS drift and geocoder wording but flags a different destination
+ok 9 - address reminder ignores GPS drift and geocoder wording but flags a different destination
+  ---
+  duration_ms: 1.6189
+  ...
+# Subtest: no reminder without a default or a detected address; old addresses use normalized text
+ok 10 - no reminder without a default or a detected address; old addresses use normalized text
+  ---
+  duration_ms: 0.6387
+  ...
+# Subtest: AI request carries user session and selected coordinates; validates real food cards
+ok 11 - AI request carries user session and selected coordinates; validates real food cards
+  ---
+  duration_ms: 44.225
+  ...
+# Subtest: AI blocks stale login, invalid location and oversized prompt before network request
+ok 12 - AI blocks stale login, invalid location and oversized prompt before network request
+  ---
+  duration_ms: 1.6007
+  ...
+# Subtest: AI rejects invalid IDs, negative prices and out-of-range recommendations
+ok 13 - AI rejects invalid IDs, negative prices and out-of-range recommendations
+  ---
+  duration_ms: 5.9732
+  ...
+# Subtest: Gemini quota is shown as an error, not an empty successful recommendation
+ok 14 - Gemini quota is shown as an error, not an empty successful recommendation
+  ---
+  duration_ms: 1.5848
+  ...
+# Subtest: AI chat sends bounded prior messages with food card context for follow-up questions
+ok 15 - AI chat sends bounded prior messages with food card context for follow-up questions
+  ---
+  duration_ms: 2.2254
+  ...
+# Subtest: AI rejects privileged history roles and oversized history before making requests
+ok 16 - AI rejects privileged history roles and oversized history before making requests
+  ---
+  duration_ms: 2.1976
+  ...
+# Subtest: AI streaming decodes split UTF-8 and delivers text before final result is available
+ok 17 - AI streaming decodes split UTF-8 and delivers text before final result is available
+  ---
+  duration_ms: 10.1978
+  ...
+# Subtest: AI streaming rejects interrupted answers, provider errors and unverified final cards
+ok 18 - AI streaming rejects interrupted answers, provider errors and unverified final cards
+  ---
+  duration_ms: 6.5616
+  ...
+# Subtest: email quota is distinguished from user request throttling by Supabase code or message
+ok 19 - email quota is distinguished from user request throttling by Supabase code or message
+  ---
+  duration_ms: 4.3469
+  ...
+# Subtest: SMTP recipient restriction explains server configuration without exposing raw error details
+ok 20 - SMTP recipient restriction explains server configuration without exposing raw error details
+  ---
+  duration_ms: 0.3436
+  ...
+# Subtest: missing configuration initializes signed out and cannot create a demo session
+ok 21 - missing configuration initializes signed out and cannot create a demo session
+  ---
+  duration_ms: 6.8676
+  ...
+# Subtest: restores a persisted session, handles remote sign-out and unsubscribes
+ok 22 - restores a persisted session, handles remote sign-out and unsubscribes
+  ---
+  duration_ms: 22.9181
+  ...
+# Subtest: a stale storage response cannot restore a session after sign-out
+ok 23 - a stale storage response cannot restore a session after sign-out
+  ---
+  duration_ms: 3.2936
+  ...
+# Subtest: unmounted initialization ignores late responses
+ok 24 - unmounted initialization ignores late responses
+  ---
+  duration_ms: 1.045
+  ...
+# Subtest: login normalizes email, preserves password and exposes server failures
+ok 25 - login normalizes email, preserves password and exposes server failures
+  ---
+  duration_ms: 2.1086
+  ...
+# Subtest: registration sends full_name and waits for email confirmation without a session
+ok 26 - registration sends full_name and waits for email confirmation without a session
+  ---
+  duration_ms: 0.7136
+  ...
+# Subtest: successful registration accepts an immediate session when email confirmation is disabled
+ok 27 - successful registration accepts an immediate session when email confirmation is disabled
+  ---
+  duration_ms: 0.4415
+  ...
+# Subtest: logout failure retains the session, successful logout clears it
+ok 28 - logout failure retains the session, successful logout clears it
+  ---
+  duration_ms: 1.0967
+  ...
+# Subtest: concurrent submits are rejected until the request completes
+ok 29 - concurrent submits are rejected until the request completes
+  ---
+  duration_ms: 1.0426
+  ...
+# Subtest: restores quantity, every option and note after creating a fresh store
+ok 30 - restores quantity, every option and note after creating a fresh store
+  ---
+  duration_ms: 9.67
+  ...
+# Subtest: pending request/context survives but the in-flight lock never survives restart
+ok 31 - pending request/context survives but the in-flight lock never survives restart
+  ---
+  duration_ms: 8.9336
+  ...
+# Subtest: account switch and explicit logout remove the previous owner cart
+ok 32 - account switch and explicit logout remove the previous owner cart
+  ---
+  duration_ms: 1.3163
+  ...
+# Subtest: clear cart remains empty on disk even after earlier slow writes
+ok 33 - clear cart remains empty on disk even after earlier slow writes
+  ---
+  duration_ms: 80.2964
+  ...
+# Subtest: invalid saved data cannot overwrite actions or restore malformed items
+ok 34 - invalid saved data cannot overwrite actions or restore malformed items
+  ---
+  duration_ms: 1.353
+  ...
+# Subtest: home queries keep active filtering and deterministic ordering; empty data stays empty
+ok 35 - home queries keep active filtering and deterministic ordering; empty data stays empty
+  ---
+  duration_ms: 46.6398
+  ...
+# Subtest: food uses one nested request for all option groups/items and preserves data
+ok 36 - food uses one nested request for all option groups/items and preserves data
+  ---
+  duration_ms: 3.721
+  ...
+# Subtest: not found and malformed mock IDs return null without a fallback dish
+ok 37 - not found and malformed mock IDs return null without a fallback dish
+  ---
+  duration_ms: 2.3436
+  ...
+# Subtest: category/restaurant filters are sent as UUIDs and cancellation signal is forwarded
+ok 38 - category/restaurant filters are sent as UUIDs and cancellation signal is forwarded
+  ---
+  duration_ms: 3.4119
+  ...
+# Subtest: backend/configuration errors propagate so React Query can show errors, never mocks
+ok 39 - backend/configuration errors propagate so React Query can show errors, never mocks
+  ---
+  duration_ms: 3.1733
+  ...
+# Subtest: single-choice groups replace choices and required groups reject empty selections
+ok 40 - single-choice groups replace choices and required groups reject empty selections
+  ---
+  duration_ms: 0.5281
+  ...
+# Subtest: multiple groups, zero-cost options, removed options and cent rounding are handled
+ok 41 - multiple groups, zero-cost options, removed options and cent rounding are handled
+  ---
+  duration_ms: 0.5994
+  ...
+# Subtest: cart merges only identical food/option combinations regardless of selection order
+ok 42 - cart merges only identical food/option combinations regardless of selection order
+  ---
+  duration_ms: 0.4121
+  ...
+# Subtest: restaurant cards display database label text without an allowlist and ignore invalid entries
+ok 43 - restaurant cards display database label text without an allowlist and ignore invalid entries
+  ---
+  duration_ms: 1.2756
+  ...
+# Subtest: live filters use real restaurant IDs and require actual coordinates for nearby results
+ok 44 - live filters use real restaurant IDs and require actual coordinates for nearby results
+  ---
+  duration_ms: 1.9384
+  ...
+# Subtest: customer chat closes exactly five minutes after server completion time
+ok 45 - customer chat closes exactly five minutes after server completion time
+  ---
+  duration_ms: 3.9388
+  ...
+# Subtest: only active orders or completed orders with a valid timestamp allow sending
+ok 46 - only active orders or completed orders with a valid timestamp allow sending
+  ---
+  duration_ms: 0.436
+  ...
+# Subtest: customer sees each driver action even when the coarse order status stays unchanged
+ok 47 - customer sees each driver action even when the coarse order status stays unchanged
+  ---
+  duration_ms: 2.7719
+  ...
+# Subtest: old driver, old order snapshot and failed progress requests cannot display a stale stage
+ok 48 - old driver, old order snapshot and failed progress requests cannot display a stale stage
+  ---
+  duration_ms: 0.3894
+  ...
+# Subtest: unassigned and failed trips have explicit customer labels without claiming a successful delivery
+ok 49 - unassigned and failed trips have explicit customer labels without claiming a successful delivery
+  ---
+  duration_ms: 0.4601
+  ...
+# Subtest: four-milestone bar does not mark arrival until the driver confirms it
+ok 50 - four-milestone bar does not mark arrival until the driver confirms it
+  ---
+  duration_ms: 0.5872
+  ...
+# Subtest: progress API calls the customer projection RPC instead of selecting private assignment rows
+ok 51 - progress API calls the customer projection RPC instead of selecting private assignment rows
+  ---
+  duration_ms: 45.9124
+  ...
+# Subtest: delivery warning uses strictly more than 20 km, including valid zero coordinates
+ok 52 - delivery warning uses strictly more than 20 km, including valid zero coordinates
+  ---
+  duration_ms: 1.9541
+  ...
+# Subtest: unknown or invalid coordinates never invent a far-away customer location
+ok 53 - unknown or invalid coordinates never invent a far-away customer location
+  ---
+  duration_ms: 2.4081
+  ...
+# Subtest: recipient survives a fresh storage instance after reload and stays isolated by account
+ok 54 - recipient survives a fresh storage instance after reload and stays isolated by account
+  ---
+  duration_ms: 6.732
+  ...
+# Subtest: invalid or unavailable storage never supplies a fabricated recipient; write failures are reported
+ok 55 - invalid or unavailable storage never supplies a fabricated recipient; write failures are reported
+  ---
+  duration_ms: 1.6322
+  ...
+# Subtest: Haversine is symmetric, handles zero coordinates and antipodes, and rejects invalid points
+ok 56 - Haversine is symmetric, handles zero coordinates and antipodes, and rejects invalid points
+  ---
+  duration_ms: 21.7988
+  ...
+# Subtest: VND shipping rounds only extra kilometres upward, including fractional boundary crossings
+ok 57 - VND shipping rounds only extra kilometres upward, including fractional boundary crossings
+  ---
+  duration_ms: 0.4896
+  ...
+# Subtest: a new destination changes intent; pricing never uses the one-decimal display distance
+ok 58 - a new destination changes intent; pricing never uses the one-decimal display distance
+  ---
+  duration_ms: 0.4953
+  ...
+# Subtest: createOrder rejects missing coordinates or invalid shipping before contacting Supabase
+ok 59 - createOrder rejects missing coordinates or invalid shipping before contacting Supabase
+  ---
+  duration_ms: 2.0509
+  ...
+# Subtest: real GPS payload keeps zero coordinates; no assignment is null and invalid responses are rejected
+ok 60 - real GPS payload keeps zero coordinates; no assignment is null and invalid responses are rejected
+  ---
+  duration_ms: 4.7869
+  ...
+# Subtest: completed/cancelled/unassigned orders never display a cached live marker
+ok 61 - completed/cancelled/unassigned orders never display a cached live marker
+  ---
+  duration_ms: 0.4207
+  ...
+# Subtest: stale server flag or aged cache hides GPS; errors and waiting never become simulated positions
+ok 62 - stale server flag or aged cache hides GPS; errors and waiting never become simulated positions
+  ---
+  duration_ms: 38.2814
+  ...
+# Subtest: GPS API uses the ownership-checked RPC, sends only the order ID and supports cancellation
+ok 63 - GPS API uses the ownership-checked RPC, sends only the order ID and supports cancellation
+  ---
+  duration_ms: 68.0646
+  ...
+# Subtest: GPS API preserves RPC denial instead of inventing a driver point
+ok 64 - GPS API preserves RPC denial instead of inventing a driver point
+  ---
+  duration_ms: 2.7869
+  ...
+# Subtest: driver is resolved through the current user order, not an invented profiles foreign key
+ok 65 - driver is resolved through the current user order, not an invented profiles foreign key
+  ---
+  duration_ms: 47.9776
+  ...
+# Subtest: unassigned orders never substitute a demo driver or fetch an unrelated profile
+ok 66 - unassigned orders never substitute a demo driver or fetch an unrelated profile
+  ---
+  duration_ms: 2.806
+  ...
+# Subtest: missing orders stop before profile lookup; missing driver profiles remain explicit null
+ok 67 - missing orders stop before profile lookup; missing driver profiles remain explicit null
+  ---
+  duration_ms: 5.8739
+  ...
+# Subtest: combining food and shipping vouchers discounts separate bases, including exact minimum before discount
+ok 68 - combining food and shipping vouchers discounts separate bases, including exact minimum before discount
+  ---
+  duration_ms: 2.4742
+  ...
+# Subtest: discount caps are independent and percentages use the correct base
+ok 69 - discount caps are independent and percentages use the correct base
+  ---
+  duration_ms: 0.4439
+  ...
+# Subtest: wrong target, expired shipping code and minimum violations cannot discount the order
+ok 70 - wrong target, expired shipping code and minimum violations cannot discount the order
+  ---
+  duration_ms: 2.6275
+  ...
+# Subtest: selecting one voucher never overwrites the other type; clearing both is explicit
+ok 71 - selecting one voucher never overwrites the other type; clearing both is explicit
+  ---
+  duration_ms: 0.5326
+  ...
+# Subtest: request signatures include the shipping code and the atomic RPC sends both normalized codes
+ok 72 - request signatures include the shipping code and the atomic RPC sends both normalized codes
+  ---
+  duration_ms: 46.6507
+  ...
+# Subtest: percentage discounts apply to food, leaving the delivery fee intact
+ok 73 - percentage discounts apply to food, leaving the delivery fee intact
+  ---
+  duration_ms: 5.7244
+  ...
+# Subtest: shipping offers subtract $1 or the full shipping fee
+ok 74 - shipping offers subtract $1 or the full shipping fee
+  ---
+  duration_ms: 0.6441
+  ...
+# Subtest: 30% offer requires a subtotal strictly over $50 and stops applying if the cart shrinks
+ok 75 - 30% offer requires a subtotal strictly over $50 and stops applying if the cart shrinks
+  ---
+  duration_ms: 0.4993
+  ...
+# Subtest: an empty cart has no shipping fee, discount or total
+ok 76 - an empty cart has no shipping fee, discount or total
+  ---
+  duration_ms: 0.9346
+  ...
+# Subtest: cent rounding produces an exact displayed breakdown
+ok 77 - cent rounding produces an exact displayed breakdown
+  ---
+  duration_ms: 0.8863
+  ...
+# Subtest: shipping savings cannot exceed the delivery fee
+ok 78 - shipping savings cannot exceed the delivery fee
+  ---
+  duration_ms: 0.2028
+  ...
+# Subtest: search matches all words, ignores case and extra spaces, and finds restaurants
+ok 79 - search matches all words, ignores case and extra spaces, and finds restaurants
+  ---
+  duration_ms: 0.7387
+  ...
+# Subtest: category, keyword and multiple filters intersect
+ok 80 - category, keyword and multiple filters intersect
+  ---
+  duration_ms: 0.304
+  ...
+# Subtest: sorting preserves the catalog and nearby limits results to 2 km
+ok 81 - sorting preserves the catalog and nearby limits results to 2 km
+  ---
+  duration_ms: 0.7441
+  ...
+# Subtest: order selections replace the previous voucher and retain the delivery address
+ok 82 - order selections replace the previous voucher and retain the delivery address
+  ---
+  duration_ms: 1.0789
+  ...
+# Subtest: favorites start empty, stay unique, and can return to the empty state
+ok 83 - favorites start empty, stay unique, and can return to the empty state
+  ---
+  duration_ms: 40.3711
+  ...
+# Subtest: the Favorite search filter uses the same saved restaurants as the Favorites tab
+ok 84 - the Favorite search filter uses the same saved restaurants as the Favorites tab
+  ---
+  duration_ms: 0.446
+  ...
+# Subtest: orders start empty and keep the submitted snapshot after checkout
+ok 85 - orders start empty and keep the submitted snapshot after checkout
+  ---
+  duration_ms: 10.0087
+  ...
+# Subtest: React Query exposes loading then resolves the simulated response
+ok 86 - React Query exposes loading then resolves the simulated response
+  ---
+  duration_ms: 275.7394
+  ...
+# Subtest: mock loading can be cancelled when navigating away and missing dishes resolve as null
+ok 87 - mock loading can be cancelled when navigating away and missing dishes resolve as null
+  ---
+  duration_ms: 908.4495
+  ...
+# Subtest: collections come from database configuration, including new names and disabled entries
+ok 88 - collections come from database configuration, including new names and disabled entries
+  ---
+  duration_ms: 1.5169
+  ...
+# Subtest: food collection membership uses explicit mapped dishes, never a restaurant name or fruit ingredient
+ok 89 - food collection membership uses explicit mapped dishes, never a restaurant name or fruit ingredient
+  ---
+  duration_ms: 8.7822
+  ...
+# Subtest: restaurant-tag categories use complete labels with case/whitespace normalization, independent of menus
+ok 90 - restaurant-tag categories use complete labels with case/whitespace normalization, independent of menus
+  ---
+  duration_ms: 0.6238
+  ...
+# Subtest: discovery API joins explicit food links, filters availability and active restaurants and propagates errors
+ok 91 - discovery API joins explicit food links, filters availability and active restaurants and propagates errors
+  ---
+  duration_ms: 53.8278
+  ...
+# Subtest: public icon URLs default to category-icons and support a safely encoded folder override
+ok 92 - public icon URLs default to category-icons and support a safely encoded folder override
+  ---
+  duration_ms: 0.9466
+  ...
+# Subtest: catalog foods loads later menu pages and propagates a failed page instead of partial results
+ok 93 - catalog foods loads later menu pages and propagates a failed page instead of partial results
+  ---
+  duration_ms: 8.0764
+  ...
+# Subtest: food offers require a valid original price above the selling price
+ok 94 - food offers require a valid original price above the selling price
+  ---
+  duration_ms: 1.9945
+  ...
+# Subtest: discount badge rounds the saving from original and selling prices and hides absent promotions
+ok 95 - discount badge rounds the saving from original and selling prices and hides absent promotions
+  ---
+  duration_ms: 0.3224
+  ...
+# Subtest: map bridge rejects stale sessions, foreign messages, malformed JSON and disabled selections
+ok 96 - map bridge rejects stale sessions, foreign messages, malformed JSON and disabled selections
+  ---
+  duration_ms: 2.2184
+  ...
+# Subtest: map bridge accepts zero coordinates and rejects nonnumeric or out-of-range locations
+ok 97 - map bridge accepts zero coordinates and rejects nonnumeric or out-of-range locations
+  ---
+  duration_ms: 6.9883
+  ...
+# Subtest: map scene copies only coordinates and flags, never addresses, auth data or callbacks
+ok 98 - map scene copies only coordinates and flags, never addresses, auth data or callbacks
+  ---
+  duration_ms: 1.0511
+  ...
+# Subtest: inline document safely embeds token values and bundles Leaflet without external scripts
+ok 99 - inline document safely embeds token values and bundles Leaflet without external scripts
+  ---
+  duration_ms: 8.2146
+  ...
+# Subtest: tile configuration accepts HTTPS providers and rejects insecure or incomplete templates
+ok 100 - tile configuration accepts HTTPS providers and rejects insecure or incomplete templates
+  ---
+  duration_ms: 1.2969
+  ...
+# Subtest: menu grouping keeps odd rows within their category and preserves every food once
+ok 101 - menu grouping keeps odd rows within their category and preserves every food once
+  ---
+  duration_ms: 20.7761
+  ...
+# Subtest: home nearest-first list responds to the chosen address without mutating shared catalog order
+ok 102 - home nearest-first list responds to the chosen address without mutating shared catalog order
+  ---
+  duration_ms: 2.9456
+  ...
+# Subtest: missing delivery coordinates keep catalog order; equal distances keep a stable order
+ok 103 - missing delivery coordinates keep catalog order; equal distances keep a stable order
+  ---
+  duration_ms: 0.4032
+  ...
+# Subtest: order history groups and sorts using Vietnam dates across a UTC month boundary
+ok 104 - order history groups and sorts using Vietnam dates across a UTC month boundary
+  ---
+  duration_ms: 36.6374
+  ...
+# Subtest: legacy orders without a timestamp stay visible in an unknown-date section
+ok 105 - legacy orders without a timestamp stay visible in an unknown-date section
+  ---
+  duration_ms: 0.8656
+  ...
+# Subtest: coordinates accept zero and reject missing/out-of-range/NaN values
+ok 106 - coordinates accept zero and reject missing/out-of-range/NaN values
+  ---
+  duration_ms: 1.5484
+  ...
+# Subtest: straight-line trip starts at restaurant, reaches destination and clamps progress
+ok 107 - straight-line trip starts at restaurant, reaches destination and clamps progress
+  ---
+  duration_ms: 0.9907
+  ...
+# Subtest: reverse-geocoded address keeps street number and removes duplicate areas
+ok 108 - reverse-geocoded address keeps street number and removes duplicate areas
+  ---
+  duration_ms: 0.3305
+  ...
+# Subtest: history and realtime overlap merge once in stable chronological order
+ok 109 - history and realtime overlap merge once in stable chronological order
+  ---
+  duration_ms: 3.2551
+  ...
+# Subtest: nullable legacy chat timestamps and types do not drop the message or show epoch dates
+ok 110 - nullable legacy chat timestamps and types do not drop the message or show epoch dates
+  ---
+  duration_ms: 0.5526
+  ...
+# Subtest: image upload data validates real signatures and rejects arbitrary file content
+ok 111 - image upload data validates real signatures and rejects arbitrary file content
+  ---
+  duration_ms: 0.8982
+  ...
+# Subtest: message insert sends only the user role and preserves a stable client ID
+ok 112 - message insert sends only the user role and preserves a stable client ID
+  ---
+  duration_ms: 51.206
+  ...
+# Subtest: duplicate message retry reads the same message instead of creating another
+ok 113 - duplicate message retry reads the same message instead of creating another
+  ---
+  duration_ms: 4.5019
+  ...
+# Subtest: empty messages and an image from another order are rejected before sending
+ok 114 - empty messages and an image from another order are rejected before sending
+  ---
+  duration_ms: 2.2217
+  ...
+# Subtest: private image upload sends ArrayBuffer with an allowed MIME type
+ok 115 - private image upload sends ArrayBuffer with an allowed MIME type
+  ---
+  duration_ms: 4.5726
+  ...
+# Subtest: location checkout uses the new RPC and includes zero coordinates
+ok 116 - location checkout uses the new RPC and includes zero coordinates
+  ---
+  duration_ms: 4.0905
+  ...
+# Subtest: review preserves independent restaurant/driver stars, feedback and deduplicated tags
+ok 117 - review preserves independent restaurant/driver stars, feedback and deduplicated tags
+  ---
+  duration_ms: 2.781
+  ...
+# Subtest: zero, fractional, out-of-range stars, unknown tags and overlong feedback are rejected
+ok 118 - zero, fractional, out-of-range stars, unknown tags and overlong feedback are rejected
+  ---
+  duration_ms: 0.9987
+  ...
+# Subtest: review checks authenticated owner and completed status before posting
+ok 119 - review checks authenticated owner and completed status before posting
+  ---
+  duration_ms: 79.2926
+  ...
+# Subtest: completed review uses both authenticated stage RPCs and returns the server record
+ok 120 - completed review uses both authenticated stage RPCs and returns the server record
+  ---
+  duration_ms: 9.2715
+  ...
+# Subtest: review retry delegates idempotence to the atomic stage RPCs
+ok 121 - review retry delegates idempotence to the atomic stage RPCs
+  ---
+  duration_ms: 4.7888
+  ...
+# Subtest: review backend error propagates without marking the order completed
+ok 122 - review backend error propagates without marking the order completed
+  ---
+  duration_ms: 5.0058
+  ...
+# Subtest: favorite insert is idempotent and deletion is scoped to both owner and restaurant
+ok 123 - favorite insert is idempotent and deletion is scoped to both owner and restaurant
+  ---
+  duration_ms: 3.7017
+  ...
+# Subtest: favorite query is scoped and skips null joined restaurants
+ok 124 - favorite query is scoped and skips null joined restaurants
+  ---
+  duration_ms: 2.7444
+  ...
+# Subtest: optimistic favorite rollback preserves concurrent changes for other restaurants
+ok 125 - optimistic favorite rollback preserves concurrent changes for other restaurants
+  ---
+  duration_ms: 1.3231
+  ...
+# Subtest: same restaurant cannot be toggled simultaneously across Home and Favorites
+ok 126 - same restaurant cannot be toggled simultaneously across Home and Favorites
+  ---
+  duration_ms: 1.1068
+  ...
+# Subtest: order sections keep pending/preparing/delivering active and terminal orders in history
+ok 127 - order sections keep pending/preparing/delivering active and terminal orders in history
+  ---
+  duration_ms: 0.4248
+  ...
+# Subtest: voucher accepts the exact minimum and checks active, expiry, restaurant and supported values
+ok 128 - voucher accepts the exact minimum and checks active, expiry, restaurant and supported values
+  ---
+  duration_ms: 3.678
+  ...
+# Subtest: fixed/percentage totals clamp discounts to food subtotal and preserve delivery fee
+ok 129 - fixed/percentage totals clamp discounts to food subtotal and preserve delivery fee
+  ---
+  duration_ms: 6.2053
+  ...
+# Subtest: cart merges identical options/notes, keeps differing notes and rejects mixed restaurants
+ok 130 - cart merges identical options/notes, keeps differing notes and rejects mixed restaurants
+  ---
+  duration_ms: 0.8182
+  ...
+# Subtest: note editing can merge identical lines and quantity limits hold
+ok 131 - note editing can merge identical lines and quantity limits hold
+  ---
+  duration_ms: 0.5099
+  ...
+# Subtest: pending checkout locks edits; retry reuses request ID; successful clear resets pending request
+ok 132 - pending checkout locks edits; retry reuses request ID; successful clear resets pending request
+  ---
+  duration_ms: 1.3114
+  ...
+# Subtest: JSON serialization retains all option names/prices and note without sharing mutable arrays
+ok 133 - JSON serialization retains all option names/prices and note without sharing mutable arrays
+  ---
+  duration_ms: 0.3349
+  ...
+# Subtest: voucher lookup sends a normalized code with equality, not a wildcard search
+ok 134 - voucher lookup sends a normalized code with equality, not a wildcard search
+  ---
+  duration_ms: 51.6272
+  ...
+# Subtest: createOrder calls the atomic RPC with the supplied idempotency ID and JSON snapshot
+ok 135 - createOrder calls the atomic RPC with the supplied idempotency ID and JSON snapshot
+  ---
+  duration_ms: 3.7805
+  ...
+# Subtest: failed RPC never clears the cart; invalid checkout does not issue any request
+ok 136 - failed RPC never clears the cart; invalid checkout does not issue any request
+  ---
+  duration_ms: 3.5062
+  ...
+# Subtest: recipient validation requires a name and phone, normalizes phone without dropping its prefix
+ok 137 - recipient validation requires a name and phone, normalizes phone without dropping its prefix
+  ---
+  duration_ms: 3.4528
+  ...
+# Subtest: each address sends its own recipient; editing only a recipient updates the checkout selection
+ok 138 - each address sends its own recipient; editing only a recipient updates the checkout selection
+  ---
+  duration_ms: 2.1927
+  ...
+# Subtest: recipient changes create a new order intent, while equivalent formatting reuses it
+ok 139 - recipient changes create a new order intent, while equivalent formatting reuses it
+  ---
+  duration_ms: 0.4883
+  ...
+# Subtest: checkout sends normalized recipient fields and rejects missing recipients before network access
+ok 140 - checkout sends normalized recipient fields and rejects missing recipients before network access
+  ---
+  duration_ms: 42.6295
+  ...
+# Subtest: unrated restaurants stay unrated through favorites/card adapters and labels
+ok 141 - unrated restaurants stay unrated through favorites/card adapters and labels
+  ---
+  duration_ms: 1.7292
+  ...
+# Subtest: restaurant reviews validate filters and pagination before a request
+ok 142 - restaurant reviews validate filters and pagination before a request
+  ---
+  duration_ms: 1.9834
+  ...
+# Subtest: review feed and stats use projections, not direct access to other customers tables
+ok 143 - review feed and stats use projections, not direct access to other customers tables
+  ---
+  duration_ms: 41.2211
+  ...
+# Subtest: Vietnamese and accent-free dish search returns its restaurant once, never a food result
+ok 144 - Vietnamese and accent-free dish search returns its restaurant once, never a food result
+  ---
+  duration_ms: 5.1765
+  ...
+# Subtest: unfiltered discovery keeps restaurants without menus; category requires a matching menu
+ok 145 - unfiltered discovery keeps restaurants without menus; category requires a matching menu
+  ---
+  duration_ms: 0.3294
+  ...
+# Subtest: keyword phrases match a single name with complete words, never prefixes or mixed dishes
+ok 146 - keyword phrases match a single name with complete words, never prefixes or mixed dishes
+  ---
+  duration_ms: 1.4331
+  ...
+# Subtest: restaurant filters preserve favorite ownership and reject unknown nearby coordinates
+ok 147 - restaurant filters preserve favorite ownership and reject unknown nearby coordinates
+  ---
+  duration_ms: 0.6777
+  ...
+# Subtest: sorting restaurants does not reorder the source query cache
+ok 148 - sorting restaurants does not reorder the source query cache
+  ---
+  duration_ms: 0.5459
+  ...
+# Subtest: food previews use the same phrase matching and preserve food data and restaurant ownership
+ok 149 - food previews use the same phrase matching and preserve food data and restaurant ownership
+  ---
+  duration_ms: 0.6588
+  ...
+# Subtest: SDK errors are localized without exposing raw technical errors
+ok 150 - SDK errors are localized without exposing raw technical errors
+  ---
+  duration_ms: 2.9301
+  ...
+# Subtest: money uses VND across invoices and promotion text without negative zero
+ok 151 - money uses VND across invoices and promotion text without negative zero
+  ---
+  duration_ms: 0.8777
+  ...
+# Subtest: review rewards require trimmed 50 Unicode characters and an uploaded photo
+ok 152 - review rewards require trimmed 50 Unicode characters and an uploaded photo
+  ---
+  duration_ms: 2.1388
+  ...
+# Subtest: restaurant payload rejects duplicate votes and foreign photo paths, while driver stage omits food data
+ok 153 - restaurant payload rejects duplicate votes and foreign photo paths, while driver stage omits food data
+  ---
+  duration_ms: 2.208
+  ...
+# Subtest: new review API sends RPC values without a client-supplied owner or reward amount
+ok 154 - new review API sends RPC values without a client-supplied owner or reward amount
+  ---
+  duration_ms: 53.9093
+  ...
+# Subtest: receipt text uses the order snapshot rather than current food names and options
+ok 155 - receipt text uses the order snapshot rather than current food names and options
+  ---
+  duration_ms: 2.2517
+  ...
+# Subtest: reward tiers match the requested amounts and pending requests cannot inject a price
+ok 156 - reward tiers match the requested amounts and pending requests cannot inject a price
+  ---
+  duration_ms: 2.6728
+  ...
+# Subtest: redemption sends a request ID, amount and expected session user; costs are server-owned
+ok 157 - redemption sends a request ID, amount and expected session user; costs are server-owned
+  ---
+  duration_ms: 49.7556
+  ...
+# Subtest: Vietnamese local and international phone formats have the same signup identity
+ok 158 - Vietnamese local and international phone formats have the same signup identity
+  ---
+  duration_ms: 2.465
+  ...
+# Subtest: duplicate phone stops signup and duplicate email/obfuscated user produces recovery actions
+ok 159 - duplicate phone stops signup and duplicate email/obfuscated user produces recovery actions
+  ---
+  duration_ms: 2.2632
+  ...
+# Subtest: missing/invalid phone and a failed availability check never call signup
+ok 160 - missing/invalid phone and a failed availability check never call signup
+  ---
+  duration_ms: 0.6542
+  ...
+# Subtest: password recovery sends email without a redirect and verifies a recovery OTP before updating the same user
+ok 161 - password recovery sends email without a redirect and verifies a recovery OTP before updating the same user
+  ---
+  duration_ms: 2.7372
+  ...
+# Subtest: recovery rejects invalid input, expired OTPs and missing sessions without changing a password
+ok 162 - recovery rejects invalid input, expired OTPs and missing sessions without changing a password
+  ---
+  duration_ms: 1.3781
+  ...
+# Subtest: a changed recovery session never updates another account password and provider errors remain visible
+ok 163 - a changed recovery session never updates another account password and provider errors remain visible
+  ---
+  duration_ms: 0.4988
+  ...
+# Subtest: native OAuth exchanges the PKCE code once even when callback and browser both complete
+ok 164 - native OAuth exchanges the PKCE code once even when callback and browser both complete
+  ---
+  duration_ms: 3.7962
+  ...
+# Subtest: disabled providers, cancellation and unexpected redirects never create a fake session
+ok 165 - disabled providers, cancellation and unexpected redirects never create a fake session
+  ---
+  duration_ms: 1.4128
+  ...
+# Subtest: web OAuth requests a normal browser redirect and leaves completion to the callback page
+ok 166 - web OAuth requests a normal browser redirect and leaves completion to the callback page
+  ---
+  duration_ms: 0.9991
+  ...
+# Subtest: confirmed Google recipient remains complete when the current-location card is selected again
+ok 167 - confirmed Google recipient remains complete when the current-location card is selected again
+  ---
+  duration_ms: 2.7146
+  ...
+# Subtest: confirming an unrelated saved address or stale GPS editor preserves the current GPS card
+ok 168 - confirming an unrelated saved address or stale GPS editor preserves the current GPS card
+  ---
+  duration_ms: 0.5382
+  ...
+# Subtest: GPS delivery uses coordinates and recipient from profile without a fabricated phone or saved ID
+ok 169 - GPS delivery uses coordinates and recipient from profile without a fabricated phone or saved ID
+  ---
+  duration_ms: 1.5573
+  ...
+# Subtest: saved address refresh cannot replace GPS; explicit user selection advances its revision
+ok 170 - saved address refresh cannot replace GPS; explicit user selection advances its revision
+  ---
+  duration_ms: 0.4316
+  ...
+# Subtest: startup GPS has a deadline and a late result cannot become a second successful completion
+ok 171 - startup GPS has a deadline and a late result cannot become a second successful completion
+  ---
+  duration_ms: 8.3497
+  ...
+# Subtest: fresh Android last-known fix avoids waiting for a new GPS update
+ok 172 - fresh Android last-known fix avoids waiting for a new GPS update
+  ---
+  duration_ms: 0.8188
+  ...
+# Subtest: missing or invalid last-known fix requests GPS; disabled services report the cause
+ok 173 - missing or invalid last-known fix requests GPS; disabled services report the cause
+  ---
+  duration_ms: 0.9427
+  ...
+# Subtest: profile loading does not block coordinates/geocoding and failed profiles do not discard GPS
+ok 174 - profile loading does not block coordinates/geocoding and failed profiles do not discard GPS
+  ---
+  duration_ms: 1.1745
+  ...
+# Subtest: reverse-geocoding failure preserves the successful coordinates for manual address entry
+ok 175 - reverse-geocoding failure preserves the successful coordinates for manual address entry
+  ---
+  duration_ms: 0.7499
+  ...
+# Subtest: wallet joins vouchers and filters both owner and unused flag; missing relation is not displayed
+ok 176 - wallet joins vouchers and filters both owner and unused flag; missing relation is not displayed
+  ---
+  duration_ms: 28.3876
+  ...
+# Subtest: banner campaign only returns assigned public vouchers and preserves their ordering
+ok 177 - banner campaign only returns assigned public vouchers and preserves their ordering
+  ---
+  duration_ms: 2.4695
+  ...
+# Subtest: invalid or unavailable banner never falls back to the full voucher catalog
+ok 178 - invalid or unavailable banner never falls back to the full voucher catalog
+  ---
+  duration_ms: 1.8474
+  ...
+# Subtest: collection uses authenticated RPC without a caller-controlled owner or used flag
+ok 179 - collection uses authenticated RPC without a caller-controlled owner or used flag
+  ---
+  duration_ms: 2.5027
+  ...
+# Subtest: voucher history only reads this customer used wallet entries and propagates errors
+ok 180 - voucher history only reads this customer used wallet entries and propagates errors
+  ---
+  duration_ms: 5.5085
+  ...
+# Subtest: manual code validates before collection and normalizes exact code
+ok 181 - manual code validates before collection and normalizes exact code
+  ---
+  duration_ms: 5.4156
+  ...
+# Subtest: manual entry propagates used/expired collection rejection and checks changed voucher values
+ok 182 - manual entry propagates used/expired collection rejection and checks changed voucher values
+  ---
+  duration_ms: 6.746
+  ...
+# Subtest: campaign treats inactive, expired and invalid dates as exhausted; future and unlimited valid
+ok 183 - campaign treats inactive, expired and invalid dates as exhausted; future and unlimited valid
+  ---
+  duration_ms: 0.321
+  ...
+1..183
+# tests 183
+# suites 0
+# pass 183
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5061.2336

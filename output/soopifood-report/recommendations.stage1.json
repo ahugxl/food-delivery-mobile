@@ -1,0 +1,14 @@
+{
+  "stage": "stage1",
+  "lang": "en",
+  "primary_language": "vi-VN",
+  "recommend": {"canvas": "ppt169"},
+  "audience": {"value": "Giảng viên Nguyễn Minh Hái và sinh viên lớp 420300143202"},
+  "communication_intent": {"value": "Báo cáo đồ án soopiFood trong 5 phút, giải thích kiến trúc, UI/UX, backend và database, SDLC và phân công nhóm; chứng minh các kỹ thuật đã hiện thực bằng mã nguồn."},
+  "audience_outcome": {"value": "Hiểu hệ thống được tổ chức và vận hành ra sao, đóng góp của nhóm và các kỹ thuật cache/performance thực tế."},
+  "core_message": {"value": "soopiFood kết nối trải nghiệm đặt món với dữ liệu thật, cập nhật thời gian thực và trợ lý chọn món AI."},
+  "delivery_context": {"value": "Thuyết trình trực tiếp bằng tiếng Việt trong 5 phút; đề xuất 7 slide ít chữ, có sơ đồ và ảnh ứng dụng."},
+  "artifact_afterlife": {"value": "PPTX chỉnh sửa được để nộp báo cáo và tái sử dụng, kèm ghi chú thuyết trình."},
+  "content_divergence": {"value": "Không bịa số liệu hiệu năng, kết quả kiểm thử hoặc phân công thành viên; ưu tiên bằng chứng từ checkout hiện tại."},
+  "template_options": {"schema_version": 1, "phase": "template", "lang": "en", "explicit_workspace_roots": [], "default_mode": "free_design"}
+}

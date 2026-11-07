@@ -1,0 +1,124 @@
+@startuml
+!pragma layout smetana
+skinparam shadowing false
+hide methods
+title soopiFood - Core ERD (selected columns and relationships)
+entity "auth.users" as users {
+  *id : uuid <<PK>>
+}
+entity profiles {
+  *id : uuid <<PK,FK>>
+  role : text
+  loyalty_points : integer
+}
+entity user_addresses {
+  *id : uuid <<PK>>
+  *user_id : uuid <<FK>>
+  is_default : boolean
+}
+entity restaurants {
+  *id : uuid <<PK>>
+  name : text
+  latitude : float
+  longitude : float
+}
+entity categories {
+  *id : uuid <<PK>>
+}
+entity foods {
+  *id : uuid <<PK>>
+  *restaurant_id : uuid <<FK>>
+  category_id : uuid <<FK>>
+  price : numeric
+}
+entity food_option_groups {
+  *id : uuid <<PK>>
+  *food_id : uuid <<FK>>
+}
+entity food_option_items {
+  *id : uuid <<PK>>
+  *group_id : uuid <<FK>>
+  extra_price : numeric
+}
+entity orders {
+  *id : uuid <<PK>>
+  *user_id : uuid <<FK>>
+  *restaurant_id : uuid <<FK>>
+  driver_id : uuid <<FK auth.users>>
+  voucher_id : uuid <<FK>>
+  shipping_voucher_id : uuid <<FK>>
+  total : numeric
+  status : text
+}
+entity order_items {
+  *id : uuid <<PK>>
+  *order_id : uuid <<FK>>
+  *food_id : uuid <<FK>>
+  options_snapshot : jsonb
+}
+entity vouchers {
+  *id : uuid <<PK>>
+  restaurant_id : uuid <<FK>>
+  applies_to : text
+}
+entity user_vouchers {
+  *id : uuid <<PK>>
+  *user_id : uuid <<FK>>
+  *voucher_id : uuid <<FK>>
+}
+entity banners {
+  *id : uuid <<PK>>
+}
+entity banner_vouchers {
+  *banner_id : uuid <<PK,FK>>
+  *voucher_id : uuid <<PK,FK>>
+}
+entity reviews {
+  *id : uuid <<PK>>
+  *order_id : uuid <<FK>>
+  *user_id : uuid <<FK>>
+}
+entity messages {
+  *id : uuid <<PK>>
+  *order_id : uuid <<FK>>
+  *sender_id : uuid <<FK>>
+}
+entity driver_profiles {
+  *user_id : uuid <<PK,FK profiles>>
+}
+entity delivery_assignments {
+  *id : uuid <<PK>>
+  *order_id : uuid <<FK>>
+  *driver_id : uuid <<FK>>
+  status : text
+}
+users ||--o| profiles
+users ||--o{ user_addresses
+users ||--o{ orders : customer
+users |o--o{ orders : driver
+restaurants ||--o{ foods
+categories |o--o{ foods
+foods ||--o{ food_option_groups
+food_option_groups ||--o{ food_option_items
+restaurants ||--o{ orders
+orders ||--o{ order_items
+foods ||--o{ order_items
+restaurants |o--o{ vouchers
+vouchers |o--o{ orders : food/shipping voucher
+users ||--o{ user_vouchers
+vouchers ||--o{ user_vouchers
+banners ||--o{ banner_vouchers
+vouchers ||--o{ banner_vouchers
+orders ||--o{ reviews
+users ||--o{ reviews
+orders ||--o{ messages
+users ||--o{ messages
+profiles ||--o| driver_profiles
+driver_profiles ||--o{ delivery_assignments
+orders ||--o{ delivery_assignments
+legend bottom
+Cardinality shows referential structure, not every unique constraint.
+Successful business checkout requires at least one order item.
+For all columns, constraints and omitted tables, read current migrations.
+endlegend
+@enduml

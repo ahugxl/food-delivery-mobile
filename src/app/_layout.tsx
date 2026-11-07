@@ -22,6 +22,7 @@ import { supabase } from '@/src/services/supabase';
 import { useCartStore } from '@/src/store/cartStore';
 import { SavedAddressSync } from '../hooks/useSavedAddresses';
 import { StartupLocationSync } from '../hooks/useStartupLocation';
+import { UsageAnalyticsSync } from '../hooks/useUsageAnalytics';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -129,6 +130,7 @@ export default function RootLayout() {
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <KeyboardProvider statusBarTranslucent navigationBarTranslucent preserveEdgeToEdge>
             <ErrorBoundary>
+              <UsageAnalyticsSync />
               <SavedAddressSync />
               <StartupLocationSync />
               <RootLayoutNav />

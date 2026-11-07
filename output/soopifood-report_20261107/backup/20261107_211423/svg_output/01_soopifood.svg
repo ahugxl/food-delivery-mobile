@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, Arial" font-size="24" data-pptx-page-role="cover">
+<rect id="bg" data-pptx-role="background" width="1280" height="720" fill="#EFF7F1" />
+<rect id="green-field" data-pptx-role="decoration" width="844" height="720" fill="#006B42" />
+<g id="brand" data-pptx-bounds="48 40 550 80"><image href="../images/logo.png" x="48" y="40" width="72" height="72" preserveAspectRatio="xMidYMid meet" /><text x="140" y="72" font-size="20" font-weight="bold" fill="#FFFFFF">BÁO CÁO ĐỒ ÁN</text><text x="140" y="101" font-size="16" fill="#D4E4D9">Ứng dụng đặt đồ ăn · Lớp 420300143202</text></g>
+<g id="cover-message" data-pptx-bounds="48 158 744 244" fill="#FFFFFF"><text x="48" y="222" font-size="64" font-weight="bold">soopiFood</text><text x="48" y="294" font-size="40" font-weight="bold"><tspan x="48" dy="0">Đặt món liền mạch.</tspan><tspan x="48" dy="52">Theo dõi rõ ràng.</tspan></text><text x="48" y="393" fill="#D4E4D9">Từ lựa chọn món đến trải nghiệm sau giao hàng.</text></g>
+<g id="instructor" data-pptx-bounds="48 438 720 48"><text x="48" y="469" font-size="20" fill="#FFFFFF">Giảng viên hướng dẫn: Nguyễn Minh Hái</text></g>
+<g id="team" data-pptx-bounds="48 504 720 142" fill="#FFFFFF"><text x="48" y="527" font-size="16" fill="#D4E4D9">SINH VIÊN THỰC HIỆN</text><text x="48" y="566">Nguyễn Hữu Thịnh <tspan fill="#D4E4D9">— 23690091</tspan></text><text x="48" y="600">Huỳnh Anh Trọng <tspan fill="#D4E4D9">— 23711131</tspan></text><text x="48" y="634">Đào Thế Vinh <tspan fill="#D4E4D9">— 23702541</tspan></text></g>
+<g id="tracking-proof" data-pptx-bounds="892 54 340 606"><image href="../images/app-tracking.png" x="924" y="54" width="276" height="592" preserveAspectRatio="xMidYMid meet" /></g>
+<g id="footer" data-pptx-bounds="48 674 1184 26" font-size="16"><text x="48" y="695" fill="#D4E4D9">KIẾN TRÚC · UI/UX · DỮ LIỆU · SDLC</text><text x="1232" y="695" text-anchor="end" fill="#61766B">01 / 08</text></g>
+</svg>

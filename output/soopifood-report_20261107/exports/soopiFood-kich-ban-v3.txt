@@ -1,0 +1,42 @@
+﻿soopiFood — KỊCH BẢN THUYẾT TRÌNH (8 SLIDE)
+Thời gian dưới đây là gợi ý luyện tập trong 5 phút.
+
+SLIDE 1 | 00:00–00:25
+Kính chào thầy Nguyễn Minh Hái và các bạn. Nhóm chúng em gồm Nguyễn Hữu Thịnh, Huỳnh Anh Trọng và Đào Thế Vinh, thuộc lớp 420300143202. Hôm nay, nhóm xin giới thiệu soopiFood, ứng dụng đặt đồ ăn kết nối từ lúc chọn món đến khi hoàn tất giao hàng. Trong năm phút, chúng em tập trung vào kiến trúc, thiết kế giao diện, dữ liệu, quy trình phát triển và các kỹ thuật nổi bật đã hiện thực. Ảnh bên phải được quay từ app thật; trong buổi demo đó, trạng thái và vị trí tài xế được mô phỏng bằng SQL để kiểm tra luồng theo dõi.
+
+SLIDE 2 | 00:25–01:05
+Sơ đồ này thể hiện ba tầng của hệ thống. Phía trên là app khách hàng, app tài xế và web quản trị. App khách dùng Expo và React Native. App khách cùng app tài xế truy cập Supabase qua HTTPS và Realtime để đăng nhập, đặt hàng, cập nhật trạng thái và nhắn tin.
+
+Khối lớn ở giữa là backend Supabase được quản lý, gồm Auth, Data API và các hàm RPC, Realtime, cùng Storage cho ảnh người dùng. RLS và quyền gọi hàm kiểm soát truy cập. Dữ liệu nghiệp vụ và vector menu được lưu trong PostgreSQL với pgvector.
+
+Bên phải là hai dịch vụ riêng. API quản trị dùng Node.js và Express để kiểm tra phiên đăng nhập, quyền admin, quản lý dữ liệu và phân công tài xế. Backend AI dùng Spring Boot và Spring AI, nhận câu hỏi từ app khách, gọi Gemini, tìm vector rồi kiểm tra kết quả bằng RPC trước khi trả lời theo luồng SSE. API quản trị upload ảnh món và quán lên Backblaze B2 qua S3; app nhận ảnh qua Cloudflare CDN. Các khóa đặc quyền và khóa AI được giữ ở backend, không nhúng vào app khách.
+
+SLIDE 3 | 01:05–01:30
+Các công nghệ của soopiFood được chia thành sáu nhóm theo vai trò. Expo, React Native, TypeScript, Expo Router và NativeWind xây dựng app. Zustand, AsyncStorage, React Query và FlashList quản lý trạng thái và danh sách. Supabase cung cấp xác thực, PostgreSQL, RPC, Realtime và Storage. Backend AI dùng Java, Spring Boot, Spring AI, Gemini và pgvector, kết hợp Tool Calling và SSE. Bản đồ dùng Expo Location, Leaflet, OpenStreetMap qua WebView. Web admin dùng React và Vite, API Node.js và Express. Docker, Render và Expo EAS hỗ trợ triển khai; ảnh được lưu trên B2 và phân phối qua Cloudflare. Git, npm và Maven hỗ trợ phát triển và quản lý mã nguồn.
+
+SLIDE 4 | 01:30–02:05
+Về giao diện, nhóm tổ chức theo hành trình đặt món thay vì đưa tất cả chức năng lên một màn hình. Người dùng bắt đầu bằng email và mật khẩu hoặc đăng nhập xã hội. Sau đó, họ tìm quán, xem những món phù hợp rồi chuyển sang xác nhận đơn.
+
+Ba hình trên slide là màn hình thật của ứng dụng. Ở bước thanh toán, app hiển thị địa chỉ, người nhận và hai lựa chọn voucher độc lập: giảm tiền món và giảm phí giao hàng. Toàn bộ nhãn hướng đến người dùng được trình bày bằng tiếng Việt. Những trạng thái đang tải, gặp lỗi hoặc chưa có dữ liệu đều có phản hồi. Nếu món có lựa chọn bắt buộc, người dùng phải chọn đủ trước khi thêm vào giỏ. Ứng dụng cũng kiểm tra phạm vi giao hàng hai mươi ki lô mét. Mục tiêu của nhóm là giúp khách biết mình cần làm gì và tránh sai thông tin trước khi đặt.
+
+SLIDE 5 | 02:05–02:50
+Đằng sau giao diện là dữ liệu thật trên Supabase. File định nghĩa kiểu hiện tại khai báo hai mươi chín bảng public, đã mở rộng so với thiết kế ban đầu. Con số này được kiểm tra từ mã nguồn, không phải kết quả truy vấn trực tiếp database trong lần dựng báo cáo.
+
+Sơ đồ bên trái chỉ giữ các quan hệ lõi: nhà hàng có nhiều món, khách có nhiều đơn, mỗi đơn có các dòng chi tiết tham chiếu món và có đánh giá sau giao hàng. Những nhóm bảng khác phục vụ danh mục, ưu đãi, người dùng và vận hành tài xế.
+
+Khi đặt hàng, client gọi hàm create_food_order. Phía database kiểm tra các điều kiện về giá, khoảng cách, phí giao hàng và voucher, sau đó ghi đơn cùng chi tiết. Cấu hình món được lưu dưới dạng snapshot để giữ lại lựa chọn tại thời điểm đặt. Khoản giảm tiền món và khoản giảm phí giao hàng được lưu riêng. RLS và quyền gọi RPC được dùng để kiểm soát truy cập. Chức năng đánh giá, yêu thích và ví voucher đều có lớp API làm việc với dữ liệu thật. Nhóm không coi kiểm tra kiểu TypeScript là bằng chứng thay thế cho việc kiểm tra quyền trên database đang chạy.
+
+SLIDE 6 | 02:50–03:40
+Điểm nổi bật tiếp theo là các cơ chế cache và AI có thể chỉ ra ngay trong code. React Query quản lý dữ liệu từ server với staleTime mặc định sáu mươi giây. Sau các thao tác thay đổi dữ liệu, ứng dụng làm mới những query liên quan. Zustand Persist kết hợp AsyncStorage lưu và khôi phục giỏ hàng, đồng thời kiểm tra dữ liệu và chủ sở hữu. FlashList được sử dụng cho danh sách giỏ hàng để tái sử dụng phần hiển thị khi cuộn. Đây là các cơ chế tối ưu đã triển khai; nhóm chưa có benchmark để kết luận nhanh hơn bao nhiêu phần trăm.
+
+Với AI, Gemini không chỉ trả lời tự do. Mô hình gọi hàm tìm món, chọn nhóm từ danh mục thực và tìm kiếm bằng vector để hiểu nhu cầu. Backend tiếp tục kiểm tra lại kết quả với dữ liệu Supabase: mức giá, nhóm món, khả năng bán, giờ mở cửa và phạm vi hai mươi ki lô mét. Chỉ các món vượt qua kiểm tra mới được đưa vào kết quả. Câu trả lời tiếng Việt được truyền theo luồng, kèm thẻ món để người dùng mở và chọn tùy chọn. Cách này kết hợp sự linh hoạt của hội thoại với các điều kiện nghiệp vụ cụ thể.
+
+SLIDE 7 | 03:40–04:30
+Về SDLC, nhóm tổng hợp quá trình thành sáu giai đoạn: xác định yêu cầu, thiết kế giao diện và dữ liệu, lập trình theo từng pha, kiểm thử, triển khai rồi tiếp tục cải tiến từ phản hồi demo. Trong dự án có lệnh npm test cho kiểm thử logic và typecheck để phát hiện lỗi kiểu. App được đóng gói APK bằng EAS; backend AI có cấu hình Docker để triển khai trên Render. Đây là cách trình bày lại quá trình thực hiện, không phải một tuyên bố rằng nhóm đã tiến hành nghiên cứu người dùng chính thức.
+
+Phần dưới là đóng góp ghi nhận trong Git theo bảng nhóm cung cấp. Nguyễn Hữu Thịnh thực hiện các phần app khách gồm tìm món, OAuth, đánh giá và đổi xu. Huỳnh Anh Trọng đóng góp phần AI trả lời tiếng Việt, kiểm thử hội thoại và sửa server admin. Đào Thế Vinh đóng góp trang chủ, banner và chiến dịch voucher. Bảng này phản ánh những đóng góp đã ghi nhận, không dùng để suy diễn toàn bộ trách nhiệm của mỗi thành viên.
+
+SLIDE 8 | 04:30–05:00
+Tổng kết lại, soopiFood đã kết nối hành trình đặt món với hai loại voucher, theo dõi và chat theo đơn, đánh giá sau giao hàng, tích xu và đổi mã. Phần hội thoại AI gợi ý các món có trong menu, như màn hình thực tế bên phải.
+
+Hướng phát triển tiếp theo của nhóm là đo độ trễ và tải bằng benchmark, kiểm thử xuyên suốt ba ứng dụng khách hàng, quản trị và tài xế với GPS thật, đồng thời giám sát lỗi cùng quota AI. Đây là những bước giúp đánh giá chất lượng vận hành rõ ràng hơn. Nhóm chúng em cảm ơn thầy và các bạn đã lắng nghe và xin tiếp nhận câu hỏi.

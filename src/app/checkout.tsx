@@ -20,6 +20,7 @@ import { userMessage } from '../utils/userMessage';
 import { useShippingQuote } from '../hooks/useShippingQuote';
 import { voucherKeys } from '../services/voucherApi';
 import { hasRecipient } from '../features/order/recipient';
+import { analytics } from '../services/analytics';
 
 export default function CheckoutScreen() {
   const items = useCartStore(state => state.items);
@@ -33,6 +34,7 @@ export default function CheckoutScreen() {
   const shipping = useShippingQuote(items[0]?.restaurantId, address);
   const shippingReady = items.length === 0 || shipping.deliveryFee !== null;
   const totals = purchaseTotals(items, voucher, Date.now(), shipping.deliveryFee ?? 0, shippingVoucher);
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const mutation = useMutation({ mutationFn: purchaseApi.createOrder, retry: false });
   const coordinates = validCoordinates(address) ? { latitude: address.latitude, longitude: address.longitude } : undefined;
   const canOrder = !!userId && items.length > 0 && address.street.trim().length >= 5 && hasRecipient(address) && !!coordinates && shippingReady && !shipping.isFetching && !totals.voucherError && !locked;
@@ -49,6 +51,7 @@ export default function CheckoutScreen() {
       useCartStore.getState().setCheckingOut(true);
       const order = await mutation.mutateAsync({ orderId, items, address: address.street, voucherCode: voucher?.code, shippingVoucherCode: shippingVoucher?.code, coordinates: coordinates!, deliveryFee: shipping.deliveryFee, recipientName: address.recipientName, recipientPhone: address.recipientPhone });
       if (useAuthStore.getState().user?.id !== userId || useCartStore.getState().checkoutRequest?.id !== order.id) return;
+      analytics.orderCreated(order.id, itemCount, order.total, !!order.voucher_id, !!order.shipping_voucher_id);
       useCartStore.getState().clearCart();
       useOrderStore.getState().setCheckoutVouchers(null, null);
       void client.invalidateQueries({ queryKey: ['orders', userId] });

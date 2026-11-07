@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, Arial" font-size="24" data-pptx-page-role="content" role="img" aria-labelledby="soopi-arch-title soopi-arch-desc" id="soopifood-architecture-root">
+<title id="soopi-arch-title">Kiến trúc hệ thống soopiFood</title>
+<desc id="soopi-arch-desc">App khách và app tài xế truy cập Supabase qua HTTPS và Realtime. Web admin dùng API Node.js Express. Backend Spring AI xác thực bằng Supabase, gọi Gemini, tìm vector và kiểm tra dữ liệu qua RPC. PostgreSQL và pgvector lưu nghiệp vụ và vector. Admin upload ảnh S3 lên Backblaze B2, app nhận ảnh qua Cloudflare CDN.</desc>
+<defs>
+      
+<marker id="soopifood-architecture-arch-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#006B42" /></marker>
+<symbol id="soopifood-architecture-ico-mobile" viewBox="0 0 24 24" fill="none" stroke="#006B42" stroke-width="2"><path d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-14M11 4h2M12 17v.01" /></symbol>
+<symbol id="soopifood-architecture-ico-truck" viewBox="0 0 24 24" fill="none" stroke="#006B42" stroke-width="2"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /></symbol>
+<symbol id="soopifood-architecture-ico-browser" viewBox="0 0 24 24" fill="none" stroke="#006B42" stroke-width="2"><path d="M4 8h16M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12M8 4v4" /></symbol>
+<symbol id="soopifood-architecture-ico-db" viewBox="0 0 24 24" fill="none" stroke="#006B42" stroke-width="2"><path d="M4 6a8 3 0 1 0 16 0a8 3 0 1 0 -16 0M4 6v6a8 3 0 0 0 16 0v-6M4 12v6a8 3 0 0 0 16 0v-6" /></symbol>
+<symbol id="soopifood-architecture-ico-ai" viewBox="0 0 24 24" fill="none" stroke="#006B42" stroke-width="2"><path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6" /></symbol>
+<symbol id="soopifood-architecture-ico-shield" viewBox="0 0 24 24" fill="none" stroke="#006B42" stroke-width="2"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3M11 11a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M12 12l0 2.5" /></symbol>
+</defs>
+<rect id="bg" data-pptx-role="background" width="1280" height="720" fill="#FFFFFF" />
+<g id="heading" data-pptx-bounds="48 24 1184 68"><rect x="48" y="28" width="188" height="48" rx="8" fill="#006B42" /><text x="142" y="60" font-size="28" font-weight="bold" text-anchor="middle" fill="#FFFFFF">soopiFood</text><text x="260" y="63" font-size="40" font-weight="bold" fill="#153F32">Kiến trúc hệ thống</text></g>
+<g id="architecture" data-pptx-bounds="16 112 1248 584">
+<!-- Tầng giao diện, vùng dịch vụ và các kết nối được vẽ trước nội dung nút. -->
+<rect x="48" y="112" width="1184" height="144" rx="8" fill="#EFF7F1" stroke="#006B42" stroke-width="2" stroke-dasharray="8,5" />
+<rect x="48" y="340" width="760" height="236" rx="8" fill="#EFF7F1" stroke="#006B42" stroke-width="2" stroke-dasharray="8,5" />
+<g fill="none" stroke="#006B42" stroke-width="2">
+<line x1="220" y1="240" x2="220" y2="340" marker-end="url(#soopifood-architecture-arch-arrow)" />
+<line x1="636" y1="240" x2="636" y2="340" marker-end="url(#soopifood-architecture-arch-arrow)" />
+<line x1="1048" y1="240" x2="1048" y2="340" marker-end="url(#soopifood-architecture-arch-arrow)" />
+<line x1="864" y1="400" x2="808" y2="400" marker-end="url(#soopifood-architecture-arch-arrow)" />
+<line x1="864" y1="540" x2="808" y2="540" marker-end="url(#soopifood-architecture-arch-arrow)" />
+<line x1="248" y1="576" x2="248" y2="636" marker-end="url(#soopifood-architecture-arch-arrow)" />
+<line x1="1048" y1="592" x2="1048" y2="636" marker-end="url(#soopifood-architecture-arch-arrow)" />
+<path d="M68 192H32Q24 192 24 200V588Q24 596 32 596H828Q836 596 836 588V572Q836 564 844 564H864" stroke-dasharray="5,4" marker-end="url(#soopifood-architecture-arch-arrow)" />
+<path d="M1232 392H1248Q1256 392 1256 400V604Q1256 612 1248 612H1056Q1048 596 1040 612H656Q648 612 648 620V636" stroke-dasharray="5,4" marker-end="url(#soopifood-architecture-arch-arrow)" />
+</g>
+<g font-size="16" fill="#61766B">
+<rect x="236" y="276" width="188" height="24" fill="#FFFFFF" /><text x="244" y="294">HTTPS / REALTIME</text>
+<rect x="652" y="276" width="188" height="24" fill="#FFFFFF" /><text x="660" y="294">HTTPS / REALTIME</text>
+<rect x="1064" y="276" width="140" height="24" fill="#FFFFFF" /><text x="1072" y="294">HTTPS / JWT</text>
+<rect x="812" y="362" width="48" height="24" fill="#FFFFFF" /><text x="836" y="380" text-anchor="middle">RPC</text>
+<rect x="812" y="502" width="48" height="24" fill="#FFFFFF" /><text x="836" y="520" text-anchor="middle">RPC</text>
+<rect x="264" y="592" width="60" height="24" fill="#FFFFFF" /><text x="272" y="610">SQL</text>
+
+<rect x="664" y="612" width="44" height="20" fill="#FFFFFF" /><text x="686" y="628" text-anchor="middle">S3</text>
+</g>
+<!-- Ba ứng dụng sử dụng hệ thống. -->
+<text x="68" y="135" font-size="16" font-weight="bold" fill="#006B42">GIAO DIỆN &amp; NGƯỜI DÙNG</text>
+<g id="customer"><rect x="68" y="152" width="352" height="88" rx="8" fill="#FFFFFF" stroke="#D4E4D9" /><use href="#soopifood-architecture-ico-mobile" x="84" y="172" width="40" height="40" /><text x="140" y="187" font-weight="bold" fill="#153F32">App khách hàng</text><text x="140" y="218" font-size="16" fill="#61766B">Expo / React Native · iOS / Android</text></g>
+<g id="driver"><rect x="444" y="152" width="356" height="88" rx="8" fill="#FFFFFF" stroke="#D4E4D9" /><use href="#soopifood-architecture-ico-truck" x="460" y="172" width="40" height="40" /><text x="516" y="187" font-weight="bold" fill="#153F32">App tài xế</text><text x="516" y="218" font-size="20" fill="#61766B">Trạng thái · GPS · chat</text></g>
+<g id="admin-web"><rect x="824" y="152" width="388" height="88" rx="8" fill="#FFFFFF" stroke="#D4E4D9" /><use href="#soopifood-architecture-ico-browser" x="840" y="172" width="40" height="40" /><text x="896" y="187" font-weight="bold" fill="#153F32">Web quản trị</text><text x="896" y="218" font-size="20" fill="#61766B">Trình duyệt web</text></g>
+<!-- Supabase là backend quản lý, không phải tiến trình nằm trong Spring Boot. -->
+<g id="supabase"><use href="#soopifood-architecture-ico-shield" x="68" y="356" width="40" height="40" /><text x="124" y="376" font-size="28" font-weight="bold" fill="#006B42">Supabase — Backend dùng chung</text><text x="124" y="405" font-size="16" fill="#61766B">Dịch vụ được quản lý · Kiểm tra danh tính và quyền truy cập</text>
+<rect x="68" y="428" width="224" height="68" rx="8" fill="#FFFFFF" /><rect x="306" y="428" width="224" height="68" rx="8" fill="#FFFFFF" /><rect x="544" y="428" width="244" height="68" rx="8" fill="#FFFFFF" />
+<text x="84" y="454" font-size="20" font-weight="bold" fill="#153F32">Auth</text><text x="84" y="480" font-size="16" fill="#61766B">Email · OAuth · JWT</text>
+<text x="322" y="454" font-size="20" font-weight="bold" fill="#153F32">Data API / RPC</text><text x="322" y="480" font-size="16" fill="#61766B">Đọc dữ liệu · xử lý nghiệp vụ</text>
+<text x="560" y="454" font-size="20" font-weight="bold" fill="#153F32">Realtime</text><text x="560" y="480" font-size="16" fill="#61766B">Tin nhắn · cập nhật đơn</text>
+<text x="68" y="531" font-size="20" fill="#153F32">Đơn hàng · voucher · đánh giá · chat · tài xế</text><text x="68" y="559" font-size="16" fill="#61766B">RLS &amp; quyền RPC · Storage cho ảnh người dùng</text></g>
+<g id="admin-api"><rect x="864" y="340" width="368" height="108" rx="8" fill="#EFF7F1" stroke="#61766B" stroke-dasharray="6,4" /><use href="#soopifood-architecture-ico-browser" x="884" y="360" width="36" height="36" /><text x="936" y="370" font-weight="bold" fill="#153F32">API quản trị</text><text x="936" y="400" font-size="20" fill="#61766B">Node.js / Express</text><text x="884" y="430" font-size="16" fill="#61766B">JWT · quyền admin · CRUD · phân công</text></g>
+<g id="ai-service"><rect x="864" y="488" width="368" height="104" rx="8" fill="#EFF7F1" stroke="#006B42" stroke-dasharray="6,4" /><use href="#soopifood-architecture-ico-ai" x="884" y="508" width="36" height="36" /><text x="936" y="520" font-weight="bold" fill="#006B42">Backend AI</text><text x="936" y="548" font-size="20" fill="#61766B">Spring Boot / Spring AI</text><text x="884" y="576" font-size="16" fill="#61766B">App khách gọi HTTPS / SSE · tool + vector</text></g>
+<g id="database"><rect x="48" y="636" width="400" height="56" rx="8" fill="#EFF7F1" stroke="#006B42" /><use href="#soopifood-architecture-ico-db" x="68" y="646" width="36" height="36" /><text x="120" y="659" font-size="20" font-weight="bold" fill="#006B42">PostgreSQL + pgvector</text><text x="120" y="682" font-size="16" fill="#61766B">Nghiệp vụ + vector menu (Supabase)</text></g>
+<g id="media"><rect x="480" y="636" width="328" height="56" rx="8" fill="#FFFFFF" stroke="#61766B" stroke-dasharray="6,4" /><text x="500" y="659" font-size="20" font-weight="bold" fill="#153F32">Backblaze B2 + Cloudflare</text><text x="500" y="682" font-size="16" fill="#61766B">Upload S3 · link CDN tới app</text></g>
+<g id="gemini"><rect x="864" y="636" width="368" height="56" rx="8" fill="#FFFFFF" stroke="#006B42" stroke-dasharray="6,4" /><text x="884" y="659" font-size="20" font-weight="bold" fill="#006B42">Google Gemini</text><text x="884" y="682" font-size="16" fill="#61766B">Hội thoại · Tool Calling · Embedding</text></g>
+</g>
+<g id="footer" data-pptx-bounds="48 698 1184 22" fill="#61766B" font-size="16"><text x="48" y="713">Mũi tên thể hiện hướng gọi dịch vụ · Khóa đặc quyền được giữ ở backend</text><text x="1232" y="713" text-anchor="end">02 / 08</text></g>
+</svg>

@@ -1,0 +1,37 @@
+@startuml
+title UC-06 - AI suggestions with current catalog verification
+skinparam shadowing false
+actor Customer
+participant "AI screen / aiApi" as UI
+participant AiController as CTRL
+participant RecommendationService as SVC
+participant "SupabaseGateway / Auth" as DB
+participant "Gemini / FoodTools / Embeddings" as AI
+Customer -> UI : Message + delivery point
+UI -> CTRL : POST /api/ai/chat/stream\nJWT + question + limited history
+CTRL --> UI : SSE status
+CTRL -> SVC : stream(...)
+SVC -> DB : Authenticate token
+DB --> SVC : User session or error
+SVC -> SVC : Rate limit / worker capacity
+alt Unavailable, unauthorized or over limit
+  SVC --> CTRL : ApiFailure
+  CTRL --> UI : HTTP error / SSE error as applicable
+else Accepted
+  SVC -> DB : Check index availability
+  SVC -> AI : Generate / invoke food search tool
+  AI -> DB : Match vectors and filters
+  DB --> AI : Candidate foods
+  AI -> DB : Recheck current price / availability / range
+  DB --> AI : Verified foods
+  AI --> SVC : Text and bounded food results
+  SVC --> CTRL : onText / onResult
+  CTRL --> UI : SSE delta / result
+  UI -> UI : Validate result schema
+  UI --> Customer : Message + up to 5 food cards
+end
+note over Customer,UI
+Customer opens a food and checks out separately.
+AI does not create orders.
+end note
+@enduml

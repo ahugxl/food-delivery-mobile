@@ -1,0 +1,7 @@
+No,Filename,Width,Height,AspectRatio,PixelAspectRatio,SourceDisplayRatio,RatioSource,Format,HasTransparentPixels,UsageCount,DisplayRatioVariants,AssetKind,SvgRenderable,PptxNativeSupported,SizeKB,Category
+1,app-ai.png,720,1600,0.45,0.45,,native,PNG,False,1,,bitmap,True,True,449.8,Portrait
+2,app-checkout.png,428,918,0.47,0.47,,native,PNG,False,1,,bitmap,True,True,133.0,Portrait
+3,app-login.png,428,918,0.47,0.47,,native,PNG,False,1,,bitmap,True,True,141.5,Portrait
+4,app-search.png,428,918,0.47,0.47,,native,PNG,False,1,,bitmap,True,True,183.6,Portrait
+5,app-tracking.png,428,918,0.47,0.47,,native,PNG,False,1,,bitmap,True,True,321.2,Portrait
+6,logo.png,1024,1024,1.00,1.00,,native,PNG,False,1,,bitmap,True,True,1438.2,Near square

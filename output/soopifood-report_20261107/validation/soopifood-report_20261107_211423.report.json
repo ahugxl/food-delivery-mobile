@@ -1,0 +1,203 @@
+{
+  "schema": "ppt-master.pptx-postflight-report.v1",
+  "status": "passed-with-warnings",
+  "output": {
+    "path": "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107\\exports\\soopifood-report_20261107_211423.pptx",
+    "bytes": 1093440
+  },
+  "source": {
+    "svg_slide_count": 8,
+    "layout_definition_count": 0,
+    "fingerprint": {
+      "algorithm": "sha256",
+      "digest": "cb926458ffa3553cd9ce9acfb79541da5b3a76ccdddd2889d555b4f18e51bf3b",
+      "file_count": 8,
+      "files": [
+        {
+          "file": "01_soopifood.svg",
+          "sha256": "64b4c0bb4e22624c650c35f01c5b450114ad4bcf53a47e77ef98e01613fe684b"
+        },
+        {
+          "file": "02_kien_truc.svg",
+          "sha256": "9503e8d20aedfd51c1dd15670700bc73cec9e736c6522414d05bce79f98f4a80"
+        },
+        {
+          "file": "03_cong_nghe.svg",
+          "sha256": "078c413bb1ad2575de2f0ec4b2cfb36345d106a8b3fc79e01962e3647e971f88"
+        },
+        {
+          "file": "04_ui_ux.svg",
+          "sha256": "4cef78a5333e177a86f4bdbbc47b2bc5727954c1dbc22e3768efbc570b642085"
+        },
+        {
+          "file": "05_backend_database.svg",
+          "sha256": "511ebb48605019bf21b5874523e2695f7b50f3d92515105b1921611686dd8a64"
+        },
+        {
+          "file": "06_cache_ai.svg",
+          "sha256": "bc1d4949769552c0c9db3f1f113050481dfa6cf5f75ef3e61dedb041b8138a52"
+        },
+        {
+          "file": "07_sdlc_nhom.svg",
+          "sha256": "6795ad13452e007b58d6f892a589243870ecb3e38eae4b7c751cbd435dd819f5"
+        },
+        {
+          "file": "08_ket_qua.svg",
+          "sha256": "032b521d3bf9f26b1a087054ccf218d4c3f3fd10e3c68e2d162f734fbb6a2962"
+        }
+      ]
+    },
+    "authoring_roundtrip": null
+  },
+  "package": {
+    "zip_integrity": "passed",
+    "corrupt_member": null,
+    "slides": 8,
+    "notes": 8,
+    "masters": 1,
+    "layouts": 1
+  },
+  "checks": {
+    "zip_integrity": "passed",
+    "slide_count": "passed",
+    "internal_relationships": "enforced-at-build",
+    "structured_package": "not-applicable",
+    "transitions": "enforced-at-build",
+    "animations": "enforced-at-build",
+    "project_svg_contract": "enforced-at-build",
+    "compatibility_normalization": "not-applicable",
+    "authoring_roundtrip": "not-applicable",
+    "quality_gate": "passed",
+    "quality_warnings": "warning",
+    "template_tokens": "passed",
+    "external_images": "passed",
+    "font_portability": "passed"
+  },
+  "quality": {
+    "status": "loaded",
+    "path": "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107\\validation\\svg_quality_report.json",
+    "schema": "ppt-master.svg-quality-report.v1",
+    "stage": "final",
+    "source_match": "passed",
+    "source_fingerprint": {
+      "algorithm": "sha256",
+      "digest": "cb926458ffa3553cd9ce9acfb79541da5b3a76ccdddd2889d555b4f18e51bf3b",
+      "file_count": 8,
+      "files": [
+        {
+          "file": "01_soopifood.svg",
+          "sha256": "64b4c0bb4e22624c650c35f01c5b450114ad4bcf53a47e77ef98e01613fe684b"
+        },
+        {
+          "file": "02_kien_truc.svg",
+          "sha256": "9503e8d20aedfd51c1dd15670700bc73cec9e736c6522414d05bce79f98f4a80"
+        },
+        {
+          "file": "03_cong_nghe.svg",
+          "sha256": "078c413bb1ad2575de2f0ec4b2cfb36345d106a8b3fc79e01962e3647e971f88"
+        },
+        {
+          "file": "04_ui_ux.svg",
+          "sha256": "4cef78a5333e177a86f4bdbbc47b2bc5727954c1dbc22e3768efbc570b642085"
+        },
+        {
+          "file": "05_backend_database.svg",
+          "sha256": "511ebb48605019bf21b5874523e2695f7b50f3d92515105b1921611686dd8a64"
+        },
+        {
+          "file": "06_cache_ai.svg",
+          "sha256": "bc1d4949769552c0c9db3f1f113050481dfa6cf5f75ef3e61dedb041b8138a52"
+        },
+        {
+          "file": "07_sdlc_nhom.svg",
+          "sha256": "6795ad13452e007b58d6f892a589243870ecb3e38eae4b7c751cbd435dd819f5"
+        },
+        {
+          "file": "08_ket_qua.svg",
+          "sha256": "032b521d3bf9f26b1a087054ccf218d4c3f3fd10e3c68e2d162f734fbb6a2962"
+        }
+      ]
+    },
+    "summary": {
+      "total": 8,
+      "passed": 7,
+      "warnings": 1,
+      "errors": 0
+    },
+    "categories": {
+      "blocking": {
+        "count": 0,
+        "issues": []
+      },
+      "introduced": {
+        "count": 1,
+        "issues": [
+          {
+            "file": "01_soopifood.svg",
+            "message": "Image ../images/logo.png is 1024x1024 and renders at 0.07x scale in a 72x72 meet frame; the source is 1.4 MiB — file-size advisory only, not an aspect-ratio warning; consider a smaller source asset, or export with svg_to_pptx.py --image-sizing display to downsize at export time"
+          }
+        ]
+      },
+      "inherited": {
+        "count": 0,
+        "issues": []
+      },
+      "source-import": {
+        "count": 0,
+        "summary": {
+          "warning_count": 0,
+          "by_code": {}
+        }
+      }
+    }
+  },
+  "resources": {
+    "unresolved_template_tokens": [],
+    "fonts": {
+      "stacks": [
+        "Segoe UI, Arial"
+      ],
+      "generic_only_stacks": [],
+      "unsafe_exported_faces": []
+    },
+    "images": {
+      "data_uri": 0,
+      "local": 6,
+      "external": 0,
+      "external_references": []
+    }
+  },
+  "export_policy": {
+    "project_svg_contract": "strict",
+    "dangerous_normalization_count": 0
+  },
+  "deck_motion": {
+    "transition": {
+      "effect": null,
+      "effect_options": {},
+      "duration": 0.4,
+      "auto_advance": null,
+      "sound": null
+    },
+    "animation": {
+      "effect": "none",
+      "effect_request": null,
+      "duration": 0.4,
+      "stagger": 0.5,
+      "trigger": "after-previous"
+    },
+    "cli_overrides": {
+      "transition": false,
+      "transition_duration": false,
+      "auto_advance": false,
+      "transition_sound": false,
+      "animation": false,
+      "animation_duration": false,
+      "animation_stagger": false,
+      "animation_trigger": false
+    },
+    "narration_timings": false
+  },
+  "backup_path": "D:\\TBDD\\btl\\food-delivery\\output\\soopifood-report_20261107\\backup\\20261107_211423\\svg_output",
+  "conversion_trace_path": null
+}

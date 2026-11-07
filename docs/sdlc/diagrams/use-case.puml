@@ -1,0 +1,45 @@
+@startuml
+!pragma layout smetana
+left to right direction
+skinparam shadowing false
+title soopiFood - Use Case
+actor "Guest" as Guest
+actor "Customer" as Customer
+actor "Driver\n(external client)" as Driver
+actor "Admin\n(external client)" as Admin
+actor "Auth / Email provider" as Auth
+actor Gemini
+rectangle "soopiFood: customer app + backend" {
+  usecase "UC-01\nAccess account / Recover password" as U1
+  usecase "UC-02\nFind and configure food" as U2
+  usecase "UC-03\nPlace COD order" as U3
+  usecase "Validate cart, recipient,\nlocation and server prices" as VALID
+  usecase "Apply food / shipping voucher" as VOUCHER
+  usecase "UC-04\nTrack order / Chat" as U4
+  usecase "UC-05\nReview / Redeem points" as U5
+  usecase "UC-06\nAsk AI for food suggestions" as U6
+  usecase "UC-07\nManage profile / Addresses" as U7
+  usecase "UC-08\nFavorites / Collect campaign vouchers" as U8
+  usecase "UC-09\nDelivery and administration integration" as U9
+}
+Guest --> U1
+Customer --> U1
+Customer --> U2
+Customer --> U3
+Customer --> U4
+Customer --> U5
+Customer --> U6
+Customer --> U7
+Customer --> U8
+U3 ..> VALID : <<include>>
+VOUCHER ..> U3 : <<extend>>
+Driver --> U9
+Admin --> U9
+Driver --> U4
+Auth --> U1
+Gemini --> U6
+note bottom of U9
+Driver/admin UI is outside this repository.
+Backend contracts are present.
+end note
+@enduml

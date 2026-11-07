@@ -1,0 +1,95 @@
+{
+  "roles": {
+    "body": {
+      "family": "Segoe UI, Arial",
+      "size": 24.0,
+      "weight": "normal",
+      "cjk_chars_per_100px": 3.9,
+      "latin_chars_per_100px": 8.9,
+      "caps_chars_per_100px": 7.5,
+      "digits_chars_per_100px": 7.3,
+      "citation_chars_per_100px": 8.5,
+      "script_clusters_per_100px": {},
+      "longest_planned_line": {
+        "px": 3137.1,
+        "slide": "P06",
+        "text": "Cải tiến. Đóng góp ghi nhận trong Git: …"
+      }
+    },
+    "title": {
+      "family": "Segoe UI, Arial",
+      "size": 40.0,
+      "weight": "normal",
+      "cjk_chars_per_100px": 2.4,
+      "latin_chars_per_100px": 5.3,
+      "caps_chars_per_100px": 4.5,
+      "digits_chars_per_100px": 4.4,
+      "citation_chars_per_100px": 5.1,
+      "script_clusters_per_100px": {},
+      "longest_planned_line": {
+        "px": 806.0,
+        "slide": "P06",
+        "text": "SDLC: phát triển qua từng vòng hoàn thi…"
+      }
+    },
+    "subtitle": {
+      "family": "Segoe UI, Arial",
+      "size": 28.0,
+      "weight": "normal",
+      "cjk_chars_per_100px": 3.4,
+      "latin_chars_per_100px": 7.6,
+      "caps_chars_per_100px": 6.4,
+      "digits_chars_per_100px": 6.2,
+      "citation_chars_per_100px": 7.3,
+      "script_clusters_per_100px": {},
+      "longest_planned_line": {
+        "px": 993.0,
+        "slide": "P06",
+        "text": "Triển khai theo pha chức năng, kiểm tra…"
+      }
+    },
+    "annotation": {
+      "family": "Segoe UI, Arial",
+      "size": 16.0,
+      "weight": "normal",
+      "cjk_chars_per_100px": 5.9,
+      "latin_chars_per_100px": 13.3,
+      "caps_chars_per_100px": 11.3,
+      "digits_chars_per_100px": 10.9,
+      "citation_chars_per_100px": 12.7,
+      "script_clusters_per_100px": {},
+      "longest_planned_line": null
+    },
+    "display": {
+      "family": "Segoe UI, Arial",
+      "size": 64.0,
+      "weight": "normal",
+      "cjk_chars_per_100px": 1.5,
+      "latin_chars_per_100px": 3.3,
+      "caps_chars_per_100px": 2.8,
+      "digits_chars_per_100px": 2.7,
+      "citation_chars_per_100px": 3.2,
+      "script_clusters_per_100px": {},
+      "longest_planned_line": null
+    },
+    "label": {
+      "family": "Segoe UI, Arial",
+      "size": 20.0,
+      "weight": "normal",
+      "cjk_chars_per_100px": 4.7,
+      "latin_chars_per_100px": 10.7,
+      "caps_chars_per_100px": 9.0,
+      "digits_chars_per_100px": 8.7,
+      "citation_chars_per_100px": 10.2,
+      "script_clusters_per_100px": {},
+      "longest_planned_line": null
+    }
+  },
+  "script_samples": {},
+  "source": "spec_lock.md",
+  "generated_at": "2026-11-07T13:34:36Z",
+  "notes": [
+    "role display (64px, at least twice body) has no display_family and uses body_family; declare display_family if it is display type",
+    "every role is measured at normal weight; recalibrate a role realized as bold deck-wide with --role NAME:FAMILY:SIZE:bold: bold widens Latin and digits about 7%, while the bundled advance table gives CJK one width for both weights"
+  ]
+}
